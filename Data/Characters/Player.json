@@ -1,0 +1,6 @@
+{
+    "name": "Wolvey",
+    "type": "player",
+    "starting-hp": 100,
+    "ap-per-turn": 3
+}
