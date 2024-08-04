@@ -44,7 +44,10 @@ public:
 	VkDevice GetVulkanDevice() const;
 	VkRenderPass& GetRenderPass();
 	VkExtent2D GetSwapChainExtent() const;
+	VkFormat GetSwapChainFormat() const;
 	VkFramebuffer GetCurrentFramebuffer() const;
+	VkImage GetCurrentSwapChainImage() const;
+	VkImageView GetCurrentSwapChainImageView() const;
 	VkCommandPool GetCommandPool() const;
 	VkCommandBuffer GetCurrentCommandBuffer() const;
 	VkQueue GetGraphicsQueue() const;

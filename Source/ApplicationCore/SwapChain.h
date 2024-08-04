@@ -30,6 +30,8 @@ public:
 	void PresentNextImage(int currentImageIndex);
 
 	VkFramebuffer GetFramebuffer(int currentImageIndex) const;
+	VkImage GetImage(int currentImageIndex) const;
+	VkImageView GetImageView(int currentImageIndex) const;
 	VkFormat GetImageFormat() const;
 	VkExtent2D GetSwapExtent() const;
 	VkRenderPass& GetRenderPass();

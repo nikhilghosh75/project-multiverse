@@ -36,7 +36,7 @@ void SwapChain::Setup(VkPhysicalDevice device, VkSurfaceKHR surface)
     createInfo.imageExtent = extent;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
     createInfo.imageArrayLayers = 1;
-    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     indices = FindQueueFamilies(device, surface);
     uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -239,6 +239,16 @@ void SwapChain::PresentNextImage(int currentImageIndex)
 VkFramebuffer SwapChain::GetFramebuffer(int currentImageIndex) const
 {
     return swapChainFramebuffers[currentImageIndex];
+}
+
+VkImage SwapChain::GetImage(int currentImageIndex) const
+{
+    return swapChainImages[currentImageIndex];
+}
+
+VkImageView SwapChain::GetImageView(int currentImageIndex) const
+{
+    return swapChainImageViews[currentImageIndex];
 }
 
 VkFormat SwapChain::GetImageFormat() const
