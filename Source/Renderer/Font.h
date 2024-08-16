@@ -41,6 +41,8 @@ public:
 		int xAdvance;
 		Rect uvCoordinates;
 		glm::vec2 offset;
+		int ascent;
+		int decent;
 
 		bool operator<(const Character& other) const
 		{

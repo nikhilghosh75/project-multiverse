@@ -100,14 +100,17 @@ void Font::ReadFromTTFBuffer(void* data, uint32_t size)
 		charInfo.uvCoordinates.bottom = (float)bakedChar.y0 / bitmapResolution;
 		charInfo.uvCoordinates.right = (float)bakedChar.x1 / bitmapResolution;
 		charInfo.uvCoordinates.top = (float)bakedChar.y1 / bitmapResolution;
-		charInfo.offset = glm::vec2((float)bakedChar.xoff / bitmapResolution, (float)bakedChar.yoff / bitmapResolution);
+		charInfo.offset = glm::vec2((float)bakedChar.xoff, (float)bakedChar.yoff);
+
+		int x0, x1; // Unused currently
+		stbtt_GetCodepointBitmapBox(&fontInfo, glyphIndex, scale, scale, &x0, &charInfo.ascent, &x1, &charInfo.decent);
 
 		characters.push_back(charInfo);
 
 		currentChar++;
 	}
 
-	delete bakedChars;
+	delete[] bakedChars;
 }
 
 int Font::GetIdealBitmapResolution(int numCharacters)

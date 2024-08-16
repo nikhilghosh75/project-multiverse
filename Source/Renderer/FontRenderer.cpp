@@ -105,10 +105,15 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 		float uvWidth = character.uvCoordinates.right - character.uvCoordinates.left;
 		float normalizedCharWidth = uvWidth * font->GetBitmapWidth() * fontScale / width;
 
-		float bottom = currentCursorLocation.y;
-		float left = currentCursorLocation.x;
-		float top = currentCursorLocation.y + normalizedFontSize;
-		float right = currentCursorLocation.x + normalizedCharWidth;
+		float uvHeight = character.uvCoordinates.top - character.uvCoordinates.bottom;
+		float normalizedCharHeight = uvHeight * font->GetBitmapHeight() * fontScale / height;
+		glm::vec2 normalizedOffset = character.offset * (fontScale / width);
+		// glm::vec2 normalizedOffset = glm::vec2(0, 0);
+
+		float bottom = currentCursorLocation.y - normalizedCharHeight;
+		float left = currentCursorLocation.x + normalizedOffset.x;
+		float top = currentCursorLocation.y;
+		float right = left + normalizedCharWidth;
 
 		float uvBottom = character.uvCoordinates.bottom;
 		float uvLeft = character.uvCoordinates.left;
