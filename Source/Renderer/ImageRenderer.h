@@ -4,15 +4,25 @@
 #include "RenderPipeline.h"
 #include "Texture.h"
 
+class ImageRenderingOptions
+{
+public:
+	ImageRenderingOptions();
+
+	bool keepAspectRatio;
+};
+
 class ImageRenderer
 {
+	static inline ImageRenderingOptions defaultOptions;
+
 public:
 	ImageRenderer();
 	~ImageRenderer();
 
 	static ImageRenderer* Get();
 
-	void AddImage(Texture* texture, Rect rect);
+	void AddImage(Texture* texture, Rect rect, ImageRenderingOptions options = defaultOptions);
 
 	void Render();
 
@@ -28,6 +38,8 @@ private:
 		static VkVertexInputBindingDescription GetBindingDescription();
 		static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 	};
+
+	Rect FitRectToTexture(Rect currentRect);
 	
 	void CreatePipeline();
 	void CreateDescriptorSetLayout();

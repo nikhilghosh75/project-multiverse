@@ -1,11 +1,17 @@
 #include "ImageRenderer.h"
 #include "Device.h"
+#include "Window.h"
 #include <array>
 
 const std::vector<uint16_t> indices = 
 {
     0, 1, 2, 2, 3, 0
 };
+
+ImageRenderingOptions::ImageRenderingOptions()
+{
+    keepAspectRatio = false;
+}
 
 ImageRenderer::ImageRenderer()
 {
@@ -26,9 +32,12 @@ ImageRenderer* ImageRenderer::Get()
     return instance;
 }
 
-void ImageRenderer::AddImage(Texture* texture, Rect rect)
+void ImageRenderer::AddImage(Texture* texture, Rect rect, ImageRenderingOptions options)
 {
     currentTexture = texture;
+
+    if (options.keepAspectRatio)
+        rect = FitRectToTexture(rect);
 
     glm::vec2 bottomLeft = glm::vec2(rect.left, rect.bottom);
     glm::vec2 topLeft = glm::vec2(rect.left, rect.top);
@@ -53,6 +62,34 @@ void ImageRenderer::Render()
     UpdateDescriptorSets();
     PopulateBuffers();
     DispatchCommands();
+}
+
+Rect ImageRenderer::FitRectToTexture(Rect currentRect)
+{
+    if (!currentTexture)
+        return currentRect;
+
+    int width, height;
+    Window::GetWindowSize(&width, &height);
+
+    glm::vec2 screenDimensions = glm::vec2(
+        (currentRect.right - currentRect.left) * (float)width, (currentRect.bottom - currentRect.top) * (float)height);
+    float currentRatio = (float)screenDimensions.x / (float)screenDimensions.y;
+    float imageRatio = (float)currentTexture->GetTextureWidth() / (float)currentTexture->GetTextureHeight();
+
+    if (currentRatio > imageRatio)
+    {
+        screenDimensions.x = screenDimensions.y * imageRatio;
+    }
+    else if (currentRatio < imageRatio)
+    {
+        screenDimensions.y = screenDimensions.x / imageRatio;
+    }
+
+    glm::vec2 windowDimensions = glm::vec2(screenDimensions.x / width, screenDimensions.y / height);
+    currentRect.ResizeFromCenter(windowDimensions.x, windowDimensions.y);
+
+    return currentRect;
 }
 
 void ImageRenderer::CreatePipeline()
@@ -143,6 +180,8 @@ void ImageRenderer::UpdateDescriptorSets()
     descriptorWrites[0].pImageInfo = &imageInfo;
 
     vkUpdateDescriptorSets(Device::Get()->GetVulkanDevice(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+
+    currentTexture->TransitionLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void ImageRenderer::PopulateBuffers()
@@ -177,8 +216,8 @@ void ImageRenderer::DispatchCommands()
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = Device::Get()->GetSwapChainExtent();
 
-    VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 0.0f}} };
-    renderPassInfo.clearValueCount = 0;
+    VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
+    renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
