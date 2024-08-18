@@ -28,6 +28,11 @@ public:
 	VkSampler GetSampler() inline const { return textureSampler; }
 	VkImage GetImage() inline const { return textureImage; }
 
+	uint32_t GetTextureWidth() inline const { return textureWidth; }
+	uint32_t GetTextureHeight() inline const { return textureHeight; }
+
+	void TransitionLayout(VkImageLayout newLayout);
+
 private:
 	void SetupVulkanTexture(unsigned char* pixels);
 
@@ -35,6 +40,8 @@ private:
 
 	uint32_t textureWidth;
 	uint32_t textureHeight;
+
+	VkImageLayout currentLayout;
 
 	uint8_t textureChannels;
 	bool isInitialized;

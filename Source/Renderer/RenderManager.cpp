@@ -48,4 +48,9 @@ void RenderManager::StartFrame()
 void RenderManager::EndFrame()
 {
 	// See if any requests can be combined
+
+	Device::Get()->TransitionImageLayout(
+		Device::Get()->GetCurrentSwapChainImage(),
+		Device::Get()->GetSwapChainFormat(),
+		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
