@@ -116,11 +116,13 @@ void Window::Process()
 
 void Window::GetWindowSize(int* width, int* height)
 {
+	int titlebarHeight = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CXPADDEDBORDER);
 	RECT rect;
 	GetWindowRect(g_window, &rect);
 
-	*width = rect.right;
-	*height = rect.bottom;
+	// TODO: Figure out why there are 14 extra pixels
+	*width = rect.right - rect.left;
+	*height = rect.bottom - rect.top - titlebarHeight - 14;
 }
 
 void Window::ChangeKeyState(KeyCode keycode, bool justPressed)
