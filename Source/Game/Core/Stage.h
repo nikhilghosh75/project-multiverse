@@ -12,8 +12,17 @@ public:
 
 	virtual void Update() = 0;
 
+	virtual void Render() = 0;
+
 	virtual void OnStateAdd() {}
 	virtual void OnStateRemove() {}
+
+	bool BlocksInput() const { return blocksInput; }
+	bool BlocksRendering() const { return blocksRendering; }
+
+protected:
+	bool blocksInput;
+	bool blocksRendering;
 };
 
 class StageManager
@@ -32,7 +41,9 @@ public:
 private:
 	static inline std::vector<Stage*> stages;
 
+	static inline std::vector<Stage*> stagesDeletedThisFrame;
+
 	static inline Stage* nextStage;
 
-	static inline int popBackCount = 0;
+	static inline int startOfFrameCount = 0;
 };

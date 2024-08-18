@@ -14,11 +14,14 @@ void StageManager::AddStage(Stage* stage)
 
 void StageManager::PopStage()
 {
-	popBackCount++;
+	stagesDeletedThisFrame.push_back(stages[stages.size() - 1]);
+	stages.pop_back();
 }
 
 void StageManager::Update()
 {
+	startOfFrameCount = stages.size() - 1;
+
 	Stage* topStage = stages[stages.size() - 1];
 	if (topStage)
 	{
@@ -29,12 +32,13 @@ void StageManager::Update()
 		// Quit the game
 	}
 
-	for (int i = 0; i < popBackCount; i++)
+	for (int i = 0; i < stagesDeletedThisFrame.size(); i++)
 	{
-		stages[stages.size() - 1]->OnStateRemove();
-		delete stages[stages.size() - 1];
-		stages.pop_back();
+		stagesDeletedThisFrame[i]->OnStateRemove();
+		delete stagesDeletedThisFrame[i];
 	}
+
+	stagesDeletedThisFrame.clear();
 
 	if (nextStage != nullptr)
 	{
