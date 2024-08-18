@@ -131,9 +131,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Combat\Actions\Action.cpp" />
+    <ClCompile Include="Combat\Actions\MeleeAttack.cpp" />
+    <ClCompile Include="Combat\Characters\Character.cpp" />
+    <ClCompile Include="Combat\Characters\EnemyCharacter.cpp" />
+    <ClCompile Include="Combat\Characters\PlayerCharacter.cpp" />
+    <ClCompile Include="UI\Button.cpp" />
+    <ClCompile Include="UI\HUD\CombatHUD.cpp" />
+    <ClCompile Include="Combat\CombatStage.cpp" />
+    <ClCompile Include="Combat\EncounterInfo.cpp" />
     <ClCompile Include="Core\Game.cpp" />
+    <ClCompile Include="Core\PlayerState.cpp" />
+    <ClCompile Include="Core\RunManager.cpp" />
     <ClCompile Include="Core\Stage.cpp" />
     <ClCompile Include="Temp\TempStage.cpp" />
+    <ClCompile Include="UI\HUD\MainCombatHUDState.cpp" />
     <ClCompile Include="UI\Main Menu\StartScreenStage.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -148,8 +160,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Combat\Actions\Action.h" />
+    <ClInclude Include="Combat\Actions\MeleeAttack.h" />
+    <ClInclude Include="Combat\Characters\Character.h" />
+    <ClInclude Include="Combat\Characters\EnemyCharacter.h" />
+    <ClInclude Include="Combat\Characters\PlayerCharacter.h" />
+    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\HUD\CombatHUD.h" />
+    <ClInclude Include="Combat\CombatStage.h" />
+    <ClInclude Include="Combat\EncounterInfo.h" />
+    <ClInclude Include="Core\PlayerState.h" />
+    <ClInclude Include="Core\RunManager.h" />
     <ClInclude Include="Core\Stage.h" />
     <ClInclude Include="Temp\TempStage.h" />
+    <ClInclude Include="UI\HUD\MainCombatHUDState.h" />
     <ClInclude Include="UI\Main Menu\StartScreenStage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
