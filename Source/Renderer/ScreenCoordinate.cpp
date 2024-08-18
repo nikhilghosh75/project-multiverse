@@ -46,13 +46,13 @@ Rect ScreenCoordinate::CreateRect(ScreenCoordinate position, glm::vec2 dimension
 	Window::GetWindowSize(&width, &height);
 
 	glm::vec2 screenPosition = position.GetScreenPosition();
-	glm::vec2 screenDimensions = glm::vec2(dimensions.x / width, dimensions.y / height);
+	glm::vec2 screenDimensions = glm::vec2(dimensions.x / (float)width, dimensions.y / (float)height);
 
 	Rect rect;
 
-	rect.bottom = screenPosition.y - screenDimensions.y * pivot.y;
-	rect.top = screenPosition.y + screenDimensions.y * (1 - pivot.y);
-	rect.left = screenPosition.x + screenDimensions.x * pivot.x;
+	rect.bottom = screenPosition.y + screenDimensions.y * (1 - pivot.y);
+	rect.top = screenPosition.y - screenDimensions.y * pivot.y;
+	rect.left = screenPosition.x - screenDimensions.x * pivot.x;
 	rect.right = screenPosition.x + screenDimensions.x * (1 - pivot.x);
 
 	return rect;
