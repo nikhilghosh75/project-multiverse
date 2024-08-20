@@ -13,6 +13,8 @@ public:
 
 	void Render();
 
+	PlayerCharacter* GetPlayerCharacter() { return playerCharacter; }
+
 private:
 	PlayerCharacter* playerCharacter;
 

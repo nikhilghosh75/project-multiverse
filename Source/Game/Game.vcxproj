@@ -146,6 +146,7 @@
     <ClCompile Include="Core\Stage.cpp" />
     <ClCompile Include="Temp\TempStage.cpp" />
     <ClCompile Include="UI\HUD\MainCombatHUDState.cpp" />
+    <ClCompile Include="UI\HUD\MeleeCombatHUDState.cpp" />
     <ClCompile Include="UI\Main Menu\StartScreenStage.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +175,7 @@
     <ClInclude Include="Core\Stage.h" />
     <ClInclude Include="Temp\TempStage.h" />
     <ClInclude Include="UI\HUD\MainCombatHUDState.h" />
+    <ClInclude Include="UI\HUD\MeleeCombatHUDState.h" />
     <ClInclude Include="UI\Main Menu\StartScreenStage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

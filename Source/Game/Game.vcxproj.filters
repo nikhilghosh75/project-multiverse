@@ -63,6 +63,9 @@
     <ClCompile Include="Combat\Actions\MeleeAttack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\HUD\MeleeCombatHUDState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Temp\TempStage.h">
@@ -108,6 +111,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Combat\Actions\MeleeAttack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\MeleeCombatHUDState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

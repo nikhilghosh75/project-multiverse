@@ -2,6 +2,7 @@
 #include "Combat/CombatStage.h"
 #include "FontRenderer.h"
 #include "UI/Button.h"
+#include "MeleeCombatHUDState.h"
 
 #include <iostream>
 
@@ -28,7 +29,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 
 void MainCombatHUDState::OnMeleeButtonClicked()
 {
-	std::cout << "Melee Clicked" << std::endl;
+	CombatHUD::SetCurrentState(new MeleeCombatHUDState());
 }
 
 void MainCombatHUDState::OnGunButtonClicked()
