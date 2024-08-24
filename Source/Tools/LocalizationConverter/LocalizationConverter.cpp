@@ -1,16 +1,20 @@
 #include "CRC.h"
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <set>
+
+const int RESERVED_WORDS = 128;
 
 int main(char** argv, int argc)
 {
 	std::ifstream tempStream("C:/Users/debgh/source/repos/College Basketball Simuator/Data/English.txt");
 	char line[1024];
 	std::memset(line, 0, 1024);
-
-	char* wordBuffer = (char*)malloc(1048576);
-	int currentWordBufferPosition = 0;
+  
+	std::map<std::string, uint16_t> words;
+	int numWords = 0;
+	int currentWord = RESERVED_WORDS;
 
 	std::set<uint32_t> setOfCodes;
 	int numLines = 0;
@@ -48,13 +52,37 @@ int main(char** argv, int argc)
 		setOfCodes.insert(crc);
 		numLines++;
 
+		// Insert words in the string
+		int i = 0;
+		int lastWordIndex = 0;
+		while (valueStr[i] != '\0')
+		{
+			if (valueStr[i] == ' ')
+			{
+				std::string word = std::string(&valueStr[lastWordIndex], i - lastWordIndex);
+				if (words.find(word) == words.end())
+				{
+					words.insert({ word, currentWord });
+					currentWord++;
+				}
 
+				lastWordIndex = i + 1;
+				numWords++;
+			}
+			i++;
+		}
 
 		std::memset(line, 0, 1024);
 	}
 
+	for (auto it : words)
+	{
+		std::cout << it.first << " - " << it.second << std::endl;
+	}
+
 	std::cout << std::endl;
 	std::cout << "Lines: " << numLines << ", Keys: " << setOfCodes.size() << std::endl;
+	std::cout << "Words: " << numWords << ", Unique Words: " << words.size() << std::endl;
 
 	delete wordBuffer;
 }
