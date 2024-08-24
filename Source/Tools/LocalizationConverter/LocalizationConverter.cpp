@@ -11,7 +11,7 @@ int main(char** argv, int argc)
 	std::ifstream tempStream("C:/Users/debgh/source/repos/College Basketball Simuator/Data/English.txt");
 	char line[1024];
 	std::memset(line, 0, 1024);
-
+  
 	std::map<std::string, uint16_t> words;
 	int numWords = 0;
 	int currentWord = RESERVED_WORDS;
@@ -83,4 +83,6 @@ int main(char** argv, int argc)
 	std::cout << std::endl;
 	std::cout << "Lines: " << numLines << ", Keys: " << setOfCodes.size() << std::endl;
 	std::cout << "Words: " << numWords << ", Unique Words: " << words.size() << std::endl;
+
+	delete wordBuffer;
 }
