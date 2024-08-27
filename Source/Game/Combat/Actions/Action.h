@@ -10,9 +10,9 @@ protected:
 	bool requiresTarget = false;
 
 public:
-	virtual void Execute(CombatStage* stage);
+	virtual void Execute(CombatStage* stage, Character* executor);
 
-	virtual void ExecuteOnTarget(CombatStage* stage, Character* character);
+	virtual void ExecuteOnTarget(CombatStage* stage, Character* executor, Character* target);
 
 	int GetCost() const;
 	bool RequiresTarget() const;

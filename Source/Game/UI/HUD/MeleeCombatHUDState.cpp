@@ -1,4 +1,5 @@
 #include "MeleeCombatHUDState.h"
+#include "EnemyTurnHUDState.h"
 #include "Combat/CombatStage.h"
 #include "Combat/Actions/MeleeAttack.h"
 #include "Combat/Characters/PlayerCharacter.h"
@@ -6,6 +7,7 @@
 #include "UI/Button.h"
 
 MeleeCombatHUDState::MeleeCombatHUDState()
+	: selectedAttack(nullptr)
 {
 }
 
@@ -25,6 +27,19 @@ void MeleeCombatHUDState::Render(CombatStage* stage)
 				{
 					this->StartExecuteAction(attack, stage);
 				});
+		}
+	}
+}
+
+void MeleeCombatHUDState::OnTargetSelected(CombatStage* stage, Character* character)
+{
+	if (action != nullptr)
+	{
+		action->ExecuteOnTarget(stage, stage->GetCurrentTurnCharacter(), character);
+		if (stage->GetPlayerCharacter()->GetActionPoints() == 0)
+		{
+			stage->AdvanceTurn();
+			CombatHUD::SetCurrentState(new EnemyTurnHUDState());
 		}
 	}
 }
