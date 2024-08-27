@@ -30,3 +30,8 @@ void Rect::ResizeFromCenter(float newWidth, float newHeight)
 	top = centerY - newHeight / 2;
 	bottom = centerY + newHeight / 2;
 }
+
+bool Rect::IsPointInside(float x, float y)
+{
+	return left < x && right > x && bottom > y && top < y;
+}

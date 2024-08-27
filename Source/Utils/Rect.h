@@ -16,5 +16,7 @@ public:
 	float Height() const;
 
 	void ResizeFromCenter(float newWidth, float newHeight);
+
+	bool IsPointInside(float x, float y);
 };
 
