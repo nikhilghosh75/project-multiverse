@@ -10,6 +10,9 @@ PlayerCharacter::PlayerCharacter()
 	: playerState(nullptr)
 {
 	texture = new Texture("Data/Sprites/Player/Wolvey.png");
+	type = CharacterType::Player;
+
+	screenPosition = playerScreenPosition;
 
 	AddTempAbilities();
 }
@@ -18,6 +21,9 @@ PlayerCharacter::PlayerCharacter(PlayerState* _playerState)
 	: playerState(_playerState)
 {
 	texture = new Texture("Data/Sprites/Player/Wolvey.png");
+	type = CharacterType::Player;
+
+	screenPosition = playerScreenPosition;
 
 	Setup(playerState->health);
 

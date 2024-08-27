@@ -4,6 +4,8 @@
 #include "glm/glm.hpp"
 #include "Texture.h"
 
+class CombatStage;
+
 enum class CharacterType
 {
 	Player,
@@ -24,9 +26,15 @@ public:
 	glm::vec2 screenPosition;
 
 	virtual void Damage(int damage);
+	virtual void DeductActionPoints(int actionPoints);
+
+	virtual void OnTurnStart(CombatStage* stage) {}
+	virtual void OnTurnUpdate(CombatStage* stage) {}
 
 	int GetHealth() const;
 	int GetActionPoints() const;
+
+	bool IsDead() const;
 
 	std::vector<Action*> actions;
 

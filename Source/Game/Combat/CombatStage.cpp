@@ -23,11 +23,15 @@ CombatStage::CombatStage(EncounterInfo& info)
 		enemies.push_back(enemyCharacter);
 	}
 
+	currentTurnCharacter = playerCharacter;
+
 	CombatHUD::Initialize();
 }
 
 void CombatStage::Update()
 {
+	currentTurnCharacter->OnTurnUpdate(this);
+
 	playerCharacter->Render();
 
 	for (int i = 0; i < enemies.size(); i++)
@@ -41,4 +45,45 @@ void CombatStage::Update()
 void CombatStage::Render()
 {
 
+}
+
+void CombatStage::AdvanceTurn()
+{
+	do
+	{
+		if (currentTurnCharacter == playerCharacter)
+		{
+			currentTurnCharacter = enemies[0];
+		}
+		else
+		{
+			for (int i = 0; i < enemies.size(); i++)
+			{
+				if (currentTurnCharacter == enemies[i])
+				{
+					if (i == enemies.size() - 1)
+					{
+						currentTurnCharacter = playerCharacter;
+					}
+					else
+					{
+						currentTurnCharacter = enemies[i + 1];
+					}
+					break;
+				}
+			}
+		}
+	} while (!currentTurnCharacter->IsDead());
+
+	currentTurnCharacter->OnTurnStart(this);
+}
+
+std::vector<glm::vec2>& CombatStage::GetEnemyPositions()
+{
+	return enemyPositions[enemies.size()];
+}
+
+std::vector<EnemyCharacter*>& CombatStage::GetEnemyCharacters()
+{
+	return enemies;
 }

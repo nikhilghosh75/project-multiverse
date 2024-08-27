@@ -12,6 +12,17 @@ public:
 
 	void Render();
 
+	void OnTurnStart(CombatStage* stage);
+	void OnTurnUpdate(CombatStage* stage);
+
 private:
-	glm::vec2 renderPosition;
+	enum class State
+	{
+		Deciding,
+		Attacking,
+		Cooldown
+	};
+
+	State currentState = State::Deciding;
+	float timeLeftInState = 0.f;
 };

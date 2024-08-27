@@ -26,6 +26,8 @@ void StartScreenStage::Update()
 		EnemyInfo debufferInfo;
 		debufferInfo.enemyName = "Debuffer";
 		debufferInfo.texture = new Texture("Data/Sprites/Enemies/Debuffer.png");
+		debufferInfo.startingHealth = 40;
+		debufferInfo.enemyAttack = new MeleeAttack("Head Butt", 7, 2, 2);
 		info.enemies.push_back(debufferInfo);
 		
 		CombatStage* combatStage = new CombatStage(info);
