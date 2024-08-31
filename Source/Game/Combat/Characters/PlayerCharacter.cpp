@@ -2,6 +2,7 @@
 #include "ScreenCoordinate.h"
 #include "Rect.h"
 #include "ImageRenderer.h"
+#include "Combat/Actions/GunAttack.h"
 #include "Combat/Actions/MeleeAttack.h"
 
 const glm::vec2 playerScreenPosition = glm::vec2(0.2f, 0.4f);
@@ -45,4 +46,5 @@ void PlayerCharacter::AddTempAbilities()
 {
 	actions.push_back(new MeleeAttack("Teleporting Sword (IO)", 9, 3, 3));
 	actions.push_back(new MeleeAttack("Standard Punch", 5, 1, 2));
+	actions.push_back(new GunAttack("Blubberbus (Curse of the Corsair)", 4, 2, 1, 1, 2));
 }

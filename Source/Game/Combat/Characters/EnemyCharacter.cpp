@@ -51,7 +51,7 @@ void EnemyCharacter::OnTurnUpdate(CombatStage* stage)
 		switch (currentState)
 		{
 		case State::Attacking:
-			actions[0]->ExecuteOnTarget(stage, this, stage->GetPlayerCharacter());
+			actions[0]->StartExecuteOnTarget(stage, this, stage->GetPlayerCharacter());
 			currentState = State::Cooldown;
 			timeLeftInState = cooldownTime;
 			break;

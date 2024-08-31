@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Combat/CombatStage.h"
 
 Character::Character()
 {
@@ -23,6 +24,29 @@ void Character::DeductActionPoints(int actionCost)
 
 	if (actionPoints < 0)
 		actionPoints = 0;
+}
+
+void Character::OnTurnUpdate(CombatStage* stage)
+{
+	if (currentAction != nullptr)
+	{
+		currentAction->UpdateExecute(stage, this);
+	}
+}
+
+void Character::StartAction(Action* action)
+{
+	currentAction = action;
+}
+
+void Character::EndAction(CombatStage* stage)
+{
+	currentAction = nullptr;
+
+	if (actionPoints <= 0)
+	{
+		stage->AdvanceTurn();
+	}
 }
 
 int Character::GetHealth() const

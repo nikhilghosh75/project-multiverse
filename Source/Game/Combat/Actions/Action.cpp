@@ -2,11 +2,15 @@
 #include "Combat/CombatStage.h"
 #include "Combat/Characters/Character.h"
 
-void Action::Execute(CombatStage* stage, Character* executor)
+void Action::StartExecute(CombatStage* stage, Character* executor)
 {
 }
 
-void Action::ExecuteOnTarget(CombatStage* stage, Character* executor, Character* target)
+void Action::StartExecuteOnTarget(CombatStage* stage, Character* executor, Character* target)
+{
+}
+
+void Action::UpdateExecute(CombatStage* stage, Character* executor)
 {
 }
 

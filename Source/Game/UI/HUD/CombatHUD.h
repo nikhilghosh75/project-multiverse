@@ -16,6 +16,7 @@ public:
 
 	virtual void Render(CombatStage* stage) = 0;
 
+	virtual void OnTurnAdvanced(CombatStage* stage) { }
 	virtual void OnTargetSelected(CombatStage* stage, Character* character) { }
 
 protected:
@@ -47,6 +48,8 @@ public:
 	static void Render(CombatStage* stage);
 
 	static void SetCurrentState(CombatHUDState* newState);
+
+	static CombatHUDState* GetCurrentStage();
 
 	static void AddDamageNumber(FloatingDamageNumber damageNumber);
 

@@ -10,9 +10,10 @@ MeleeAttack::MeleeAttack(std::string name, int damage, int variance, int cost)
 	this->cost = cost;
 
 	this->requiresTarget = true;
+	this->instant = true;
 }
 
-void MeleeAttack::ExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* target)
+void MeleeAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* target)
 {
 	CalculateDamage();
 

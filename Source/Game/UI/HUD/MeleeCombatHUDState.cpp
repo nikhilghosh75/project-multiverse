@@ -15,18 +15,19 @@ void MeleeCombatHUDState::Render(CombatStage* stage)
 {
 	PlayerCharacter* playerCharacter = stage->GetPlayerCharacter();
 
-	int numMeleeActions = 0;
+	int meleeIndex = 0;
 	for (int i = 0; i < playerCharacter->actions.size(); i++)
 	{
 		MeleeAttack* attack = dynamic_cast<MeleeAttack*>(playerCharacter->actions[i]);
 
 		if (attack)
 		{
-			FontRenderer::Get()->AddText(attack->GetDisplayName(), glm::vec2(-0.8, 0.45 + i * 0.12), 14);
-			Button::Add(Rect(0.43 + i * 0.12, 0.53 + i * 0.12, -0.85, -0.55), [this, stage, attack]() 
+			FontRenderer::Get()->AddText(attack->GetDisplayName(), glm::vec2(-0.8, 0.45 + meleeIndex * 0.12), 14);
+			Button::Add(Rect(0.43 + meleeIndex * 0.12, 0.53 + meleeIndex * 0.12, -0.85, -0.55), [this, stage, attack]() 
 				{
 					this->StartExecuteAction(attack, stage);
 				});
+			meleeIndex++;
 		}
 	}
 }
@@ -35,11 +36,13 @@ void MeleeCombatHUDState::OnTargetSelected(CombatStage* stage, Character* charac
 {
 	if (action != nullptr)
 	{
-		action->ExecuteOnTarget(stage, stage->GetCurrentTurnCharacter(), character);
-		if (stage->GetPlayerCharacter()->GetActionPoints() == 0)
-		{
-			stage->AdvanceTurn();
-			CombatHUD::SetCurrentState(new EnemyTurnHUDState());
-		}
+		character->StartAction(action);
+		action->StartExecuteOnTarget(stage, stage->GetCurrentTurnCharacter(), character);
+		character->EndAction(stage);
 	}
+}
+
+void MeleeCombatHUDState::OnTurnAdvanced(CombatStage* stage)
+{
+	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
 }

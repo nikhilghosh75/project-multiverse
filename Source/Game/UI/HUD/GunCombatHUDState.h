@@ -1,12 +1,13 @@
 #pragma once
+
 #include "CombatHUD.h"
 
-class MeleeAttack;
+class GunAttack;
 
-class MeleeCombatHUDState : public CombatHUDState
+class GunCombatHUDState : public CombatHUDState
 {
 public:
-	MeleeCombatHUDState();
+	GunCombatHUDState();
 
 	void Render(CombatStage* stage);
 
@@ -14,5 +15,5 @@ public:
 	void OnTurnAdvanced(CombatStage* stage);
 
 private:
-	MeleeAttack* selectedAttack;
+	GunAttack* selectedAttack;
 };

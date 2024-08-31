@@ -29,7 +29,11 @@ public:
 	virtual void DeductActionPoints(int actionPoints);
 
 	virtual void OnTurnStart(CombatStage* stage) {}
-	virtual void OnTurnUpdate(CombatStage* stage) {}
+
+	virtual void OnTurnUpdate(CombatStage* stage);
+
+	void StartAction(Action* action);
+	void EndAction(CombatStage* stage);
 
 	int GetHealth() const;
 	int GetActionPoints() const;
@@ -46,4 +50,5 @@ protected:
 	void Setup(int startingHealth);
 
 	Texture* texture;
+	Action* currentAction;
 };

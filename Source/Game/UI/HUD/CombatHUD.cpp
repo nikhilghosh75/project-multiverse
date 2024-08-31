@@ -39,6 +39,11 @@ void CombatHUD::SetCurrentState(CombatHUDState* newState)
 	currentState = newState;
 }
 
+CombatHUDState* CombatHUD::GetCurrentStage()
+{
+	return currentState;
+}
+
 void CombatHUD::AddDamageNumber(FloatingDamageNumber damageNumber)
 {
 	damageNumbers.push_back(damageNumber);
@@ -121,7 +126,7 @@ void CombatHUDState::StartExecuteAction(Action* action, CombatStage* combatStage
 	}
 	else
 	{
-		action->Execute(combatStage, combatStage->GetCurrentTurnCharacter());;
+		action->StartExecute(combatStage, combatStage->GetCurrentTurnCharacter());;
 	}
 }
 

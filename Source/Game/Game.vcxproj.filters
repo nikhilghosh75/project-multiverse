@@ -72,6 +72,12 @@
     <ClCompile Include="UI\HUD\EnemyTurnHUDState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI\HUD\GunCombatHUDState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Combat\Actions\GunAttack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Temp\TempStage.h">
@@ -126,6 +132,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\HUD\EnemyTurnHUDState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\HUD\GunCombatHUDState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Combat\Actions\GunAttack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

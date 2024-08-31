@@ -75,6 +75,7 @@ void CombatStage::AdvanceTurn()
 		}
 	} while (!currentTurnCharacter->IsDead());
 
+	CombatHUD::GetCurrentStage()->OnTurnAdvanced(this);
 	currentTurnCharacter->OnTurnStart(this);
 }
 
