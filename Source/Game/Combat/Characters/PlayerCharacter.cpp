@@ -5,6 +5,7 @@
 #include "Combat/Actions/GuardAction.h"
 #include "Combat/Actions/GunAttack.h"
 #include "Combat/Actions/MeleeAttack.h"
+#include "Combat/Actions/PassAction.h"
 
 const glm::vec2 playerScreenPosition = glm::vec2(0.2f, 0.4f);
 
@@ -52,4 +53,5 @@ void PlayerCharacter::AddTempAbilities()
 	actions.push_back(new GunAttack("Blubberbus (Curse of the Corsair)", 4, 2, 1, 1, 2));
 	actions.push_back(new GuardAction("Weak Guard", 2, 1));
 	actions.push_back(new GuardAction("Strong Guard", 4, 2));
+	actions.push_back(new PassAction());
 }

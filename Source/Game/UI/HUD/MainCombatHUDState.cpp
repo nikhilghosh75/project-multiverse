@@ -1,7 +1,9 @@
 #include "MainCombatHUDState.h"
 #include "Combat/CombatStage.h"
+#include "Combat/Actions/PassAction.h"
 #include "FontRenderer.h"
 #include "UI/Button.h"
+#include "EnemyTurnHUDState.h"
 #include "GuardCombatHUDState.h"
 #include "GunCombatHUDState.h"
 #include "MeleeCombatHUDState.h"
@@ -26,7 +28,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 	Button::Add(Rect(0.67, 0.77, -0.85, -0.55), [this]() { this->OnGuardButtonClicked(); });
 
 	FontRenderer::Get()->AddText("Pass", glm::vec2(-0.8, 0.81), 14);
-	Button::Add(Rect(0.79, 0.89, -0.85, -0.55), [this]() { this->OnPassButtonClicked(); });
+	Button::Add(Rect(0.79, 0.89, -0.85, -0.55), [this, stage]() { this->OnPassButtonClicked(stage); });
 }
 
 void MainCombatHUDState::OnMeleeButtonClicked()
@@ -44,7 +46,19 @@ void MainCombatHUDState::OnGuardButtonClicked()
 	CombatHUD::SetCurrentState(new GuardCombatHUDState());
 }
 
-void MainCombatHUDState::OnPassButtonClicked()
+void MainCombatHUDState::OnPassButtonClicked(CombatStage* stage)
 {
-	std::cout << "Pass Clicked" << std::endl;
+	PassAction* passAction = stage->GetCurrentTurnCharacter()->FindFirstActionOfType<PassAction>();
+
+	if (passAction)
+	{
+		stage->GetCurrentTurnCharacter()->StartAction(passAction);
+		passAction->StartExecute(stage, stage->GetCurrentTurnCharacter());
+		stage->GetCurrentTurnCharacter()->EndAction(stage);
+	}
+}
+
+void MainCombatHUDState::OnTurnAdvanced(CombatStage* stage)
+{
+	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
 }

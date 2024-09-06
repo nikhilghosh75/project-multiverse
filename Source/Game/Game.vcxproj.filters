@@ -84,6 +84,9 @@
     <ClCompile Include="Combat\Actions\GuardAction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Combat\Actions\PassAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Temp\TempStage.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Combat\Actions\GuardAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Combat\Actions\PassAction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

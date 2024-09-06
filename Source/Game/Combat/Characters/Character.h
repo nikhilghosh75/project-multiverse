@@ -46,6 +46,21 @@ public:
 
 	std::vector<Action*> actions;
 
+	template<typename T> T* FindFirstActionOfType()
+	{
+		for (int i = 0; i < actions.size(); i++)
+		{
+			T* t = dynamic_cast<T*>(actions[i]);
+
+			if (t)
+			{
+				return t;
+			}
+		}
+
+		return nullptr;
+	}
+
 protected:
 	int maxHealth;
 	int health;

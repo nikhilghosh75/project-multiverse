@@ -135,6 +135,7 @@
     <ClCompile Include="Combat\Actions\GuardAction.cpp" />
     <ClCompile Include="Combat\Actions\GunAttack.cpp" />
     <ClCompile Include="Combat\Actions\MeleeAttack.cpp" />
+    <ClCompile Include="Combat\Actions\PassAction.cpp" />
     <ClCompile Include="Combat\Characters\Character.cpp" />
     <ClCompile Include="Combat\Characters\EnemyCharacter.cpp" />
     <ClCompile Include="Combat\Characters\PlayerCharacter.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Combat\Actions\GuardAction.h" />
     <ClInclude Include="Combat\Actions\GunAttack.h" />
     <ClInclude Include="Combat\Actions\MeleeAttack.h" />
+    <ClInclude Include="Combat\Actions\PassAction.h" />
     <ClInclude Include="Combat\Characters\Character.h" />
     <ClInclude Include="Combat\Characters\EnemyCharacter.h" />
     <ClInclude Include="Combat\Characters\PlayerCharacter.h" />

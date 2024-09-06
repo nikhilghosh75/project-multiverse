@@ -15,5 +15,7 @@ private:
 
 	void OnGuardButtonClicked();
 
-	void OnPassButtonClicked();
+	void OnPassButtonClicked(CombatStage* stage);
+
+	void OnTurnAdvanced(CombatStage* stage);
 };
