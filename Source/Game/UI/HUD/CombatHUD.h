@@ -6,6 +6,7 @@ class CombatStage;
 class Action;
 class Character;
 class Texture;
+class VectorPainter;
 
 class CombatHUDState
 {
@@ -59,11 +60,17 @@ private:
 	static void RenderCrosshair(glm::vec2 position);
 	static inline Texture* crosshairTexture;
 
+	// Damage Numbers
 	static void RenderDamageNumbers(CombatStage* stage);
 	static inline std::vector<FloatingDamageNumber> damageNumbers;
 
+	// Current Turn Triangle
 	static void RenderCurrentTurnTriangle(CombatStage* stage);
 	static inline Texture* triangleTexture;
+
+	// Character HUDs
+	static void RenderCharacterHUDs(CombatStage* stage);
+	static void RenderCharacterHUD(CombatStage* stage, Character* character, VectorPainter* painter);
 
 	static inline CombatHUDState* currentState;
 };

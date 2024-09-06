@@ -48,11 +48,11 @@ void GunAttack::ExecuteShot(CombatStage* combatStage, Character* executor)
 		currentShot++;
 
 		int damage = baseDamage + std::rand() % damageVariance;
-		target->Damage(damage);
+		int actualDamage = target->Damage(damage);
 
 		glm::vec2 damageNumberPosition = target->screenPosition + glm::vec2(0.05, -0.05);
 		damageNumberPosition = damageNumberPosition * 2.f - glm::vec2(1.f, 1.f);
-		CombatHUD::AddDamageNumber(FloatingDamageNumber(damage, damageNumberPosition, 2.f));
+		CombatHUD::AddDamageNumber(FloatingDamageNumber(actualDamage, damageNumberPosition, 2.f));
 
 		time += timeBetweenShots;
 	}

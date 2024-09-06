@@ -17,12 +17,12 @@ void MeleeAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* exec
 {
 	CalculateDamage();
 
-	target->Damage(lastDamage);
+	int actualDamage = target->Damage(lastDamage);
 	executor->DeductActionPoints(cost);
 
 	glm::vec2 damageNumberPosition = target->screenPosition + glm::vec2(0.05, -0.05);
 	damageNumberPosition = damageNumberPosition * 2.f - glm::vec2(1.f, 1.f);
-	CombatHUD::AddDamageNumber(FloatingDamageNumber(lastDamage, damageNumberPosition, 2.f));
+	CombatHUD::AddDamageNumber(FloatingDamageNumber(actualDamage, damageNumberPosition, 2.f));
 }
 
 int MeleeAttack::CalculateDamage()
