@@ -2,6 +2,7 @@
 #include "Combat/CombatStage.h"
 #include "FontRenderer.h"
 #include "UI/Button.h"
+#include "GuardCombatHUDState.h"
 #include "GunCombatHUDState.h"
 #include "MeleeCombatHUDState.h"
 
@@ -40,7 +41,7 @@ void MainCombatHUDState::OnGunButtonClicked()
 
 void MainCombatHUDState::OnGuardButtonClicked()
 {
-	std::cout << "Guard Clicked" << std::endl;
+	CombatHUD::SetCurrentState(new GuardCombatHUDState());
 }
 
 void MainCombatHUDState::OnPassButtonClicked()
