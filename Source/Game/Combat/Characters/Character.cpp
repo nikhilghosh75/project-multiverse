@@ -3,9 +3,11 @@
 
 Character::Character()
 {
+	maxHealth = 0;
 	health = 0;
 	texture = nullptr;
 	actionPoints = 0;
+	defense = 0;
 }
 
 Character::~Character()
@@ -13,9 +15,12 @@ Character::~Character()
 
 }
 
-void Character::Damage(int damage)
+int Character::Damage(int damage)
 {
-	health -= damage;
+	int actualDamage = damage > defense ? damage - defense : 0;
+	health -= actualDamage;
+
+	return actualDamage;
 }
 
 void Character::DeductActionPoints(int actionCost)
@@ -54,17 +59,27 @@ int Character::GetHealth() const
 	return health;
 }
 
+int Character::GetMaxHealth() const
+{
+	return maxHealth;
+}
+
 int Character::GetActionPoints() const
 {
 	return actionPoints;
 }
 
+int Character::GetDefense() const
+{
+	return defense;
+}
+
+void Character::IncreaseDefense(int defenseIncrease)
+{
+	defense += defenseIncrease;
+}
+
 bool Character::IsDead() const
 {
 	return health >= 0;
-}
-
-void Character::Setup(int startingHealth)
-{
-	health = startingHealth;
 }

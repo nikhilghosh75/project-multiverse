@@ -2,6 +2,7 @@
 #include "ScreenCoordinate.h"
 #include "Rect.h"
 #include "ImageRenderer.h"
+#include "Combat/Actions/GuardAction.h"
 #include "Combat/Actions/GunAttack.h"
 #include "Combat/Actions/MeleeAttack.h"
 
@@ -26,7 +27,9 @@ PlayerCharacter::PlayerCharacter(PlayerState* _playerState)
 
 	screenPosition = playerScreenPosition;
 
-	Setup(playerState->health);
+	health = playerState->health;
+	maxHealth = playerState->maxHealth;
+	defense = 0;
 
 	AddTempAbilities();
 }
@@ -47,4 +50,6 @@ void PlayerCharacter::AddTempAbilities()
 	actions.push_back(new MeleeAttack("Teleporting Sword (IO)", 9, 3, 3));
 	actions.push_back(new MeleeAttack("Standard Punch", 5, 1, 2));
 	actions.push_back(new GunAttack("Blubberbus (Curse of the Corsair)", 4, 2, 1, 1, 2));
+	actions.push_back(new GuardAction("Weak Guard", 2, 1));
+	actions.push_back(new GuardAction("Strong Guard", 4, 2));
 }

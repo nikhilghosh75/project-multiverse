@@ -23,7 +23,9 @@ EnemyCharacter::EnemyCharacter(EnemyInfo& info, glm::vec2 _renderPosition)
 
 	actions.push_back(info.enemyAttack);
 
-	Setup(info.startingHealth);
+	health = info.startingHealth;
+	maxHealth = info.startingHealth;
+	defense = 0;
 }
 
 void EnemyCharacter::Render()

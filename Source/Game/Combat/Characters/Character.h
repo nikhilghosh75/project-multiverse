@@ -25,7 +25,7 @@ public:
 
 	glm::vec2 screenPosition;
 
-	virtual void Damage(int damage);
+	virtual int Damage(int damage); // Returns the actual amount of damage done
 	virtual void DeductActionPoints(int actionPoints);
 
 	virtual void OnTurnStart(CombatStage* stage) {}
@@ -36,18 +36,22 @@ public:
 	void EndAction(CombatStage* stage);
 
 	int GetHealth() const;
+	int GetMaxHealth() const;
 	int GetActionPoints() const;
+	int GetDefense() const;
+
+	void IncreaseDefense(int defenseIncrease);
 
 	bool IsDead() const;
 
 	std::vector<Action*> actions;
 
-private:
+protected:
+	int maxHealth;
 	int health;
 	int actionPoints;
 
-protected:
-	void Setup(int startingHealth);
+	int defense;
 
 	Texture* texture;
 	Action* currentAction;
