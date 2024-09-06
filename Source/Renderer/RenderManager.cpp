@@ -10,12 +10,14 @@ RenderManager::~RenderManager()
 {
 	delete fontRenderer;
 	delete imageRenderer;
+	delete vectorRenderer;
 }
 
 void RenderManager::Setup()
 {	
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
+	vectorRenderer = new VectorRenderer();
 }
 
 void RenderManager::StartFrame()
