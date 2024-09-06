@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Combat\Actions\Action.cpp" />
+    <ClCompile Include="Combat\Actions\GuardAction.cpp" />
     <ClCompile Include="Combat\Actions\GunAttack.cpp" />
     <ClCompile Include="Combat\Actions\MeleeAttack.cpp" />
     <ClCompile Include="Combat\Characters\Character.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="Core\Stage.cpp" />
     <ClCompile Include="Temp\TempStage.cpp" />
     <ClCompile Include="UI\HUD\EnemyTurnHUDState.cpp" />
+    <ClCompile Include="UI\HUD\GuardCombatHUDState.cpp" />
     <ClCompile Include="UI\HUD\GunCombatHUDState.cpp" />
     <ClCompile Include="UI\HUD\MainCombatHUDState.cpp" />
     <ClCompile Include="UI\HUD\MeleeCombatHUDState.cpp" />
@@ -166,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Combat\Actions\Action.h" />
+    <ClInclude Include="Combat\Actions\GuardAction.h" />
     <ClInclude Include="Combat\Actions\GunAttack.h" />
     <ClInclude Include="Combat\Actions\MeleeAttack.h" />
     <ClInclude Include="Combat\Characters\Character.h" />
@@ -181,6 +184,7 @@
     <ClInclude Include="Core\Stage.h" />
     <ClInclude Include="Temp\TempStage.h" />
     <ClInclude Include="UI\HUD\EnemyTurnHUDState.h" />
+    <ClInclude Include="UI\HUD\GuardCombatHUDState.h" />
     <ClInclude Include="UI\HUD\GunCombatHUDState.h" />
     <ClInclude Include="UI\HUD\MainCombatHUDState.h" />
     <ClInclude Include="UI\HUD\MeleeCombatHUDState.h" />
