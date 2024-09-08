@@ -73,4 +73,5 @@ private:
 	static void RenderCharacterHUD(CombatStage* stage, Character* character, VectorPainter* painter);
 
 	static inline CombatHUDState* currentState;
+	static inline CombatHUDState* previousState;
 };

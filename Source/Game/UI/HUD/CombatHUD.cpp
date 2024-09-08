@@ -21,6 +21,7 @@ const float healthBarWidth = 0.08f;
 void CombatHUD::Initialize()
 {
 	currentState = new MainCombatHUDState();
+	previousState = nullptr;
 
 	crosshairTexture = new Texture("Data/Sprites/UI/Crosshair.png");
 	triangleTexture = new Texture("Data/Sprites/UI/Red Triangle.png");
@@ -28,6 +29,12 @@ void CombatHUD::Initialize()
 
 void CombatHUD::Render(CombatStage* stage)
 {
+	if (previousState)
+	{
+		delete previousState;
+		previousState = nullptr;
+	}
+
 	currentState->Render(stage);
 
 	if (currentState->isSelectingTarget)
@@ -42,6 +49,7 @@ void CombatHUD::Render(CombatStage* stage)
 
 void CombatHUD::SetCurrentState(CombatHUDState* newState)
 {
+	previousState = currentState;
 	currentState = newState;
 }
 
