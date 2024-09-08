@@ -80,6 +80,8 @@ public:
 	// Create a buffer from a vector (uploading the contents of the vector into the buffer's memory)
 	template<typename T> void CreateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory, VkBufferUsageFlags flags);
 
+	template<typename T> void PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory);
+
 private:
 	static inline Device* device;
 
@@ -148,6 +150,26 @@ inline void Device::CreateBufferFromVector(const std::vector<T>& vector, VkBuffe
 	vkUnmapMemory(vulkanDevice, stagingBufferMemory);
 
 	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | flags, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, memory);
+
+	CopyBuffer(stagingBuffer, buffer, bufferSize);
+
+	vkDestroyBuffer(vulkanDevice, stagingBuffer, nullptr);
+	vkFreeMemory(vulkanDevice, stagingBufferMemory, nullptr);
+}
+
+template<typename T>
+inline void Device::PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory)
+{
+	VkDeviceSize bufferSize = sizeof(vector[0]) * vector.size();
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	void* data;
+	vkMapMemory(vulkanDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, vector.data(), (size_t)bufferSize);
+	vkUnmapMemory(vulkanDevice, stagingBufferMemory);
 
 	CopyBuffer(stagingBuffer, buffer, bufferSize);
 

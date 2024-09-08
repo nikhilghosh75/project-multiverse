@@ -5,6 +5,7 @@
 #include "Rect.h"
 #include "RenderPipeline.h"
 #include "ScreenCoordinate.h"
+#include <array>
 
 class VectorPainter
 {
@@ -73,13 +74,14 @@ private:
 		static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 	};
 
+	void CreateBuffers();
 	void CreatePipeline();
 	void CreateDescriptorSetLayout();
 	void CreateDescriptorPool();
 	void CreateDescriptorSets();
 
 	void UpdateDescriptorSets();
-	void CreateBuffers();
+	void PopulateBuffers();
 	void DispatchCommands();
 
 	void Render();
@@ -90,10 +92,15 @@ private:
 
 	glm::vec2 ConvertToRenderSpace(glm::vec2 point, ScreenSpace space) const;
 
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
-	VkBuffer indexBuffer;
-	VkDeviceMemory indexBufferMemory;
+	static const int MAX_REQUESTS_IN_FLIGHT = 5;
+	static const int MAX_VERTICES_IN_REQUEST = 4096;
+
+	unsigned int currentIndex = 0;
+
+	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> vertexBuffers;
+	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> vertexBufferMemories;
+	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> indexBuffers;
+	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> indexBufferMemories;
 
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSet descriptorSet;

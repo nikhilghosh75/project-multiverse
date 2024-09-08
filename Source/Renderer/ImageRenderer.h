@@ -3,6 +3,7 @@
 #include "Rect.h"
 #include "RenderPipeline.h"
 #include "Texture.h"
+#include <array>
 
 class ImageRenderingOptions
 {
@@ -41,6 +42,7 @@ private:
 
 	Rect FitRectToTexture(Rect currentRect);
 	
+	void CreateBuffers();
 	void CreatePipeline();
 	void CreateDescriptorSetLayout();
 	void CreateDescriptorPool();
@@ -54,15 +56,19 @@ private:
 
 	RenderPipeline pipeline;
 
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
-	VkBuffer indexBuffer;
-	VkDeviceMemory indexBufferMemory;
+	static const int MAX_REQUESTS_IN_FLIGHT = 5;
+	static const int MAX_VERTICES_IN_REQUEST = 512;
+
+	unsigned int currentIndex = 0;
+
+	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> vertexBuffers;
+	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> vertexBufferMemories;
+	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> indexBuffers;
+	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> indexBufferMemories;
 
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;
-	// std::vector<VkDescriptorSet> descriptorSets;
 
 	std::vector<Vertex> vertices;
 	Texture* currentTexture;

@@ -57,6 +57,7 @@ VectorRenderer::VectorRenderer()
 {
 	instance = this;
 
+	CreateBuffers();
 	CreateDescriptorSetLayout();
 	CreatePipeline();
 	CreateDescriptorPool();
@@ -89,6 +90,26 @@ void VectorRenderer::SubmitPainter(const VectorPainter& painter)
 	if (vertices.size() > 0)
 	{
 		Render();
+	}
+}
+
+void VectorRenderer::CreateBuffers()
+{
+	for (int i = 0; i < MAX_REQUESTS_IN_FLIGHT; i++)
+	{
+		VkDeviceSize vertexBufferSize = MAX_VERTICES_IN_REQUEST * sizeof(Vertex);
+		Device::Get()->CreateBuffer(vertexBufferSize,
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			vertexBuffers[i],
+			vertexBufferMemories[i]);
+
+		VkDeviceSize indexBufferSize = MAX_VERTICES_IN_REQUEST * sizeof(unsigned int);
+		Device::Get()->CreateBuffer(indexBufferSize,
+			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			indexBuffers[i],
+			indexBufferMemories[i]);
 	}
 }
 
@@ -161,10 +182,10 @@ void VectorRenderer::UpdateDescriptorSets()
 	
 }
 
-void VectorRenderer::CreateBuffers()
+void VectorRenderer::PopulateBuffers()
 {
-	Device::Get()->CreateBufferFromVector(vertices, vertexBuffer, vertexBufferMemory, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-	Device::Get()->CreateBufferFromVector(indices, indexBuffer, indexBufferMemory, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex]);
+	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
 }
 
 void VectorRenderer::DispatchCommands()
@@ -215,11 +236,11 @@ void VectorRenderer::DispatchCommands()
 	scissor.extent = Device::Get()->GetSwapChainExtent();
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	VkBuffer vertexBuffers[] = { vertexBuffer };
+	VkBuffer bindableVertexBuffers[] = { vertexBuffers[currentIndex]};
 	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, bindableVertexBuffers, offsets);
 
-	vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, indexBuffers[currentIndex], 0, VK_INDEX_TYPE_UINT16);
 
 	// VkDescriptorSet& descriptorSet = descriptorSets[Device::GetFrameNumber() % MAX_FRAMES_IN_FLIGHT];
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
@@ -247,12 +268,13 @@ void VectorRenderer::DispatchCommands()
 	indices.clear();
 	currentLayer = 0;
 	maxLayers = 0;
+	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
 }
 
 void VectorRenderer::Render()
 {
 	UpdateDescriptorSets();
-	CreateBuffers();
+	PopulateBuffers();
 	DispatchCommands();
 }
 
