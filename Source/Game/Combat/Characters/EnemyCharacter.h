@@ -15,6 +15,8 @@ public:
 	void OnTurnStart(CombatStage* stage);
 	void OnTurnUpdate(CombatStage* stage);
 
+	void OnDeath();
+
 private:
 	enum class State
 	{
@@ -25,4 +27,6 @@ private:
 
 	State currentState = State::Deciding;
 	float timeLeftInState = 0.f;
+
+	bool shouldRender = true;
 };

@@ -133,7 +133,10 @@ void CombatHUD::RenderCharacterHUDs(CombatStage* stage)
 
 	for (Character* enemy : stage->GetEnemyCharacters())
 	{
-		RenderCharacterHUD(stage, enemy, &painter);
+		if (!enemy->IsDead())
+		{
+			RenderCharacterHUD(stage, enemy, &painter);
+		}
 	}
 
 	VectorRenderer::Get()->SubmitPainter(painter);

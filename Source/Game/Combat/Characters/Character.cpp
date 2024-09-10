@@ -20,6 +20,11 @@ int Character::Damage(int damage)
 	int actualDamage = damage > defense ? damage - defense : 0;
 	health -= actualDamage;
 
+	if (health < 0)
+	{
+		OnDeath();
+	}
+
 	return actualDamage;
 }
 
@@ -81,5 +86,5 @@ void Character::IncreaseDefense(int defenseIncrease)
 
 bool Character::IsDead() const
 {
-	return health >= 0;
+	return health <= 0;
 }

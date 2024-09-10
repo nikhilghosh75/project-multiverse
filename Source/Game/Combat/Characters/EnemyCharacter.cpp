@@ -30,6 +30,11 @@ EnemyCharacter::EnemyCharacter(EnemyInfo& info, glm::vec2 _renderPosition)
 
 void EnemyCharacter::Render()
 {
+	if (!shouldRender)
+	{
+		return;
+	}
+
 	ScreenCoordinate enemyPosition = ScreenCoordinate(glm::vec2(0, 0), screenPosition);
 	Rect rect = ScreenCoordinate::CreateRect(enemyPosition, glm::vec2(80, 120), glm::vec2(0.5, 0.5));
 
@@ -70,4 +75,9 @@ void EnemyCharacter::OnTurnUpdate(CombatStage* stage)
 			}
 		}
 	}
+}
+
+void EnemyCharacter::OnDeath()
+{
+	shouldRender = false;
 }

@@ -32,6 +32,8 @@ public:
 
 	virtual void OnTurnUpdate(CombatStage* stage);
 
+	virtual void OnDeath() { }
+
 	void StartAction(Action* action);
 	void EndAction(CombatStage* stage);
 

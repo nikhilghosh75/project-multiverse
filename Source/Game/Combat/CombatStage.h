@@ -23,6 +23,8 @@ public:
 	Character* GetCurrentTurnCharacter() { return currentTurnCharacter; }
 
 private:
+	void ProcessBattleOver();
+
 	PlayerCharacter* playerCharacter;
 
 	Character* currentTurnCharacter;

@@ -1,6 +1,8 @@
 #include "CombatStage.h"
 #include "Core/RunManager.h"
 #include "UI/HUD/CombatHUD.h"
+#include "Temp/TempDefeatStage.h"
+#include "Temp/TempVictoryStage.h"
 
 // TODO: Maybe change this to somewhere else
 std::vector<std::vector<glm::vec2>> enemyPositions =
@@ -40,6 +42,8 @@ void CombatStage::Update()
 	}
 
 	CombatHUD::Render(this);
+
+	ProcessBattleOver();
 }
 
 void CombatStage::Render()
@@ -73,7 +77,7 @@ void CombatStage::AdvanceTurn()
 				}
 			}
 		}
-	} while (!currentTurnCharacter->IsDead());
+	} while (currentTurnCharacter->IsDead());
 
 	CombatHUD::GetCurrentStage()->OnTurnAdvanced(this);
 	currentTurnCharacter->OnTurnStart(this);
@@ -87,4 +91,31 @@ std::vector<glm::vec2>& CombatStage::GetEnemyPositions()
 std::vector<EnemyCharacter*>& CombatStage::GetEnemyCharacters()
 {
 	return enemies;
+}
+
+void CombatStage::ProcessBattleOver()
+{
+	if (playerCharacter->IsDead())
+	{
+		// Go to Death Screen
+		StageManager::AddStage(new TempDefeatStage());
+	}
+	else
+	{
+		bool allEnemiesDead = true;
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			if (!enemies[i]->IsDead())
+			{
+				allEnemiesDead = false;
+				break;
+			}
+		}
+
+		if (allEnemiesDead)
+		{
+			// Go to Victory Screen
+			StageManager::AddStage(new TempVictoryStage());
+		}
+	}
 }
