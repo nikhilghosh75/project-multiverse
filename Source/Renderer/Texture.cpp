@@ -4,6 +4,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <iostream>
+
 Texture::Texture()
 {
 	isInitialized = false;
@@ -52,6 +54,17 @@ Texture::~Texture()
 	vkFreeMemory(Device::Get()->GetVulkanDevice(), textureImageMemory, nullptr);
 }
 
+void Texture::TransitionLayout(VkImageLayout newLayout)
+{
+	if (currentLayout == newLayout)
+	{
+		return;
+	}
+
+	Device::Get()->TransitionImageLayout(textureImage, GetIdealImageFormat(textureChannels), currentLayout, newLayout);
+	currentLayout = newLayout;
+}
+
 void Texture::SetupVulkanTexture(unsigned char* pixels)
 {
 	VkDeviceSize imageSize = textureHeight * textureWidth * textureChannels;
@@ -98,6 +111,8 @@ void Texture::SetupVulkanTexture(unsigned char* pixels)
 
 	Device::Get()->TransitionImageLayout(textureImage, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	Device::Get()->CopyBufferToImage(stagingBuffer, textureImage, static_cast<uint32_t>(textureWidth), static_cast<uint32_t>(textureHeight));
+
+	currentLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 
 	vkDestroyBuffer(Device::Get()->GetVulkanDevice(), stagingBuffer, nullptr);
 	vkFreeMemory(Device::Get()->GetVulkanDevice(), stagingBufferMemory, nullptr);

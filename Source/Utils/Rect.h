@@ -1,5 +1,6 @@
 #pragma once
 
+// Bottom is bigger than the top
 class Rect
 {
 public:
@@ -13,5 +14,9 @@ public:
 
 	float Width() const;
 	float Height() const;
+
+	void ResizeFromCenter(float newWidth, float newHeight);
+
+	bool IsPointInside(float x, float y);
 };
 

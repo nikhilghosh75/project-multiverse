@@ -3,6 +3,7 @@
 #include "RenderManager.h"
 #include "Window.h"
 #include "Stage.h"
+#include "Time.h"
 #include <windows.h>
 
 int main()
@@ -12,10 +13,13 @@ int main()
     RenderManager renderingManager;
     renderingManager.Setup();
 
+    Time::Initialize();
     StageManager::Initialize();
 
     while (Window::windowRunning)
     {
+        Time::Update();
+
         window.Process();
         Device::Get()->StartFrame();
         renderingManager.StartFrame();

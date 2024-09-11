@@ -6,6 +6,8 @@ class StartScreenStage : public Stage
 public:
 	void Update();
 
+	void Render();
+
 private:
 
 };

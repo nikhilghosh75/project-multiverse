@@ -1,6 +1,7 @@
 #pragma once
 #include "FontRenderer.h"
 #include "ImageRenderer.h"
+#include "VectorRenderer.h"
 
 class RenderManager
 {
@@ -15,4 +16,5 @@ public:
 private:
 	FontRenderer* fontRenderer;
 	ImageRenderer* imageRenderer;
+	VectorRenderer* vectorRenderer;
 };

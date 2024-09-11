@@ -63,7 +63,7 @@ private:
 	void CreatePipeline();
 
 	void UpdateDescriptorSets();
-	void CreateBuffers();
+	void PopulateBuffers();
 	void DispatchCommands();
 
 	void Render();
@@ -71,20 +71,21 @@ private:
 	std::vector<FontVertex> vertices;
 	std::vector<unsigned int> indices;
 
-	VkBuffer fontVertexBuffer;
-	VkDeviceMemory fontVertexBufferMemory;
-	VkBuffer fontIndexBuffer;
-	VkDeviceMemory fontIndexBufferMemory;
+	static const int MAX_REQUESTS_IN_FLIGHT = 5;
+	static const int MAX_VERTICES_IN_REQUEST = 2048;
+
+	unsigned int currentIndex = 0;
+	
+	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> fontVertexBuffers;
+	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> fontVertexBufferMemories;
+	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> fontIndexBuffers;
+	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> fontIndexBufferMemories;
 
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSetLayout descriptorSetLayout;
 	std::vector<VkDescriptorSet> descriptorSets;
 	VkSampler sampler;
 
-	VkSemaphore renderFinishedSemaphore;
-
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
-
-	// RenderPipeline pipeline;
 };

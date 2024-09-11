@@ -57,6 +57,22 @@ FontRenderer::FontRenderer()
 		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 	);
 
+	for (int i = 0; i < MAX_REQUESTS_IN_FLIGHT; i++)
+	{
+		VkDeviceSize vertexBufferSize = MAX_VERTICES_IN_REQUEST * sizeof(FontVertex);
+		Device::Get()->CreateBuffer(vertexBufferSize, 
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+			fontVertexBuffers[i], 
+			fontVertexBufferMemories[i]);
+
+		VkDeviceSize indexBufferSize = MAX_VERTICES_IN_REQUEST * sizeof(unsigned int);
+		Device::Get()->CreateBuffer(indexBufferSize,
+			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			fontIndexBuffers[i],
+			fontIndexBufferMemories[i]);
+	}
 
 	CreatePipeline();
 }
@@ -105,10 +121,15 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 		float uvWidth = character.uvCoordinates.right - character.uvCoordinates.left;
 		float normalizedCharWidth = uvWidth * font->GetBitmapWidth() * fontScale / width;
 
-		float bottom = currentCursorLocation.y;
-		float left = currentCursorLocation.x;
-		float top = currentCursorLocation.y + normalizedFontSize;
-		float right = currentCursorLocation.x + normalizedCharWidth;
+		float uvHeight = character.uvCoordinates.top - character.uvCoordinates.bottom;
+		float normalizedCharHeight = uvHeight * font->GetBitmapHeight() * fontScale / height;
+		glm::vec2 normalizedOffset = character.offset * (fontScale / width);
+		// glm::vec2 normalizedOffset = glm::vec2(0, 0);
+
+		float bottom = currentCursorLocation.y - normalizedCharHeight;
+		float left = currentCursorLocation.x + normalizedOffset.x;
+		float top = currentCursorLocation.y;
+		float right = left + normalizedCharWidth;
 
 		float uvBottom = character.uvCoordinates.bottom;
 		float uvLeft = character.uvCoordinates.left;
@@ -338,10 +359,10 @@ void FontRenderer::UpdateDescriptorSets()
 	vkUpdateDescriptorSets(Device::Get()->GetVulkanDevice(), 1, &setWrites[0], 0, nullptr);
 }
 
-void FontRenderer::CreateBuffers()
+void FontRenderer::PopulateBuffers()
 {
-	Device::Get()->CreateBufferFromVector(vertices, fontVertexBuffer, fontVertexBufferMemory, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-	Device::Get()->CreateBufferFromVector(indices, fontIndexBuffer, fontIndexBufferMemory, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+	Device::Get()->PopulateBufferFromVector(vertices, fontVertexBuffers[currentIndex], fontIndexBufferMemories[currentIndex]);
+	Device::Get()->PopulateBufferFromVector(indices, fontIndexBuffers[currentIndex], fontIndexBufferMemories[currentIndex]);
 }
 
 void FontRenderer::DispatchCommands()
@@ -392,11 +413,11 @@ void FontRenderer::DispatchCommands()
 	scissor.extent = Device::Get()->GetSwapChainExtent();
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	VkBuffer vertexBuffers[] = { fontVertexBuffer };
+	VkBuffer vertexBuffers[] = { fontVertexBuffers[currentIndex]};
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-	vkCmdBindIndexBuffer(commandBuffer, fontIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
+	vkCmdBindIndexBuffer(commandBuffer, fontIndexBuffers[currentIndex], 0, VK_INDEX_TYPE_UINT32);
 
 	VkDescriptorSet& descriptorSet = descriptorSets[Device::GetFrameNumber() % MAX_FRAMES_IN_FLIGHT];
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
@@ -423,12 +444,14 @@ void FontRenderer::DispatchCommands()
 
 void FontRenderer::Render()
 {
-	CreateBuffers();
+	PopulateBuffers();
 	UpdateDescriptorSets();
 	DispatchCommands();
 
 	indices.clear();
 	vertices.clear();
+
+	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
 }
 
 FontVertex::FontVertex(glm::vec2 _position, glm::vec2 _uvCoordinate)

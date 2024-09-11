@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Device.h"
 #include "Input.h"
+#include <windowsx.h>
 
 HINSTANCE g_window_instance;
 HWND g_window;
@@ -116,11 +117,13 @@ void Window::Process()
 
 void Window::GetWindowSize(int* width, int* height)
 {
+	int titlebarHeight = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CXPADDEDBORDER);
 	RECT rect;
 	GetWindowRect(g_window, &rect);
 
-	*width = rect.right;
-	*height = rect.bottom;
+	// TODO: Figure out why there are 14 extra pixels
+	*width = rect.right - rect.left;
+	*height = rect.bottom - rect.top - titlebarHeight - 14;
 }
 
 void Window::ChangeKeyState(KeyCode keycode, bool justPressed)
@@ -131,6 +134,11 @@ void Window::ChangeKeyState(KeyCode keycode, bool justPressed)
 void Window::ChangeMouseState(MouseButton button, bool justPressed)
 {
 	Input::ChangeMouseState(button, justPressed);
+}
+
+void Window::ChangeMousePosition(int x, int y)
+{
+	Input::ChangeMousePosition(x, y);
 }
 
 KeyCode Window::SystemParamToKeycode(unsigned int param)
@@ -178,6 +186,13 @@ LRESULT WndProc(HWND window, int wm, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_KEYDOWN:
 
+		break;
+	case WM_MOUSEMOVE:
+	{
+		int x = GET_X_LPARAM(lParam);
+		int y = GET_Y_LPARAM(lParam);
+		Window::ChangeMousePosition(x, y);
+	}
 		break;
 	case WM_SIZE:
 	{

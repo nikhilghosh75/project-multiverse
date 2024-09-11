@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "Window.h"
 
 bool Input::GetMouseButton(MouseButton button)
 {
@@ -37,6 +38,20 @@ bool Input::GetMouseButtonUp(MouseButton button)
 	}
 
 	return false;
+}
+
+glm::vec2 Input::GetMousePosition()
+{
+	return Input::mousePosition;
+}
+
+glm::vec2 Input::GetMouseNormalizedPosition()
+{
+	int width;
+	int height;
+	Window::GetWindowSize(&width, &height);
+
+	return glm::vec2(Input::mousePosition.x / width, Input::mousePosition.y / height);
 }
 
 void Input::Initialize()
@@ -141,4 +156,9 @@ void Input::ChangeMouseState(MouseButton button, bool justPressed)
 			break;
 		}
 	}
+}
+
+void Input::ChangeMousePosition(float x, float y)
+{
+	mousePosition = glm::vec2(x, y);
 }

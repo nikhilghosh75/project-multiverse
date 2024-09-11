@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <stdint.h>
+#include "glm/glm.hpp"
 
 enum class InputType
 {
@@ -191,15 +192,20 @@ public:
 	static bool GetMouseButtonDown(MouseButton button);
 	static bool GetMouseButtonUp(MouseButton button);
 
+	static glm::vec2 GetMousePosition();
+	static glm::vec2 GetMouseNormalizedPosition();
+
 private:
 	static inline std::array<KeyStatus, (size_t)KeyCode::KEY_CODE_END> keyStatuses;
 	static inline MouseStatus leftMouseStatus;
 	static inline MouseStatus rightMouseStatus;
 	static inline MouseStatus middleMouseStatus;
+	static inline glm::vec2 mousePosition;
 
 	static void Initialize();
 	static void Update();
 
 	static void ChangeKeyState(KeyCode keycode, bool justPressed);
 	static void ChangeMouseState(MouseButton button, bool justPressed);
+	static void ChangeMousePosition(float x, float y);
 };

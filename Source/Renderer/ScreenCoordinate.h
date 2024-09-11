@@ -2,7 +2,7 @@
 #include "glm/glm.hpp"
 #include "Rect.h"
 
-enum Anchor
+enum class Anchor
 {
 	TopLeft,
 	TopCenter,
@@ -13,6 +13,13 @@ enum Anchor
 	BottomLeft,
 	BottomMiddle,
 	BottomRight
+};
+
+enum class ScreenSpace
+{
+	Rendering, // -1 to 1
+	Screen, // 0 to 1
+	Pixel // 0 to (width, height)
 };
 
 class ScreenCoordinate

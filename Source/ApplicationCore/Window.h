@@ -22,6 +22,7 @@ public:
 
 	static void ChangeKeyState(KeyCode keycode, bool justPressed);
 	static void ChangeMouseState(MouseButton button, bool justPressed);
+	static void ChangeMousePosition(int x, int y);
 
 	static void OnResize(unsigned int width, unsigned int height);
 

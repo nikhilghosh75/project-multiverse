@@ -303,7 +303,11 @@ VkCommandBuffer Device::BeginSingleTimeCommands()
 /// </summary>
 void Device::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 {
-    vkEndCommandBuffer(commandBuffer);
+    VkResult result = vkEndCommandBuffer(commandBuffer);
+    if (result != VK_SUCCESS)
+    {
+        std::cout << "Result" << std::endl;
+    }
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -314,6 +318,7 @@ void Device::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
     vkQueueWaitIdle(graphicsQueue);
 
     vkFreeCommandBuffers(vulkanDevice, commandPool, 1, &commandBuffer);
+    vkResetCommandPool(vulkanDevice, commandPool, VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT);
 }
 
 /// <summary>
