@@ -10,6 +10,7 @@ protected:
 	int cost;
 	bool requiresTarget = false;
 	bool instant = false;
+	bool immediatelyEndsTurn = false;
 
 public:
 	virtual void StartExecute(CombatStage* stage, Character* executor);
@@ -22,4 +23,5 @@ public:
 
 	int GetCost() const;
 	bool RequiresTarget() const;
+	bool EndsTurn() const;
 };

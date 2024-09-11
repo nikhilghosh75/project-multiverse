@@ -36,6 +36,12 @@ void Character::DeductActionPoints(int actionCost)
 		actionPoints = 0;
 }
 
+void Character::OnTurnStart(CombatStage* stage)
+{
+	actionPoints += actionPointsPerTurn;
+	defense = 0;
+}
+
 void Character::OnTurnUpdate(CombatStage* stage)
 {
 	if (currentAction != nullptr)
@@ -51,12 +57,12 @@ void Character::StartAction(Action* action)
 
 void Character::EndAction(CombatStage* stage)
 {
-	currentAction = nullptr;
-
-	if (actionPoints <= 0)
+	if (actionPoints <= 0 || currentAction->EndsTurn())
 	{
 		stage->AdvanceTurn();
 	}
+
+	currentAction = nullptr;
 }
 
 int Character::GetHealth() const

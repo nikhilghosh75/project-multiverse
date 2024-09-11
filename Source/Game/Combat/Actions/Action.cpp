@@ -4,6 +4,7 @@
 
 void Action::StartExecute(CombatStage* stage, Character* executor)
 {
+	
 }
 
 void Action::StartExecuteOnTarget(CombatStage* stage, Character* executor, Character* target)
@@ -22,4 +23,9 @@ int Action::GetCost() const
 bool Action::RequiresTarget() const
 {
 	return requiresTarget;
+}
+
+bool Action::EndsTurn() const
+{
+	return immediatelyEndsTurn;
 }

@@ -26,6 +26,7 @@ CombatStage::CombatStage(EncounterInfo& info)
 	}
 
 	currentTurnCharacter = playerCharacter;
+	currentTurnCharacter->OnTurnStart(this);
 
 	CombatHUD::Initialize();
 }

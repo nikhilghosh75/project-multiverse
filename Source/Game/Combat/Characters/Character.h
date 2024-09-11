@@ -28,14 +28,14 @@ public:
 	virtual int Damage(int damage); // Returns the actual amount of damage done
 	virtual void DeductActionPoints(int actionPoints);
 
-	virtual void OnTurnStart(CombatStage* stage) {}
+	virtual void OnTurnStart(CombatStage* stage);
 
 	virtual void OnTurnUpdate(CombatStage* stage);
 
 	virtual void OnDeath() { }
 
-	void StartAction(Action* action);
-	void EndAction(CombatStage* stage);
+	virtual void StartAction(Action* action);
+	virtual void EndAction(CombatStage* stage);
 
 	int GetHealth() const;
 	int GetMaxHealth() const;
@@ -67,6 +67,8 @@ protected:
 	int maxHealth;
 	int health;
 	int actionPoints;
+	
+	int actionPointsPerTurn;
 
 	int defense;
 

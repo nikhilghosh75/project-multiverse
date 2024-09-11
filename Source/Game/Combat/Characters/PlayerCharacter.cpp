@@ -6,6 +6,8 @@
 #include "Combat/Actions/GunAttack.h"
 #include "Combat/Actions/MeleeAttack.h"
 #include "Combat/Actions/PassAction.h"
+#include "Combat/CombatStage.h"
+#include "UI/HUD/CombatHUD.h"
 
 const glm::vec2 playerScreenPosition = glm::vec2(0.2f, 0.4f);
 
@@ -31,6 +33,7 @@ PlayerCharacter::PlayerCharacter(PlayerState* _playerState)
 	health = playerState->health;
 	maxHealth = playerState->maxHealth;
 	defense = 0;
+	actionPointsPerTurn = playerState->apPerTurn;
 
 	AddTempAbilities();
 }
@@ -44,6 +47,13 @@ void PlayerCharacter::Render()
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
 	ImageRenderer::Get()->AddImage(texture, rect, options);
+}
+
+void PlayerCharacter::EndAction(CombatStage* stage)
+{
+	CombatHUD::GetCurrentStage()->OnActionEnded(stage, this, currentAction);
+
+	Character::EndAction(stage);
 }
 
 void PlayerCharacter::AddTempAbilities()

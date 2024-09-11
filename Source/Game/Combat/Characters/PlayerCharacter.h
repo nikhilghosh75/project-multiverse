@@ -9,6 +9,8 @@ public:
 	PlayerCharacter(PlayerState* playerState);
 
 	void Render();
+
+	void EndAction(CombatStage* stage);
 private:
 	PlayerState* playerState;
 

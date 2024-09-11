@@ -21,6 +21,8 @@ void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* execut
 	time = timeBetweenShots;
 	currentShot = 0;
 
+	executor->DeductActionPoints(cost);
+
 	shotsThisAttack = baseShots + std::rand() % shotsVariance;
 }
 

@@ -167,6 +167,11 @@ void CombatHUD::RenderCharacterHUD(CombatStage* stage, Character* character, Vec
 	painter->LineTo(basePosition + glm::vec2(-healthBarWidth / 2 + healthBarWidth * healthPercent, 0));
 	painter->LineTo(basePosition + glm::vec2(-healthBarWidth / 2, 0));
 	painter->ClosePath();
+
+	if (character->type == CharacterType::Player || character->type == CharacterType::Companion)
+	{
+		FontRenderer::Get()->AddText(std::to_string(character->GetActionPoints()) + " AP", textPosition + glm::vec2(0, 0.02));
+	}
 }
 
 CombatHUDState::CombatHUDState()

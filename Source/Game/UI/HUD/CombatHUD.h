@@ -19,6 +19,7 @@ public:
 
 	virtual void OnTurnAdvanced(CombatStage* stage) { }
 	virtual void OnTargetSelected(CombatStage* stage, Character* character) { }
+	virtual void OnActionEnded(CombatStage* stage, Character* character, Action* action) { }
 
 protected:
 	Action* action;

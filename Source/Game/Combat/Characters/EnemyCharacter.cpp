@@ -45,6 +45,8 @@ void EnemyCharacter::Render()
 
 void EnemyCharacter::OnTurnStart(CombatStage* stage)
 {
+	Character::OnTurnStart(stage);
+
 	currentState = State::Deciding;
 	timeLeftInState = decisionTime;
 }

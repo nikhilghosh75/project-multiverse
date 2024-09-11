@@ -1,5 +1,6 @@
 #include "GunCombatHUDState.h"
 #include "EnemyTurnHUDState.h"
+#include "MainCombatHUDState.h"
 #include "Combat/CombatStage.h"
 #include "Combat/Actions/GunAttack.h"
 #include "Combat/Characters/PlayerCharacter.h"
@@ -44,4 +45,12 @@ void GunCombatHUDState::OnTargetSelected(CombatStage* stage, Character* characte
 void GunCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 {
 	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+}
+
+void GunCombatHUDState::OnActionEnded(CombatStage* stage, Character* character, Action* action)
+{
+	if (character->GetActionPoints() > 0)
+	{
+		CombatHUD::SetCurrentState(new MainCombatHUDState());
+	}
 }

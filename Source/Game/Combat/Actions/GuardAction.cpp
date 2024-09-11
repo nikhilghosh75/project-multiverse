@@ -8,11 +8,13 @@ GuardAction::GuardAction(std::string name, int defenseIncrease, int cost)
 
 	this->instant = true;
 	this->requiresTarget = false;
+	this->immediatelyEndsTurn = true;
 }
 
 void GuardAction::StartExecute(CombatStage* stage, Character* executor)
 {
 	executor->IncreaseDefense(defenseIncrease);
+	executor->DeductActionPoints(cost);
 }
 
 std::string GuardAction::GetDisplayName() const
