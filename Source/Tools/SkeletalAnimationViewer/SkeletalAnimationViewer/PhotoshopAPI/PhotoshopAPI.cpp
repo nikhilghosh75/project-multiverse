@@ -1,0 +1,23 @@
+#include "PhotoshopAPI/include/PhotoshopAPI.h"
+
+#include "PhotoshopAPI/src/Core/Struct/ByteStream.cpp"
+#include "PhotoshopAPI/src/Core/Struct/File.cpp"
+#include "PhotoshopAPI/src/Core/Struct/PascalString.cpp"
+#include "PhotoshopAPI/src/Core/Struct/ResourceBlock.cpp"
+#include "PhotoshopAPI/src/Core/Struct/Signature.cpp"
+#include "PhotoshopAPI/src/Core/Struct/TaggedBlock.cpp"
+#include "PhotoshopAPI/src/Core/Struct/TaggedBlockStorage.cpp"
+
+#include "PhotoshopAPI/src/LayeredFile/LayeredFile.cpp"
+#include "PhotoshopAPI/src/LayeredFile/LayerTypes/GroupLayer.cpp"
+#include "PhotoshopAPI/src/LayeredFile/LayerTypes/ImageLayer.cpp"
+#include "PhotoshopAPI/src/LayeredFile/LayerTypes/Layer.cpp"
+#include "PhotoshopAPI/src/LayeredFile/LayerTypes/SectionDividerLayer.cpp"
+#include "PhotoshopAPI/src/LayeredFile/Util/GenerateLayerMaskInfo.cpp"
+
+#include "PhotoshopAPI/src/PhotoshopFile/AdditionalLayerInfo.cpp"
+#include "PhotoshopAPI/src/PhotoshopFile/ColorModeData.cpp"
+#include "PhotoshopAPI/src/PhotoshopFile/FileHeader.cpp"
+#include "PhotoshopAPI/src/PhotoshopFile/ImageResources.cpp"
+#include "PhotoshopAPI/src/PhotoshopFile/LayerAndMaskInformation.cpp"
+#include "PhotoshopAPI/src/PhotoshopFile/PhotoshopFile.cpp"
