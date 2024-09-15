@@ -102,10 +102,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game;$(SolutionDir)Vendor</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,10 +118,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game;$(SolutionDir)Vendor</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
