@@ -94,3 +94,7 @@ bool Character::IsDead() const
 {
 	return health <= 0;
 }
+
+void Character::SetFromJsonData(const rapidjson::Document& data)
+{
+}

@@ -83,3 +83,16 @@ void EnemyCharacter::OnDeath()
 {
 	shouldRender = false;
 }
+
+void EnemyCharacter::SetFromJsonData(const rapidjson::Document& data)
+{
+	name = data["name"].GetString();
+	texture = new Texture(data["texture"].GetString());
+	type = CharacterType::Enemy;
+
+	health = data["starting_health"].GetInt();
+	maxHealth = data["starting_health"].GetInt();
+
+	actionPointsPerTurn = data["ap_per_turn"].GetInt();
+
+}

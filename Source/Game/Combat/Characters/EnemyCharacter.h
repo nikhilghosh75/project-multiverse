@@ -17,6 +17,9 @@ public:
 
 	void OnDeath();
 
+protected:
+	void SetFromJsonData(const rapidjson::Document& data);
+
 private:
 	enum class State
 	{

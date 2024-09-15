@@ -98,8 +98,7 @@ void CombatStage::ProcessBattleOver()
 {
 	if (playerCharacter->IsDead())
 	{
-		// Go to Death Screen
-		StageManager::AddStage(new TempDefeatStage());
+		OnBattleLost();
 	}
 	else
 	{
@@ -115,8 +114,21 @@ void CombatStage::ProcessBattleOver()
 
 		if (allEnemiesDead)
 		{
-			// Go to Victory Screen
-			StageManager::AddStage(new TempVictoryStage());
+			OnBattleWon();
 		}
 	}
 }
+
+void CombatStage::OnBattleLost()
+{
+	// Go to Death Screen
+	StageManager::AddStage(new TempDefeatStage());
+}
+
+void CombatStage::OnBattleWon()
+{
+	RunManager::OnBattleOver(this);
+
+	StageManager::AddStage(new TempVictoryStage());
+}
+

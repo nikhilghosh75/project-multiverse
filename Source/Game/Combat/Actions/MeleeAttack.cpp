@@ -4,6 +4,13 @@
 #include "UI/HUD/CombatHUD.h"
 #include <cstdlib>
 
+MeleeAttack::MeleeAttack()
+{
+	this->requiresTarget = true;
+	this->immediatelyEndsTurn = false;
+	this->instant = true;
+}
+
 MeleeAttack::MeleeAttack(std::string name, int damage, int variance, int cost)
 	: name(name), attackDamage(damage), variance(variance), lastDamage(0)
 {
@@ -11,6 +18,7 @@ MeleeAttack::MeleeAttack(std::string name, int damage, int variance, int cost)
 
 	this->requiresTarget = true;
 	this->instant = true;
+	this->immediatelyEndsTurn = false;
 }
 
 void MeleeAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* target)
@@ -47,4 +55,12 @@ std::string MeleeAttack::GetDisplayName() const
 	return name + " (" + std::to_string(attackDamage) + "-"
 		+ std::to_string(attackDamage + variance) + " DMG,"
 		+ std::to_string(cost) + " AP)";
+}
+
+void MeleeAttack::SetFromJson(const rapidjson::Document& data)
+{
+	name = data["name"].GetString();
+	cost = data["cost"].GetInt();
+	attackDamage = data["base_damage"].GetInt();
+	variance = data["variance"].GetInt();
 }

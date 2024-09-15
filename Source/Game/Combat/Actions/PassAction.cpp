@@ -12,3 +12,7 @@ std::string PassAction::GetDisplayName() const
 {
 	return "Pass";
 }
+
+void PassAction::SetFromJson(const rapidjson::Document& data)
+{
+}
