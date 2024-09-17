@@ -17,22 +17,8 @@ void StartScreenStage::Update()
 	if (Input::GetMouseButtonDown(MouseButton::Left))
 	{
 		// TODO: Change to Main Menu when we have one
-		RunManager::StartRun();
 		StageManager::PopStage();
-		
-		// TODO: Move this to the map generator
-		EncounterInfo info;
-
-		EnemyInfo debufferInfo;
-		debufferInfo.enemyName = "Debuffer";
-		debufferInfo.texture = new Texture("Data/Sprites/Enemies/Debuffer.png");
-		debufferInfo.startingHealth = 40;
-		debufferInfo.enemyAttack = new MeleeAttack("Head Butt", 7, 2, 2);
-		info.enemies.push_back(debufferInfo);
-		
-		CombatStage* combatStage = new CombatStage(info);
-		StageManager::AddStage(combatStage);
-		
+		RunManager::StartRun();
 		
 		/*
 		TempStage* tempStage = new TempStage();
