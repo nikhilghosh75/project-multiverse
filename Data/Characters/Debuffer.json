@@ -1,0 +1,15 @@
+{
+    "name": "Debuffer",
+    "type": "enemy",
+    "starting_health": 40,
+    "ap_per_turn": 2,
+    "power_rating": 6,
+    "actions": [{
+        "name": "Head Butt",
+        "type": "melee",
+        "cost": 2,
+        "base_damage": 7,
+        "variance": 4
+    }],
+    "sprite": "Data/Sprites/Enemies/Debuffer.png"
+}
