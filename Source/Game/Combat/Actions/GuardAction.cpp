@@ -29,7 +29,7 @@ std::string GuardAction::GetDisplayName() const
 	return name + "(+" + std::to_string(defenseIncrease) + " DEF, " + std::to_string(cost) + " AP)";
 }
 
-void GuardAction::SetFromJson(const rapidjson::Document& data)
+void GuardAction::SetFromJson(const rapidjson::Value& data)
 {
 	name = data["name"].GetString();
 	defenseIncrease = data["defense_increase"].GetInt();

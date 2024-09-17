@@ -3,8 +3,9 @@
 #include "Combat/Characters/Character.h"
 #include "UI/HUD/CombatHUD.h"
 #include <cstdlib>
+#include <iostream>
 
-const float timeBetweenShots = 0.4f;
+const float timeBetweenShots = 0.3f;
 
 GunAttack::GunAttack()
 {
@@ -37,6 +38,7 @@ void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* execut
 void GunAttack::UpdateExecute(CombatStage* combatStage, Character* executor)
 {
 	time -= Time::GetDeltaTime();
+	
 
 	if (time < 0)
 	{
@@ -51,7 +53,7 @@ std::string GunAttack::GetDisplayName() const
 		"-" + std::to_string(baseShots + shotsVariance) + " Shots, " + std::to_string(cost) + " AP)";
 }
 
-void GunAttack::SetFromJson(const rapidjson::Document& data)
+void GunAttack::SetFromJson(const rapidjson::Value& data)
 {
 	name = data["name"].GetString();
 	baseDamage = data["base_damage"].GetInt();

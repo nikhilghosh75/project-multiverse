@@ -14,7 +14,7 @@ protected:
 	bool immediatelyEndsTurn = false;
 
 public:
-	static Action* CreateFromJson(const rapidjson::Document& data);
+	static Action* CreateFromJson(const rapidjson::Value& data);
 
 	virtual void StartExecute(CombatStage* stage, Character* executor);
 
@@ -24,7 +24,7 @@ public:
 
 	virtual std::string GetDisplayName() const = 0;
 
-	virtual void SetFromJson(const rapidjson::Document& data) = 0;
+	virtual void SetFromJson(const rapidjson::Value& data) = 0;
 
 	int GetCost() const;
 	bool RequiresTarget() const;

@@ -6,7 +6,7 @@
 #include "MeleeAttack.h"
 #include "PassAction.h"
 
-Action* Action::CreateFromJson(const rapidjson::Document& data)
+Action* Action::CreateFromJson(const rapidjson::Value& data)
 {
 	Action* action = nullptr;
 

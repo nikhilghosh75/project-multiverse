@@ -18,7 +18,7 @@ public:
 
 	std::string GetDisplayName() const;
 
-	void SetFromJson(const rapidjson::Document& data);
+	void SetFromJson(const rapidjson::Value& data);
 
 private:
 	int attackDamage;

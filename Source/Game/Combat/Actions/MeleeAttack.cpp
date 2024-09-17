@@ -57,7 +57,7 @@ std::string MeleeAttack::GetDisplayName() const
 		+ std::to_string(cost) + " AP)";
 }
 
-void MeleeAttack::SetFromJson(const rapidjson::Document& data)
+void MeleeAttack::SetFromJson(const rapidjson::Value& data)
 {
 	name = data["name"].GetString();
 	cost = data["cost"].GetInt();
