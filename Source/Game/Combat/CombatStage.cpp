@@ -7,6 +7,7 @@
 // TODO: Maybe change this to somewhere else
 std::vector<std::vector<glm::vec2>> enemyPositions =
 {
+	{ },
 	{ glm::vec2(0.8, 0.5) },
 	{ glm::vec2(0.75, 0.3), glm::vec2(0.85, 0.6) }
 };
@@ -21,7 +22,8 @@ CombatStage::CombatStage(EncounterInfo& info)
 	for (int i = 0; i < info.enemies.size(); i++)
 	{
 		glm::vec2 position = enemyPositions[info.enemies.size()][i];
-		EnemyCharacter* enemyCharacter = new EnemyCharacter(info.enemies[i], position);
+		EnemyCharacter* enemyCharacter = new EnemyCharacter(info.enemies[i].character);
+		enemyCharacter->screenPosition = position;
 		enemies.push_back(enemyCharacter);
 	}
 
@@ -29,6 +31,7 @@ CombatStage::CombatStage(EncounterInfo& info)
 	currentTurnCharacter->OnTurnStart(this);
 
 	CombatHUD::Initialize();
+	RunManager::OnBattleStart(this);
 }
 
 void CombatStage::Update()
