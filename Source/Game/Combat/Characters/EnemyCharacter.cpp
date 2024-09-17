@@ -3,29 +3,32 @@
 #include "ImageRenderer.h"
 #include "Core/Time.h"
 #include "Combat/CombatStage.h"
+#include <iostream>
 
 const float decisionTime = 0.5f;
-const float cooldownTime = 1.5f;
+const float cooldownTime = 2.5f;
 
 EnemyCharacter::EnemyCharacter()
 {
 	type = CharacterType::Enemy;
 }
 
-EnemyCharacter::EnemyCharacter(EnemyInfo& info, glm::vec2 _renderPosition)
+EnemyCharacter::EnemyCharacter(const EnemyCharacter* baseCharacter)
 {
-	texture = info.texture;
-	name = info.enemyName;
-
 	type = CharacterType::Enemy;
+	actions = baseCharacter->actions;
+	actionPointsPerTurn = baseCharacter->actionPointsPerTurn;
+	name = baseCharacter->name;
+	maxHealth = baseCharacter->maxHealth;
+	health = baseCharacter->health;
 
-	screenPosition = _renderPosition;
+	texture = baseCharacter->texture;
+}
 
-	actions.push_back(info.enemyAttack);
-
-	health = info.startingHealth;
-	maxHealth = info.startingHealth;
-	defense = 0;
+EnemyCharacter::EnemyCharacter(const rapidjson::Document& data)
+{
+	type = CharacterType::Enemy;
+	SetFromJsonData(data);
 }
 
 void EnemyCharacter::Render()
@@ -54,6 +57,11 @@ void EnemyCharacter::OnTurnStart(CombatStage* stage)
 void EnemyCharacter::OnTurnUpdate(CombatStage* stage)
 {
 	timeLeftInState -= Time::GetDeltaTime();
+
+	if (currentState == State::Cooldown)
+	{
+		actions[0]->UpdateExecute(stage, this);
+	}
 
 	if (timeLeftInState < 0.f)
 	{
@@ -87,12 +95,18 @@ void EnemyCharacter::OnDeath()
 void EnemyCharacter::SetFromJsonData(const rapidjson::Document& data)
 {
 	name = data["name"].GetString();
-	texture = new Texture(data["texture"].GetString());
+	texture = new Texture(data["sprite"].GetString());
 	type = CharacterType::Enemy;
+
+	powerRating = data["power_rating"].GetInt();
 
 	health = data["starting_health"].GetInt();
 	maxHealth = data["starting_health"].GetInt();
 
 	actionPointsPerTurn = data["ap_per_turn"].GetInt();
-
+	
+	for (const auto& it : data["actions"].GetArray())
+	{
+		actions.push_back(Action::CreateFromJson(it));
+	}
 }

@@ -1,16 +1,14 @@
 #pragma once
 #include "Texture.h"
-#include "Combat/Actions/MeleeAttack.h"
+#include "Combat/Characters/EnemyCharacter.h"
 #include <vector>
 
 class EnemyInfo
 {
 public:
-	Texture* texture;
-	const char* enemyName;
-	int startingHealth;
+	EnemyInfo(EnemyCharacter* character);
 
-	MeleeAttack* enemyAttack;
+	EnemyCharacter* character;
 };
 
 class EncounterInfo
