@@ -3,8 +3,16 @@
 #include "Combat/Characters/Character.h"
 #include "UI/HUD/CombatHUD.h"
 #include <cstdlib>
+#include <iostream>
 
-const float timeBetweenShots = 0.4f;
+const float timeBetweenShots = 0.3f;
+
+GunAttack::GunAttack()
+{
+	this->requiresTarget = true;
+	this->instant = false;
+	this->immediatelyEndsTurn = false;
+}
 
 GunAttack::GunAttack(std::string name, int damage, int variance, int shots, int shotsVariance, int cost)
 	: name(name), baseDamage(damage), damageVariance(variance), baseShots(shots), shotsVariance(shotsVariance)
@@ -13,6 +21,7 @@ GunAttack::GunAttack(std::string name, int damage, int variance, int shots, int 
 
 	this->requiresTarget = true;
 	this->instant = false;
+	this->immediatelyEndsTurn = false;
 }
 
 void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character)
@@ -29,6 +38,7 @@ void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* execut
 void GunAttack::UpdateExecute(CombatStage* combatStage, Character* executor)
 {
 	time -= Time::GetDeltaTime();
+	
 
 	if (time < 0)
 	{
@@ -41,6 +51,17 @@ std::string GunAttack::GetDisplayName() const
 	return name + "(" + std::to_string(baseDamage) + "-" +
 		std::to_string(baseDamage + damageVariance) + " DMG per shot, " + std::to_string(baseShots) +
 		"-" + std::to_string(baseShots + shotsVariance) + " Shots, " + std::to_string(cost) + " AP)";
+}
+
+void GunAttack::SetFromJson(const rapidjson::Value& data)
+{
+	name = data["name"].GetString();
+	baseDamage = data["base_damage"].GetInt();
+	damageVariance = data["damage_variance"].GetInt();
+	baseShots = data["base_shots"].GetInt();
+	shotsVariance = data["shots_variance"].GetInt();
+
+	cost = data["cost"].GetInt();
 }
 
 void GunAttack::ExecuteShot(CombatStage* combatStage, Character* executor)

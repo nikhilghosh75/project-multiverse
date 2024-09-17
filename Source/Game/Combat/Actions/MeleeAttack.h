@@ -5,6 +5,7 @@
 class MeleeAttack : public Action
 {
 public:
+	MeleeAttack();
 	MeleeAttack(std::string name, int damage, int variance, int cost);
 
 	void StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character);
@@ -16,6 +17,8 @@ public:
 	const std::string& GetName() const;
 
 	std::string GetDisplayName() const;
+
+	void SetFromJson(const rapidjson::Value& data);
 
 private:
 	int attackDamage;

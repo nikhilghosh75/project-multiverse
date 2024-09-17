@@ -25,6 +25,10 @@ public:
 private:
 	void ProcessBattleOver();
 
+	void OnBattleLost();
+
+	void OnBattleWon();
+
 	PlayerCharacter* playerCharacter;
 
 	Character* currentTurnCharacter;

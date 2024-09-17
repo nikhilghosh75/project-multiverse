@@ -3,6 +3,7 @@
 #include "Combat/Actions/Action.h"
 #include "glm/glm.hpp"
 #include "Texture.h"
+#include "rapidjson/document.h"
 
 class CombatStage;
 
@@ -64,6 +65,8 @@ public:
 	}
 
 protected:
+	virtual void SetFromJsonData(const rapidjson::Document& data);
+
 	int maxHealth;
 	int health;
 	int actionPoints;

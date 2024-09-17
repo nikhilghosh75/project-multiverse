@@ -1,14 +1,13 @@
 #pragma once
 #include "Character.h"
-#include "Combat/EncounterInfo.h"
 #include "glm/vec2.hpp"
 
 class EnemyCharacter : public Character
 {
 public:
 	EnemyCharacter();
-
-	EnemyCharacter(EnemyInfo& info, glm::vec2 _renderPosition);
+	EnemyCharacter(const EnemyCharacter* baseCharacter);
+	EnemyCharacter(const rapidjson::Document& data);
 
 	void Render();
 
@@ -16,6 +15,11 @@ public:
 	void OnTurnUpdate(CombatStage* stage);
 
 	void OnDeath();
+
+	int powerRating = 1;
+
+protected:
+	void SetFromJsonData(const rapidjson::Document& data);
 
 private:
 	enum class State

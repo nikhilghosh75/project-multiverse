@@ -7,4 +7,6 @@ public:
 	PassAction();
 
 	std::string GetDisplayName() const;
+
+	void SetFromJson(const rapidjson::Value& data);
 };

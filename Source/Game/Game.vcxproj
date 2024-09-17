@@ -102,10 +102,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game;$(SolutionDir)Vendor</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,10 +118,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;$(SolutionDir)Source/Game;$(SolutionDir)Vendor</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +140,7 @@
     <ClCompile Include="Combat\Characters\EnemyCharacter.cpp" />
     <ClCompile Include="Combat\Characters\PlayerCharacter.cpp" />
     <ClCompile Include="Core\Time.cpp" />
+    <ClCompile Include="Map\EncounterGenerator.cpp" />
     <ClCompile Include="Temp\TempDefeatStage.cpp" />
     <ClCompile Include="Temp\TempVictoryStage.cpp" />
     <ClCompile Include="UI\Button.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="Combat\Characters\EnemyCharacter.h" />
     <ClInclude Include="Combat\Characters\PlayerCharacter.h" />
     <ClInclude Include="Core\Time.h" />
+    <ClInclude Include="Map\EncounterGenerator.h" />
     <ClInclude Include="Temp\TempDefeatStage.h" />
     <ClInclude Include="Temp\TempVictoryStage.h" />
     <ClInclude Include="UI\Button.h" />
