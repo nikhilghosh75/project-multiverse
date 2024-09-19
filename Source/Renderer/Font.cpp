@@ -92,9 +92,12 @@ void Font::ReadFromTTFBuffer(void* data, uint32_t size)
 		Font::Character charInfo;
 		charInfo.charCode = i;
 
-		int leftSideBearing;
-		stbtt_GetCodepointHMetrics(&fontInfo, glyphIndex, &charInfo.xAdvance, &leftSideBearing);
-		charInfo.xAdvance *= scale;
+		if ((char)charInfo.charCode == 'o')
+		{
+			charInfo.charCode = i;
+		}
+
+		charInfo.xAdvance = bakedChar.xadvance;
 
 		charInfo.uvCoordinates.left = (float)bakedChar.x0 / bitmapResolution;
 		charInfo.uvCoordinates.bottom = (float)bakedChar.y0 / bitmapResolution;
