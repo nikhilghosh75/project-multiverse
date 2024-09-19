@@ -38,7 +38,7 @@ public:
 	{
 	public:
 		unsigned int charCode;
-		int xAdvance;
+		float xAdvance;
 		Rect uvCoordinates;
 		glm::vec2 offset;
 		int ascent;

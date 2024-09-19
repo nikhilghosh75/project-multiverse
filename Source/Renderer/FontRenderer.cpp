@@ -6,6 +6,8 @@ const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT,
 
 std::array<FontRenderRequest, FontRenderRequest::MAX_FONT_REQUESTS> FontRenderRequest::requests;
 
+const float letterSpacingFactor = 0.6f;
+
 bool FontRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
 	if (other->type != RenderRequestType::Font)
@@ -123,12 +125,20 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 
 		float uvHeight = character.uvCoordinates.top - character.uvCoordinates.bottom;
 		float normalizedCharHeight = uvHeight * font->GetBitmapHeight() * fontScale / height;
-		glm::vec2 normalizedOffset = character.offset * (fontScale / width);
+		glm::vec2 normalizedOffset = glm::vec2(
+			character.offset.x * (fontScale / width),
+			character.offset.y * (fontScale / height));
 		// glm::vec2 normalizedOffset = glm::vec2(0, 0);
 
-		float bottom = currentCursorLocation.y - normalizedCharHeight;
+		float yOffset = 0;
+		if (c == 'p' || c == 'g' || c == 'q' || c == 'j')
+		{
+			yOffset = -0.021f * fontScale;
+		}
+
+		float bottom = currentCursorLocation.y - normalizedCharHeight - yOffset;
 		float left = currentCursorLocation.x + normalizedOffset.x;
-		float top = currentCursorLocation.y;
+		float top = currentCursorLocation.y - yOffset;
 		float right = left + normalizedCharWidth;
 
 		float uvBottom = character.uvCoordinates.bottom;
@@ -150,7 +160,7 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 		indices.push_back(vertexIndex * 4 + 3);
 		indices.push_back(vertexIndex * 4 + 0);
 
-		currentCursorLocation.x += (uvWidth * font->GetBitmapWidth() + character.xAdvance) * (fontScale / width);
+		currentCursorLocation.x += normalizedCharWidth + character.xAdvance * letterSpacingFactor * (fontScale / width);
 	}
 
 	Render();
