@@ -2,6 +2,11 @@
 
 class PlayerCharacter;
 
+class CompanionState
+{
+
+};
+
 class PlayerState
 {
 public:
