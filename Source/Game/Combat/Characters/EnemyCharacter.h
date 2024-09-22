@@ -22,6 +22,8 @@ protected:
 	void SetFromJsonData(const rapidjson::Document& data);
 
 private:
+	void ExecuteAction(CombatStage* stage);
+
 	enum class State
 	{
 		Deciding,

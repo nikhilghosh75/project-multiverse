@@ -68,7 +68,7 @@ void EnemyCharacter::OnTurnUpdate(CombatStage* stage)
 		switch (currentState)
 		{
 		case State::Attacking:
-			actions[0]->StartExecuteOnTarget(stage, this, stage->GetPlayerCharacter());
+			ExecuteAction(stage);
 			currentState = State::Cooldown;
 			timeLeftInState = cooldownTime;
 			break;
@@ -109,4 +109,15 @@ void EnemyCharacter::SetFromJsonData(const rapidjson::Document& data)
 	{
 		actions.push_back(Action::CreateFromJson(it));
 	}
+}
+
+void EnemyCharacter::ExecuteAction(CombatStage* stage)
+{
+	Character* target = stage->GetPlayerCharacter();
+	if (stage->GetCompanionCharacters().size() > 0)
+	{
+		target = stage->GetCompanionCharacters()[0];
+	}
+
+	actions[0]->StartExecuteOnTarget(stage, this, target);
 }
