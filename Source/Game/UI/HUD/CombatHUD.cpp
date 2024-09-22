@@ -131,6 +131,14 @@ void CombatHUD::RenderCharacterHUDs(CombatStage* stage)
 
 	RenderCharacterHUD(stage, stage->GetPlayerCharacter(), &painter);
 
+	for (Character* companion : stage->GetCompanionCharacters())
+	{
+		if (!companion->IsDead())
+		{
+			RenderCharacterHUD(stage, companion, &painter);
+		}
+	}
+
 	for (Character* enemy : stage->GetEnemyCharacters())
 	{
 		if (!enemy->IsDead())
