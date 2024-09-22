@@ -76,6 +76,24 @@ void CombatStage::AdvanceTurn()
 				currentTurnCharacter = enemies[0];
 			}
 		}
+		else if (currentTurnCharacter->type == CharacterType::Companion)
+		{
+			for (int i = 0; i < companions.size(); i++)
+			{
+				if (currentTurnCharacter == companions[i])
+				{
+					if (i == companions.size() - 1)
+					{
+						currentTurnCharacter = enemies[0];
+					}
+					else
+					{
+						currentTurnCharacter = companions[i + 1];
+					}
+					break;
+				}
+			}
+		}
 		else
 		{
 			for (int i = 0; i < enemies.size(); i++)
