@@ -1,7 +1,7 @@
 #pragma once
 #include "Character.h"
 
-class CompanionCharacter : Character
+class CompanionCharacter : public Character
 {
 public:
 	CompanionCharacter();

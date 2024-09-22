@@ -60,5 +60,12 @@ void MainCombatHUDState::OnPassButtonClicked(CombatStage* stage)
 
 void MainCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 {
-	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	if (stage->GetCurrentTurnCharacter()->type == CharacterType::Enemy)
+	{
+		CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	}
+	else
+	{
+		CombatHUD::SetCurrentState(new MainCombatHUDState());
+	}
 }

@@ -14,12 +14,12 @@ GunCombatHUDState::GunCombatHUDState()
 
 void GunCombatHUDState::Render(CombatStage* stage)
 {
-	PlayerCharacter* playerCharacter = stage->GetPlayerCharacter();
+	Character* currentCharacter = stage->GetCurrentTurnCharacter();
 
 	int gunIndex = 0;
-	for (int i = 0; i < playerCharacter->actions.size(); i++)
+	for (int i = 0; i < currentCharacter->actions.size(); i++)
 	{
-		GunAttack* attack = dynamic_cast<GunAttack*>(playerCharacter->actions[i]);
+		GunAttack* attack = dynamic_cast<GunAttack*>(currentCharacter->actions[i]);
 
 		if (attack)
 		{
@@ -44,7 +44,14 @@ void GunCombatHUDState::OnTargetSelected(CombatStage* stage, Character* characte
 
 void GunCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 {
-	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	if (stage->GetCurrentTurnCharacter()->type == CharacterType::Enemy)
+	{
+		CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	}
+	else
+	{
+		CombatHUD::SetCurrentState(new MainCombatHUDState());
+	}
 }
 
 void GunCombatHUDState::OnActionEnded(CombatStage* stage, Character* character, Action* action)
