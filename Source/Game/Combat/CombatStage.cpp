@@ -128,6 +128,11 @@ std::vector<EnemyCharacter*>& CombatStage::GetEnemyCharacters()
 	return enemies;
 }
 
+std::vector<CompanionCharacter*>& CombatStage::GetCompanionCharacters()
+{
+	return companions;
+}
+
 void CombatStage::ProcessBattleOver()
 {
 	if (playerCharacter->IsDead())

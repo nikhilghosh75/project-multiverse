@@ -20,6 +20,7 @@ public:
 	PlayerCharacter* GetPlayerCharacter() { return playerCharacter; }
 	std::vector<glm::vec2>& GetEnemyPositions();
 	std::vector<EnemyCharacter*>& GetEnemyCharacters();
+	std::vector<CompanionCharacter*>& GetCompanionCharacters();
 
 	Character* GetCurrentTurnCharacter() { return currentTurnCharacter; }
 

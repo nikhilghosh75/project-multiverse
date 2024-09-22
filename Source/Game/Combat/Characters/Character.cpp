@@ -20,7 +20,7 @@ int Character::Damage(int damage)
 	int actualDamage = damage > defense ? damage - defense : 0;
 	health -= actualDamage;
 
-	if (health < 0)
+	if (health <= 0)
 	{
 		OnDeath();
 	}
