@@ -1,6 +1,11 @@
 #include "CompanionCharacter.h"
 #include "ScreenCoordinate.h"
 #include "ImageRenderer.h"
+#include "Core/RunManager.h"
+#include "Combat/Actions/PassAction.h"
+
+// TODO: Change when multiple companions become possible
+glm::vec2 companionPosition = glm::vec2(0.1f, 0.2f);
 
 CompanionCharacter::CompanionCharacter()
 {
@@ -42,6 +47,8 @@ void CompanionCharacter::OnTurnStart(CombatStage* stage)
 
 void CompanionCharacter::OnDeath()
 {
+	shouldRender = false;
+	RunManager::GetPlayerState()->RemoveCompanion(this);
 }
 
 void CompanionCharacter::SetFromJsonData(const rapidjson::Document& data)
