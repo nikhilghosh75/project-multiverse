@@ -14,12 +14,12 @@ MeleeCombatHUDState::MeleeCombatHUDState()
 
 void MeleeCombatHUDState::Render(CombatStage* stage)
 {
-	PlayerCharacter* playerCharacter = stage->GetPlayerCharacter();
+	Character* currentCharacter = stage->GetCurrentTurnCharacter();
 
 	int meleeIndex = 0;
-	for (int i = 0; i < playerCharacter->actions.size(); i++)
+	for (int i = 0; i < currentCharacter->actions.size(); i++)
 	{
-		MeleeAttack* attack = dynamic_cast<MeleeAttack*>(playerCharacter->actions[i]);
+		MeleeAttack* attack = dynamic_cast<MeleeAttack*>(currentCharacter->actions[i]);
 
 		if (attack)
 		{
@@ -45,7 +45,14 @@ void MeleeCombatHUDState::OnTargetSelected(CombatStage* stage, Character* target
 
 void MeleeCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 {
-	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	if (stage->GetCurrentTurnCharacter()->type == CharacterType::Enemy)
+	{
+		CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	}
+	else
+	{
+		CombatHUD::SetCurrentState(new MainCombatHUDState());
+	}
 }
 
 void MeleeCombatHUDState::OnActionEnded(CombatStage* stage, Character* character, Action* action)

@@ -4,6 +4,7 @@
 #include "Combat/Characters/PlayerCharacter.h"
 #include "EnemyTurnHUDState.h"
 #include "FontRenderer.h"
+#include "MainCombatHUDState.h"
 #include "UI/Button.h"
 
 GuardCombatHUDState::GuardCombatHUDState()
@@ -13,12 +14,12 @@ GuardCombatHUDState::GuardCombatHUDState()
 
 void GuardCombatHUDState::Render(CombatStage* stage)
 {
-	PlayerCharacter* playerCharacter = stage->GetPlayerCharacter();
+	Character* currentCharacter = stage->GetCurrentTurnCharacter();
 
 	int guardIndex = 0;
-	for (int i = 0; i < playerCharacter->actions.size(); i++)
+	for (int i = 0; i < currentCharacter->actions.size(); i++)
 	{
-		GuardAction* guard = dynamic_cast<GuardAction*>(playerCharacter->actions[i]);
+		GuardAction* guard = dynamic_cast<GuardAction*>(currentCharacter->actions[i]);
 
 		if (guard)
 		{
@@ -36,5 +37,12 @@ void GuardCombatHUDState::Render(CombatStage* stage)
 
 void GuardCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 {
-	CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	if (stage->GetCurrentTurnCharacter()->type == CharacterType::Enemy)
+	{
+		CombatHUD::SetCurrentState(new EnemyTurnHUDState());
+	}
+	else
+	{
+		CombatHUD::SetCurrentState(new MainCombatHUDState());
+	}
 }

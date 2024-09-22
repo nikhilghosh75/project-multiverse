@@ -18,6 +18,7 @@ CombatStage::CombatStage(EncounterInfo& info)
 	blocksRendering = true;
 
 	playerCharacter = new PlayerCharacter(RunManager::GetPlayerState());
+	companions = RunManager::GetPlayerState()->companions;
 
 	for (int i = 0; i < info.enemies.size(); i++)
 	{
@@ -40,6 +41,11 @@ void CombatStage::Update()
 
 	playerCharacter->Render();
 
+	for (int i = 0; i < companions.size(); i++)
+	{
+		companions[i]->Render();
+	}
+
 	for (int i = 0; i < enemies.size(); i++)
 	{
 		enemies[i]->Render();
@@ -61,7 +67,32 @@ void CombatStage::AdvanceTurn()
 	{
 		if (currentTurnCharacter == playerCharacter)
 		{
-			currentTurnCharacter = enemies[0];
+			if (companions.size() != 0)
+			{
+				currentTurnCharacter = companions[0];
+			}
+			else
+			{
+				currentTurnCharacter = enemies[0];
+			}
+		}
+		else if (currentTurnCharacter->type == CharacterType::Companion)
+		{
+			for (int i = 0; i < companions.size(); i++)
+			{
+				if (currentTurnCharacter == companions[i])
+				{
+					if (i == companions.size() - 1)
+					{
+						currentTurnCharacter = enemies[0];
+					}
+					else
+					{
+						currentTurnCharacter = companions[i + 1];
+					}
+					break;
+				}
+			}
 		}
 		else
 		{

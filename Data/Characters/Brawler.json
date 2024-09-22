@@ -1,0 +1,20 @@
+{
+    "name": "Brawler",
+    "type": "companion",
+    "starting_health": 40,
+    "ap_per_turn": 2,
+    "actions": [{
+        "name": "Standard Punch",
+        "type": "melee",
+        "cost": 2,
+        "base_damage": 6,
+        "variance": 3
+    }, {
+        "name": "Jump Kick",
+        "type": "melee",
+        "cost": 3,
+        "base_damage": 8,
+        "variance": 5
+    }],
+    "sprite": "Data/Sprites/Companions/Brawler.png"
+}

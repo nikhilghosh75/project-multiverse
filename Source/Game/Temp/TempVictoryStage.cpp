@@ -7,7 +7,12 @@
 
 TempVictoryStage::TempVictoryStage()
 {
-
+	// TODO: Move to a Companion Select Screen
+	if (RunManager::GetEncounterNumber() == 0)
+	{
+		CompanionCharacter* character = EncounterGenerator::GetNewCompanion();
+		RunManager::GetPlayerState()->companions.push_back(character);
+	}
 }
 
 void TempVictoryStage::Update()
@@ -15,6 +20,12 @@ void TempVictoryStage::Update()
 	FontRenderer::Get()->AddText("You have won", glm::vec2(-0.2, 0), 32);
 
 	FontRenderer::Get()->AddText("Click anywhere to continue", glm::vec2(-0.1, 0.1));
+
+	// TODO: Move to a Companion Select Screen
+	if (RunManager::GetEncounterNumber() == 0)
+	{
+		FontRenderer::Get()->AddText("You have recieved a new companion", glm::vec2(-0.4, -0.4));
+	}
 
 	if (Input::GetMouseButtonDown(MouseButton::Left))
 	{

@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Stage.h"
+#include "Characters/CompanionCharacter.h"
 #include "Characters/PlayerCharacter.h"
 #include "Characters/EnemyCharacter.h"
 #include "EncounterInfo.h"
@@ -34,4 +35,5 @@ private:
 	Character* currentTurnCharacter;
 
 	std::vector<EnemyCharacter*> enemies;
+	std::vector<CompanionCharacter*> companions;
 };

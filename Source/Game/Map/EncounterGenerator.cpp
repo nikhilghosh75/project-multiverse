@@ -26,8 +26,16 @@ void EncounterGenerator::Initialize()
 			rapidjson::Document d;
 			d.Parse(buffer.data());
 
-			EnemyCharacter* character = new EnemyCharacter(d);
-			enemyCharacters.push_back(character);
+			if (strcmp(d["type"].GetString(), "enemy") == 0)
+			{
+				EnemyCharacter* character = new EnemyCharacter(d);
+				enemyCharacters.push_back(character);
+			}
+			else if (strcmp(d["type"].GetString(), "companion") == 0)
+			{
+				CompanionCharacter* character = new CompanionCharacter(d);
+				companionCharacters.push_back(character);
+			}
 		}
 	}
 }
@@ -68,6 +76,18 @@ EncounterInfo EncounterGenerator::Generate(int encounterNumber)
 	}
 
 	return info;
+}
+
+CompanionCharacter* EncounterGenerator::GetNewCompanion()
+{
+	if (companionCharacters.size() == 0)
+	{
+		return nullptr;
+	}
+
+	CompanionCharacter* baseCompanion = companionCharacters[std::rand() % companionCharacters.size()];
+	
+	return new CompanionCharacter(baseCompanion);
 }
 
 std::vector<EnemyCharacter*> EncounterGenerator::GetCharactersBelowPowerRating(int powerRating)
