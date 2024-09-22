@@ -22,18 +22,26 @@ CompanionCharacter::CompanionCharacter(const CompanionCharacter* baseCharacter)
 	health = baseCharacter->health;
 
 	texture = baseCharacter->texture;
+
+	screenPosition = companionPosition;
 }
 
 CompanionCharacter::CompanionCharacter(const rapidjson::Document& data)
 {
 	type = CharacterType::Companion;
+	screenPosition = companionPosition;
 	SetFromJsonData(data);
 }
 
 void CompanionCharacter::Render()
 {
-	ScreenCoordinate enemyPosition = ScreenCoordinate(glm::vec2(0, 0), screenPosition);
-	Rect rect = ScreenCoordinate::CreateRect(enemyPosition, glm::vec2(80, 120), glm::vec2(0.5, 0.5));
+	if (!shouldRender)
+	{
+		return;
+	}
+
+	ScreenCoordinate companionScreenPosition = ScreenCoordinate(glm::vec2(0, 0), screenPosition);
+	Rect rect = ScreenCoordinate::CreateRect(companionScreenPosition, glm::vec2(80, 120), glm::vec2(0.5, 0.5));
 
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
@@ -66,4 +74,5 @@ void CompanionCharacter::SetFromJsonData(const rapidjson::Document& data)
 	{
 		actions.push_back(Action::CreateFromJson(it));
 	}
+	actions.push_back(new PassAction());
 }

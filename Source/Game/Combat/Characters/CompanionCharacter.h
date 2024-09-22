@@ -17,4 +17,5 @@ public:
 protected:
 	void SetFromJsonData(const rapidjson::Document& data);
 
+	bool shouldRender = true;
 };
