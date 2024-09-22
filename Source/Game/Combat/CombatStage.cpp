@@ -18,6 +18,7 @@ CombatStage::CombatStage(EncounterInfo& info)
 	blocksRendering = true;
 
 	playerCharacter = new PlayerCharacter(RunManager::GetPlayerState());
+	companions = RunManager::GetPlayerState()->companions;
 
 	for (int i = 0; i < info.enemies.size(); i++)
 	{
@@ -39,6 +40,11 @@ void CombatStage::Update()
 	currentTurnCharacter->OnTurnUpdate(this);
 
 	playerCharacter->Render();
+
+	for (int i = 0; i < companions.size(); i++)
+	{
+		companions[i]->Render();
+	}
 
 	for (int i = 0; i < enemies.size(); i++)
 	{

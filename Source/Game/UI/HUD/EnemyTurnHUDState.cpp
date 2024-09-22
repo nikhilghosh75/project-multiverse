@@ -15,10 +15,10 @@ void EnemyTurnHUDState::Render(CombatStage* stage)
 	if (character)
 	{
 		FontRenderer::Get()->AddText(character->name + " 's Turn", glm::vec2(-0.2f, 0.6f), 20);
-	}
 
-	if (character->type != CharacterType::Enemy)
-	{
-		CombatHUD::SetCurrentState(new MainCombatHUDState());
+		if (character->type != CharacterType::Enemy)
+		{
+			CombatHUD::SetCurrentState(new MainCombatHUDState());
+		}
 	}
 }
