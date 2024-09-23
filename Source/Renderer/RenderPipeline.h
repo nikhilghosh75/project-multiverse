@@ -13,6 +13,7 @@ public:
 	void SetDescriptorSet(VkDescriptorSetLayout layout);
 	void SetBinding(VkVertexInputBindingDescription _binding);
 	void SetAttributes(std::vector<VkVertexInputAttributeDescription> _attributes);
+	void SetColorBlendingEnabled(bool enabled);
 
 	void Create();
 
@@ -39,6 +40,8 @@ private:
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
+
+	bool colorBlendingEnabled = false;
 
 	bool hasDescriptorLayout = false;
 };
