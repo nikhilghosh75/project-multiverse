@@ -125,6 +125,7 @@ void ImageRenderer::CreatePipeline()
 
     pipeline.SetAttributes(Vertex::GetAttributeDescriptions());
     pipeline.SetBinding(Vertex::GetBindingDescription());
+    pipeline.SetColorBlendingEnabled(true);
 
     pipeline.Create();
 }
