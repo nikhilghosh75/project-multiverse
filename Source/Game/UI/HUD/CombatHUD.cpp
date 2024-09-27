@@ -14,8 +14,8 @@
 const float boxSize = 0.08f;
 const float crosshairSize = 20.f;
 
-const glm::vec2 healthBarOffset = glm::vec2(0, -0.09f);
-const glm::vec2 characterNameOffset = glm::vec2(0, 0.09f);
+const glm::vec2 healthBarOffset = glm::vec2(0, -0.08f);
+const glm::vec2 characterNameOffset = glm::vec2(0, 0.10f);
 const float healthBarWidth = 0.08f;
 
 void CombatHUD::Initialize()
@@ -178,7 +178,7 @@ void CombatHUD::RenderCharacterHUD(CombatStage* stage, Character* character, Vec
 
 	if (character->type == CharacterType::Player || character->type == CharacterType::Companion)
 	{
-		FontRenderer::Get()->AddText(std::to_string(character->GetActionPoints()) + " AP", textPosition + glm::vec2(0, 0.02));
+		FontRenderer::Get()->AddText(std::to_string(character->GetActionPoints()) + " AP", textPosition + glm::vec2(0, 0.04));
 	}
 }
 
