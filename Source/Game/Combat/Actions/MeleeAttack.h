@@ -7,6 +7,7 @@ class MeleeAttack : public Action
 public:
 	MeleeAttack();
 	MeleeAttack(std::string name, int damage, int variance, int cost);
+	MeleeAttack(std::string name, int damage, int variance, int cost, std::string iconPath);
 
 	void StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character);
 

@@ -48,6 +48,11 @@ void Action::UpdateExecute(CombatStage* stage, Character* executor)
 {
 }
 
+Texture* Action::GetTexture() const
+{
+	return icon;
+}
+
 int Action::GetCost() const
 {
 	return cost;

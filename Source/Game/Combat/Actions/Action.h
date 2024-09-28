@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Texture.h"
 #include "rapidjson/document.h"
 
 class CombatStage;
@@ -13,6 +14,7 @@ protected:
 	bool instant = false;
 	bool immediatelyEndsTurn = false;
 
+	Texture* icon;
 public:
 	static Action* CreateFromJson(const rapidjson::Value& data);
 
@@ -26,6 +28,7 @@ public:
 
 	virtual void SetFromJson(const rapidjson::Value& data) = 0;
 
+	Texture* GetTexture() const;
 	int GetCost() const;
 	bool RequiresTarget() const;
 	bool EndsTurn() const;

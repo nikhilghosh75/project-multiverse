@@ -9,6 +9,8 @@ public:
 
 	GunAttack(std::string name, int damage, int variance, int shots, int shotsVariance, int cost);
 
+	GunAttack(std::string name, int damage, int variance, int shots, int shotsVariance, int cost, std::string iconPath);
+
 	void StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character);
 
 	void UpdateExecute(CombatStage* combatStage, Character* executor);
