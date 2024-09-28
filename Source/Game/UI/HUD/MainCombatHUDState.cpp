@@ -2,6 +2,8 @@
 #include "Combat/CombatStage.h"
 #include "Combat/Actions/PassAction.h"
 #include "FontRenderer.h"
+#include "ImageRenderer.h"
+#include "ScreenCoordinate.h"
 #include "UI/Button.h"
 #include "EnemyTurnHUDState.h"
 #include "GuardCombatHUDState.h"
@@ -10,25 +12,31 @@
 
 #include <iostream>
 
+const glm::vec2 startPosition = glm::vec2(0.15, 0.75);
+
 MainCombatHUDState::MainCombatHUDState()
 {
+	noIconTexture = new Texture("Data/Sprites/UI/Icons/Icon Null.png");
 }
 
 void MainCombatHUDState::Render(CombatStage* stage)
 {
-	// TODO: Add Localization
-	
-	FontRenderer::Get()->AddText("Melee", glm::vec2(-0.8, 0.45), 14);
-	Button::Add(Rect(0.43, 0.53, -0.85, -0.35), [this]() { this->OnMeleeButtonClicked(); });
+	glm::vec2 position = startPosition;
 
-	FontRenderer::Get()->AddText("Gun", glm::vec2(-0.8, 0.57), 14);
-	Button::Add(Rect(0.55, 0.65, -0.85, -0.35), [this]() { this->OnGunButtonClicked(); });
+	ImageRenderingOptions options;
+	options.keepAspectRatio = true;
 
-	FontRenderer::Get()->AddText("Guard", glm::vec2(-0.8, 0.69), 14);
-	Button::Add(Rect(0.67, 0.77, -0.85, -0.35), [this]() { this->OnGuardButtonClicked(); });
+	std::vector<Action*>& actions = stage->GetPlayerCharacter()->actions;
+	for (int i = 0; i < actions.size(); i++)
+	{
+		ScreenCoordinate coordinate = ScreenCoordinate(glm::vec2(10, 10), position);
+		Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(50, 83.3), glm::vec2(0.5, 0.5));
+		Texture* texture = actions[i]->GetTexture() == nullptr ? noIconTexture : actions[i]->GetTexture();
 
-	FontRenderer::Get()->AddText("Pass", glm::vec2(-0.8, 0.81), 14);
-	Button::Add(Rect(0.77, 0.89, -0.85, -0.35), [this, stage]() { this->OnPassButtonClicked(stage); });
+		ImageRenderer::Get()->AddImage(texture, rect, options);
+
+		position += glm::vec2(0.1, 0);
+	}
 }
 
 void MainCombatHUDState::OnMeleeButtonClicked()

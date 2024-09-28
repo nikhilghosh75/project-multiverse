@@ -18,4 +18,6 @@ private:
 	void OnPassButtonClicked(CombatStage* stage);
 
 	void OnTurnAdvanced(CombatStage* stage);
+
+	Texture* noIconTexture;
 };
