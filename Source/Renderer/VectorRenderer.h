@@ -23,6 +23,8 @@ public:
 	
 	void LineTo(glm::vec2 point);
 
+	void DrawRegularPolygon(glm::vec2 center, int sides, float radius, float angle = 0.0f);
+
 private:
 	friend class VectorRenderer;
 

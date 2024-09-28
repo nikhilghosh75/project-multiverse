@@ -53,6 +53,31 @@ void VectorPainter::LineTo(glm::vec2 point)
 	paths[paths.size() - 1].points.push_back(point);
 }
 
+void VectorPainter::DrawRegularPolygon(glm::vec2 center, int sides, float radius, float angle /* in radians*/)
+{
+	paths.push_back(Path());
+	paths[paths.size() - 1].color = currentColor;
+
+	float deltaAngle = 3.141592f * 2.f / sides;
+
+	glm::vec2 startPoint = glm::vec2(
+		center.x + radius * std::cos(-angle),
+		center.y + radius * std::sin(-angle)
+	);
+	paths[paths.size() - 1].points.push_back(startPoint);
+
+	for (int i = 1; i < sides; i++)
+	{
+		glm::vec2 point = glm::vec2(
+			center.x + radius * std::cos(deltaAngle * i - angle),
+			center.y + radius * std::sin(deltaAngle * i - angle)
+		);
+		paths[paths.size() - 1].points.push_back(point);
+	}
+
+	state = State::WaitingToBegin;
+}
+
 VectorRenderer::VectorRenderer()
 {
 	instance = this;

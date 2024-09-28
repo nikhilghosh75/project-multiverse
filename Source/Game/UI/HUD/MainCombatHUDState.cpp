@@ -3,6 +3,7 @@
 #include "Combat/Actions/PassAction.h"
 #include "FontRenderer.h"
 #include "ImageRenderer.h"
+#include "VectorRenderer.h"
 #include "ScreenCoordinate.h"
 #include "UI/Button.h"
 #include "EnemyTurnHUDState.h"
@@ -26,6 +27,9 @@ void MainCombatHUDState::Render(CombatStage* stage)
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
 
+	VectorPainter painter;
+	painter.SetFillColor(Color(1.0f, 0.0f, 0.0f, 1.0f));
+
 	std::vector<Action*>& actions = stage->GetPlayerCharacter()->actions;
 	for (int i = 0; i < actions.size(); i++)
 	{
@@ -35,8 +39,13 @@ void MainCombatHUDState::Render(CombatStage* stage)
 
 		ImageRenderer::Get()->AddImage(texture, rect, options);
 
+		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
+		painter.DrawRegularPolygon(bottomRight, 6, 0.02f);
+
 		position += glm::vec2(0.1, 0);
 	}
+
+	VectorRenderer::Get()->SubmitPainter(painter);
 }
 
 void MainCombatHUDState::OnMeleeButtonClicked()
