@@ -1,6 +1,12 @@
 #include "PhotoshopAPI/include/PhotoshopAPI.h"
+#include "Device.h"
+#include "Window.h"
+#include "ImGuiDevice.h"
+#include "RenderManager.h"
 
-int main()
+#include "imgui.h"
+
+void TestPhotoshopAPI()
 {
 	PhotoshopAPI::File inputFile = PhotoshopAPI::File("C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb");
 
@@ -22,5 +28,32 @@ int main()
 		std::cout << "Layer " << layers[i].m_LayerName.getString() << " has " << channels[i].getChannelOffsetsAndSizes().size()
 			<< " channels. They have data with length " << data.size() << ", height "
 			<< layers[i].getHeight() << ", and width " << layers[i].getWidth() << std::endl;
+	}
+}
+
+int main()
+{
+	Window window;
+
+	ImGuiDevice device;
+	device.Setup(Window::GetWindowHandle(), Device::Get());
+
+	RenderManager renderingManager;
+	renderingManager.Setup();
+
+	while (window.windowRunning)
+	{
+		window.Process();
+		Device::Get()->StartFrame();
+		device.StartFrame();
+		renderingManager.StartFrame();
+
+		ImGui::Begin("Test");
+		ImGui::Text("Testing Windows");
+		ImGui::End();
+
+		renderingManager.EndFrame();
+		device.EndFrame();
+		Device::Get()->EndFrame();
 	}
 }
