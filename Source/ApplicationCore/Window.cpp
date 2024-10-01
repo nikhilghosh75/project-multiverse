@@ -146,6 +146,11 @@ KeyCode Window::SystemParamToKeycode(unsigned int param)
 	return KeyCode();
 }
 
+HWND Window::GetWindowHandle()
+{
+	return g_window;
+}
+
 void Window::OnResize(unsigned int width, unsigned int height)
 {
 	if (window == nullptr)
