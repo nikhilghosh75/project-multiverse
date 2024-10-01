@@ -17,6 +17,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LocalizationConverter", "So
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkeletalAnimationViewer", "Source\Tools\SkeletalAnimationViewer\SkeletalAnimationViewer\SkeletalAnimationViewer.vcxproj", "{4B3C5AC8-DEEE-4F4E-8A61-D892C2EBDDD6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Third Party", "Third Party", "{976A133F-D61E-4274-BE0E-1EB1D6788D50}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGui", "Vendor\imgui\ImGui.vcxproj", "{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -73,6 +77,14 @@ Global
 		{4B3C5AC8-DEEE-4F4E-8A61-D892C2EBDDD6}.Release|x64.Build.0 = Release|x64
 		{4B3C5AC8-DEEE-4F4E-8A61-D892C2EBDDD6}.Release|x86.ActiveCfg = Release|Win32
 		{4B3C5AC8-DEEE-4F4E-8A61-D892C2EBDDD6}.Release|x86.Build.0 = Release|Win32
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Debug|x64.ActiveCfg = Debug|x64
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Debug|x64.Build.0 = Debug|x64
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Debug|x86.ActiveCfg = Debug|Win32
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Debug|x86.Build.0 = Debug|Win32
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Release|x64.ActiveCfg = Release|x64
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Release|x64.Build.0 = Release|x64
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Release|x86.ActiveCfg = Release|Win32
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +92,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A0AAFC0F-9311-47DF-B530-1DCC69BF15FC} = {0A746299-4E97-4FCA-AA5B-8D506AE1D025}
 		{4B3C5AC8-DEEE-4F4E-8A61-D892C2EBDDD6} = {0A746299-4E97-4FCA-AA5B-8D506AE1D025}
+		{3965A3C2-180E-47CD-BB86-2FFD1992ABB9} = {976A133F-D61E-4274-BE0E-1EB1D6788D50}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44AEB2BB-90A4-46AE-8CBA-6B79FAA82840}
