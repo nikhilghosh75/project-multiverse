@@ -12,6 +12,8 @@ class Window
 public:
 	static bool windowRunning;
 
+	static bool imguiEnabled;
+
 	Window();
 
 	~Window();

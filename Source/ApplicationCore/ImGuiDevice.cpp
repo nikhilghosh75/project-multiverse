@@ -1,6 +1,7 @@
 #include "ImGuiDevice.h"
 #include "imgui.h"
 #include "SwapChain.h"
+#include "Window.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "backends/imgui_impl_win32.h"
 
@@ -35,6 +36,8 @@ void ImGuiDevice::Setup(HWND hwnd, Device* device)
     init_info.ImageCount = 2;
 
     ImGui_ImplVulkan_Init(&init_info);
+
+    Window::imguiEnabled = true;
 }
 
 void ImGuiDevice::StartFrame()
