@@ -46,6 +46,19 @@ void MainCombatHUDState::Render(CombatStage* stage)
 	}
 
 	VectorRenderer::Get()->SubmitPainter(painter);
+
+	position = startPosition;
+	for (int i = 0; i < actions.size(); i++)
+	{
+		ScreenCoordinate coordinate = ScreenCoordinate(glm::vec2(10, 10), position);
+		Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(50, 83.3), glm::vec2(0.5, 0.5));
+
+		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
+		bottomRight = bottomRight * 2.f - glm::vec2(1, 1);
+		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.006, 0.012), 24);
+
+		position += glm::vec2(0.1, 0);
+	}
 }
 
 void MainCombatHUDState::OnMeleeButtonClicked()

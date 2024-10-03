@@ -1,5 +1,6 @@
 #include "VectorRenderer.h"
 #include "Device.h"
+#include "Window.h"
 
 VectorPainter::VectorPainter()
 	: state(State::WaitingToBegin), screenSpace(ScreenSpace::Screen)
@@ -60,17 +61,23 @@ void VectorPainter::DrawRegularPolygon(glm::vec2 center, int sides, float radius
 
 	float deltaAngle = 3.141592f * 2.f / sides;
 
+	int screenWidth, screenHeight;
+	Window::GetWindowSize(&screenWidth, &screenHeight);
+
+	float radiusX = radius * (float)screenHeight / (float)screenWidth;
+	float radiusY = radius;
+
 	glm::vec2 startPoint = glm::vec2(
-		center.x + radius * std::cos(-angle),
-		center.y + radius * std::sin(-angle)
+		center.x + radiusX * std::cos(-angle),
+		center.y + radiusY * std::sin(-angle)
 	);
 	paths[paths.size() - 1].points.push_back(startPoint);
 
 	for (int i = 1; i < sides; i++)
 	{
 		glm::vec2 point = glm::vec2(
-			center.x + radius * std::cos(deltaAngle * i - angle),
-			center.y + radius * std::sin(deltaAngle * i - angle)
+			center.x + radiusX * std::cos(deltaAngle * i - angle),
+			center.y + radiusY * std::sin(deltaAngle * i - angle)
 		);
 		paths[paths.size() - 1].points.push_back(point);
 	}
