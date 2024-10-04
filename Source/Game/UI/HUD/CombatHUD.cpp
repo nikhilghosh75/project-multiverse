@@ -197,7 +197,13 @@ void CombatHUDState::StartExecuteAction(Action* action, CombatStage* combatStage
 	}
 	else
 	{
-		action->StartExecute(combatStage, combatStage->GetCurrentTurnCharacter());;
+		combatStage->GetCurrentTurnCharacter()->StartAction(action);
+		action->StartExecute(combatStage, combatStage->GetCurrentTurnCharacter());
+
+		if (action->Instant())
+		{
+			combatStage->GetCurrentTurnCharacter()->EndAction(combatStage);
+		}
 	}
 }
 

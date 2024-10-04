@@ -58,6 +58,64 @@ Rect ScreenCoordinate::CreateRect(ScreenCoordinate position, glm::vec2 dimension
 	return rect;
 }
 
+glm::vec2 ScreenCoordinate::ConvertPointBetweenSpace(glm::vec2 point, ScreenSpace space1, ScreenSpace space2)
+{
+	switch (space1)
+	{
+	case ScreenSpace::Rendering:
+	{
+		switch (space2)
+		{
+		case ScreenSpace::Rendering: return point;
+		case ScreenSpace::Screen: return glm::vec2((point.x + 1.f) / 2.f, (point.y + 1.f) / 2.f);
+		case ScreenSpace::Pixel: return point; // TODO: Implement this properly
+		}
+		break;
+	}
+	case ScreenSpace::Screen:
+	{
+		switch (space2)
+		{
+		case ScreenSpace::Rendering: return glm::vec2(point.x * 2.f - 1.f, point.y * 2.f - 1.f);
+		case ScreenSpace::Screen: return point;
+		case ScreenSpace::Pixel: return point; // TODO: Implement this properly
+		}
+		break;
+	}
+	}
+
+	return point;
+}
+
+Rect ScreenCoordinate::ConvertRectBetweenSpaces(Rect rect, ScreenSpace space1, ScreenSpace space2)
+{
+	switch (space1)
+	{
+	case ScreenSpace::Rendering:
+	{
+		switch (space2)
+		{
+		case ScreenSpace::Rendering: return rect;
+		case ScreenSpace::Screen: return Rect((rect.top + 1.f) / 2.f, (rect.bottom + 1.f) / 2.f, (rect.left + 1.f) / 2.f, (rect.right + 1.f) / 2.f);
+		case ScreenSpace::Pixel: return rect; // TODO: Implement this properly
+		}
+		break;
+	}
+	case ScreenSpace::Screen:
+	{
+		switch (space2)
+		{
+		case ScreenSpace::Rendering: return Rect(rect.top * 2.f - 1.f, rect.bottom * 2.f - 1.f, rect.left * 2.f - 1.f, rect.right * 2.f - 1.f);
+		case ScreenSpace::Screen: return rect;
+		case ScreenSpace::Pixel: return rect; // TODO: Implement this properly
+		}
+		break;
+	}
+	}
+
+	return rect;
+}
+
 glm::vec2 ScreenCoordinate::GetAnchoredPosition(Anchor anchor)
 {
 	switch (anchor)

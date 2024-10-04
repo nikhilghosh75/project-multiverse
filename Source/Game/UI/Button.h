@@ -5,5 +5,5 @@
 class Button
 {
 public:
-	static void Add(Rect rect, std::function<void()> callback);
+	static void Add(Rect rect, std::function<void()> clickedCallback, std::function<void()> hoveredCallback = [](){});
 };

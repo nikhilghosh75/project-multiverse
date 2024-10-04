@@ -42,6 +42,19 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		painter.DrawRegularPolygon(bottomRight, 6, 0.02f);
 
+		bool hovered = false;
+		Rect renderingRect = ScreenCoordinate::ConvertRectBetweenSpaces(rect, ScreenSpace::Screen, ScreenSpace::Rendering);
+		Button::Add(renderingRect, 
+			[this, stage, &actions, i]() { this->StartExecuteAction(actions[i], stage); }, 
+			[&hovered]() { hovered = true; }
+		);
+
+		if (hovered)
+		{
+			glm::vec2 textPosition = ScreenCoordinate::ConvertPointBetweenSpace(position + glm::vec2(0, 0.15), ScreenSpace::Screen, ScreenSpace::Rendering);
+			FontRenderer::Get()->AddText(actions[i]->GetDisplayName(), textPosition);
+		}
+
 		position += glm::vec2(0.1, 0);
 	}
 
@@ -61,33 +74,6 @@ void MainCombatHUDState::Render(CombatStage* stage)
 	}
 }
 
-void MainCombatHUDState::OnMeleeButtonClicked()
-{
-	CombatHUD::SetCurrentState(new MeleeCombatHUDState());
-}
-
-void MainCombatHUDState::OnGunButtonClicked()
-{
-	CombatHUD::SetCurrentState(new GunCombatHUDState());
-}
-
-void MainCombatHUDState::OnGuardButtonClicked()
-{
-	CombatHUD::SetCurrentState(new GuardCombatHUDState());
-}
-
-void MainCombatHUDState::OnPassButtonClicked(CombatStage* stage)
-{
-	PassAction* passAction = stage->GetCurrentTurnCharacter()->FindFirstActionOfType<PassAction>();
-
-	if (passAction)
-	{
-		stage->GetCurrentTurnCharacter()->StartAction(passAction);
-		passAction->StartExecute(stage, stage->GetCurrentTurnCharacter());
-		stage->GetCurrentTurnCharacter()->EndAction(stage);
-	}
-}
-
 void MainCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 {
 	if (stage->GetCurrentTurnCharacter()->type == CharacterType::Enemy)
@@ -99,3 +85,15 @@ void MainCombatHUDState::OnTurnAdvanced(CombatStage* stage)
 		CombatHUD::SetCurrentState(new MainCombatHUDState());
 	}
 }
+
+void MainCombatHUDState::OnTargetSelected(CombatStage* stage, Character* character)
+{
+	stage->GetCurrentTurnCharacter()->StartAction(action);
+	action->StartExecuteOnTarget(stage, stage->GetCurrentTurnCharacter(), character);
+
+	if (action->Instant())
+	{
+		stage->GetCurrentTurnCharacter()->EndAction(stage);
+	}
+}
+

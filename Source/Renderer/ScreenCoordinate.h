@@ -37,6 +37,10 @@ public:
 
 	static Rect CreateRect(ScreenCoordinate position, glm::vec2 dimensions, glm::vec2 pivot);
 
+	static glm::vec2 ConvertPointBetweenSpace(glm::vec2 point, ScreenSpace space1, ScreenSpace space2);
+
+	static Rect ConvertRectBetweenSpaces(Rect rect, ScreenSpace space1, ScreenSpace space2);
+
 private:
 	static glm::vec2 GetAnchoredPosition(Anchor anchor);
 
