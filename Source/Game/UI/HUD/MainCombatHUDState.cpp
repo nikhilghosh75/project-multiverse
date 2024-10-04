@@ -37,13 +37,13 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(50, 83.3), glm::vec2(0.5, 0.5));
 		Texture* texture = actions[i]->GetTexture() == nullptr ? noIconTexture : actions[i]->GetTexture();
 
-		ImageRenderer::Get()->AddImage(texture, rect, options);
+		ImageRenderingResult result = ImageRenderer::Get()->AddImage(texture, rect, options);
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		painter.DrawRegularPolygon(bottomRight, 6, 0.02f);
 
 		bool hovered = false;
-		Rect renderingRect = ScreenCoordinate::ConvertRectBetweenSpaces(rect, ScreenSpace::Screen, ScreenSpace::Rendering);
+		Rect renderingRect = ScreenCoordinate::ConvertRectBetweenSpaces(result.finalRect, ScreenSpace::Screen, ScreenSpace::Rendering);
 		Button::Add(renderingRect, 
 			[this, stage, &actions, i]() { this->StartExecuteAction(actions[i], stage); }, 
 			[&hovered]() { hovered = true; }
