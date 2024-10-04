@@ -7,9 +7,6 @@
 #include "ScreenCoordinate.h"
 #include "UI/Button.h"
 #include "EnemyTurnHUDState.h"
-#include "GuardCombatHUDState.h"
-#include "GunCombatHUDState.h"
-#include "MeleeCombatHUDState.h"
 
 #include <iostream>
 
