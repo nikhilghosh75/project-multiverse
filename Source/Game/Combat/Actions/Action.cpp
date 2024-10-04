@@ -67,3 +67,8 @@ bool Action::EndsTurn() const
 {
 	return immediatelyEndsTurn;
 }
+
+bool Action::Instant() const
+{
+	return instant;
+}

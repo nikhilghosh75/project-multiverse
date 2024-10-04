@@ -32,4 +32,5 @@ public:
 	int GetCost() const;
 	bool RequiresTarget() const;
 	bool EndsTurn() const;
+	bool Instant() const;
 };

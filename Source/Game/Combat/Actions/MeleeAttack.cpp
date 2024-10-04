@@ -64,8 +64,7 @@ const std::string& MeleeAttack::GetName() const
 std::string MeleeAttack::GetDisplayName() const
 {
 	return name + " (" + std::to_string(attackDamage) + "-"
-		+ std::to_string(attackDamage + variance) + " DMG,"
-		+ std::to_string(cost) + " AP)";
+		+ std::to_string(attackDamage + variance) + " DMG)";
 }
 
 void MeleeAttack::SetFromJson(const rapidjson::Value& data)

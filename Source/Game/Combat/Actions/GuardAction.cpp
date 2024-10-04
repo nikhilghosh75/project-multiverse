@@ -37,7 +37,7 @@ void GuardAction::StartExecute(CombatStage* stage, Character* executor)
 
 std::string GuardAction::GetDisplayName() const
 {
-	return name + "(+" + std::to_string(defenseIncrease) + " DEF, " + std::to_string(cost) + " AP)";
+	return name + "(+" + std::to_string(defenseIncrease) + " DEF)";
 }
 
 void GuardAction::SetFromJson(const rapidjson::Value& data)

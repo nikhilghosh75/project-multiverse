@@ -61,7 +61,7 @@ std::string GunAttack::GetDisplayName() const
 {
 	return name + "(" + std::to_string(baseDamage) + "-" +
 		std::to_string(baseDamage + damageVariance) + " DMG per shot, " + std::to_string(baseShots) +
-		"-" + std::to_string(baseShots + shotsVariance) + " Shots, " + std::to_string(cost) + " AP)";
+		"-" + std::to_string(baseShots + shotsVariance) + " Shots)";
 }
 
 void GunAttack::SetFromJson(const rapidjson::Value& data)
