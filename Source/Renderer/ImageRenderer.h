@@ -13,6 +13,13 @@ public:
 	bool keepAspectRatio;
 };
 
+class ImageRenderingResult
+{
+public:
+	Rect finalRect;
+	bool rendered;
+};
+
 class ImageRenderer
 {
 	static inline ImageRenderingOptions defaultOptions;
@@ -23,7 +30,7 @@ public:
 
 	static ImageRenderer* Get();
 
-	void AddImage(Texture* texture, Rect rect, ImageRenderingOptions options = defaultOptions);
+	ImageRenderingResult AddImage(Texture* texture, Rect rect, ImageRenderingOptions options = defaultOptions);
 
 	void Render();
 

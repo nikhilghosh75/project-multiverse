@@ -33,7 +33,7 @@ ImageRenderer* ImageRenderer::Get()
     return instance;
 }
 
-void ImageRenderer::AddImage(Texture* texture, Rect rect, ImageRenderingOptions options)
+ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageRenderingOptions options)
 {
     currentTexture = texture;
 
@@ -56,6 +56,12 @@ void ImageRenderer::AddImage(Texture* texture, Rect rect, ImageRenderingOptions 
     vertices.push_back(bottomRightVertex);
 
     Render();
+
+    ImageRenderingResult result;
+    result.finalRect = rect;
+    result.rendered = true;
+
+    return result;
 }
 
 void ImageRenderer::Render()

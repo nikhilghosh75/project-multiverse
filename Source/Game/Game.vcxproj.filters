@@ -63,22 +63,13 @@
     <ClCompile Include="Combat\Actions\MeleeAttack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\HUD\MeleeCombatHUDState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Core\Time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI\HUD\EnemyTurnHUDState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI\HUD\GunCombatHUDState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Combat\Actions\GunAttack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\HUD\GuardCombatHUDState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Combat\Actions\GuardAction.cpp">
@@ -146,22 +137,13 @@
     <ClInclude Include="Combat\Actions\MeleeAttack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UI\HUD\MeleeCombatHUDState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI\HUD\EnemyTurnHUDState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UI\HUD\GunCombatHUDState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Combat\Actions\GunAttack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\HUD\GuardCombatHUDState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Combat\Actions\GuardAction.h">

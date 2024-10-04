@@ -58,10 +58,10 @@ void PlayerCharacter::EndAction(CombatStage* stage)
 
 void PlayerCharacter::AddTempAbilities()
 {
-	actions.push_back(new MeleeAttack("Teleporting Sword (IO)", 9, 3, 3));
-	actions.push_back(new MeleeAttack("Standard Punch", 5, 1, 2));
-	actions.push_back(new GunAttack("Blubberbus (Curse of the Corsair)", 4, 2, 1, 1, 2));
-	actions.push_back(new GuardAction("Weak Guard", 2, 1));
-	actions.push_back(new GuardAction("Strong Guard", 4, 2));
+	actions.push_back(new MeleeAttack("Teleporting Sword (IO)", 9, 3, 3, "Data/Sprites/UI/Icons/Icon Teleporting Sword.png"));
+	actions.push_back(new MeleeAttack("Standard Punch", 5, 1, 2, "Data/Sprites/UI/Icons/Icon Standard Punch.png"));
+	actions.push_back(new GunAttack("Blubberbus (Curse of the Corsair)", 4, 2, 1, 1, 2, "Data/Sprites/UI/Icons/Icon Blubberbus.png"));
+	actions.push_back(new GuardAction("Weak Guard", 2, 1, "Data/Sprites/UI/Icons/Icon Shield Small.png"));
+	actions.push_back(new GuardAction("Strong Guard", 4, 2, "Data/Sprites/UI/Icons/Icon Shield Big.png"));
 	actions.push_back(new PassAction());
 }

@@ -8,6 +8,8 @@ public:
 
 	GuardAction(std::string name, int defenseIncrease, int cost);
 
+	GuardAction(std::string name, int defenseIncrease, int cost, std::string iconPath);
+
 	void StartExecute(CombatStage* stage, Character* executor);
 
 	std::string GetDisplayName() const;

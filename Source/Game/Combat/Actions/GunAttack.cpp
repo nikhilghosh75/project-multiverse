@@ -24,6 +24,17 @@ GunAttack::GunAttack(std::string name, int damage, int variance, int shots, int 
 	this->immediatelyEndsTurn = false;
 }
 
+GunAttack::GunAttack(std::string name, int damage, int variance, int shots, int shotsVariance, int cost, std::string iconPath)
+	: name(name), baseDamage(damage), damageVariance(variance), baseShots(shots), shotsVariance(shotsVariance)
+{
+	this->cost = cost;
+	this->icon = new Texture(iconPath);
+
+	this->requiresTarget = true;
+	this->instant = false;
+	this->immediatelyEndsTurn = false;
+}
+
 void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character)
 {
 	target = character;
@@ -50,7 +61,7 @@ std::string GunAttack::GetDisplayName() const
 {
 	return name + "(" + std::to_string(baseDamage) + "-" +
 		std::to_string(baseDamage + damageVariance) + " DMG per shot, " + std::to_string(baseShots) +
-		"-" + std::to_string(baseShots + shotsVariance) + " Shots, " + std::to_string(cost) + " AP)";
+		"-" + std::to_string(baseShots + shotsVariance) + " Shots)";
 }
 
 void GunAttack::SetFromJson(const rapidjson::Value& data)
@@ -62,6 +73,11 @@ void GunAttack::SetFromJson(const rapidjson::Value& data)
 	shotsVariance = data["shots_variance"].GetInt();
 
 	cost = data["cost"].GetInt();
+
+	if (data.HasMember("icon"))
+	{
+		icon = new Texture(data["icon"].GetString());
+	}
 }
 
 void GunAttack::ExecuteShot(CombatStage* combatStage, Character* executor)

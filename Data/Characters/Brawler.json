@@ -8,13 +8,15 @@
         "type": "melee",
         "cost": 2,
         "base_damage": 6,
-        "variance": 3
+        "variance": 3,
+        "icon": "Data/Sprites/UI/Icons/Icon Standard Punch.png"
     }, {
         "name": "Jump Kick",
         "type": "melee",
         "cost": 3,
         "base_damage": 8,
-        "variance": 5
+        "variance": 5,
+        "icon": "Data/Sprites/UI/Icons/Icon Jump Kick.png"
     }],
     "sprite": "Data/Sprites/Companions/Brawler.png"
 }

@@ -15,4 +15,8 @@ std::string PassAction::GetDisplayName() const
 
 void PassAction::SetFromJson(const rapidjson::Value& data)
 {
+	if (data.HasMember("icon"))
+	{
+		icon = new Texture(data["icon"].GetString());
+	}
 }

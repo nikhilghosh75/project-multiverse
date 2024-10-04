@@ -21,6 +21,17 @@ MeleeAttack::MeleeAttack(std::string name, int damage, int variance, int cost)
 	this->immediatelyEndsTurn = false;
 }
 
+MeleeAttack::MeleeAttack(std::string name, int damage, int variance, int cost, std::string iconPath)
+	: name(name), attackDamage(damage), variance(variance), lastDamage(0)
+{
+	this->cost = cost;
+	this->icon = new Texture(iconPath);
+
+	this->requiresTarget = true;
+	this->instant = true;
+	this->immediatelyEndsTurn = false;
+}
+
 void MeleeAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* target)
 {
 	CalculateDamage();
@@ -53,8 +64,7 @@ const std::string& MeleeAttack::GetName() const
 std::string MeleeAttack::GetDisplayName() const
 {
 	return name + " (" + std::to_string(attackDamage) + "-"
-		+ std::to_string(attackDamage + variance) + " DMG,"
-		+ std::to_string(cost) + " AP)";
+		+ std::to_string(attackDamage + variance) + " DMG)";
 }
 
 void MeleeAttack::SetFromJson(const rapidjson::Value& data)
@@ -63,4 +73,9 @@ void MeleeAttack::SetFromJson(const rapidjson::Value& data)
 	cost = data["cost"].GetInt();
 	attackDamage = data["base_damage"].GetInt();
 	variance = data["variance"].GetInt();
+
+	if (data.HasMember("icon"))
+	{
+		icon = new Texture(data["icon"].GetString());
+	}
 }

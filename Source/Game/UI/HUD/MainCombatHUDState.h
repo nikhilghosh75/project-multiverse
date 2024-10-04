@@ -9,13 +9,9 @@ public:
 	void Render(CombatStage* stage);
 
 private:
-	void OnMeleeButtonClicked();
-
-	void OnGunButtonClicked();
-
-	void OnGuardButtonClicked();
-
-	void OnPassButtonClicked(CombatStage* stage);
-
 	void OnTurnAdvanced(CombatStage* stage);
+
+	void OnTargetSelected(CombatStage* stage, Character* character);
+
+	Texture* noIconTexture;
 };
