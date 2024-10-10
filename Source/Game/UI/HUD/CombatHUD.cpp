@@ -121,7 +121,7 @@ void CombatHUD::RenderDamageNumbers(CombatStage* stage)
 void CombatHUD::RenderCurrentTurnTriangle(CombatStage* stage)
 {
 	Character* character = stage->GetCurrentTurnCharacter();
-	ScreenCoordinate coordinate = ScreenCoordinate(glm::vec2(0, -65), character->screenPosition);
+	ScreenCoordinate coordinate = ScreenCoordinate(glm::vec2(0, -65), character->baseScreenPosition);
 	ImageRenderer::Get()->AddImage(triangleTexture, ScreenCoordinate::CreateRect(coordinate, glm::vec2(15, 15), glm::vec2(0.5, 0.5)));
 }
 
@@ -152,11 +152,11 @@ void CombatHUD::RenderCharacterHUDs(CombatStage* stage)
 
 void CombatHUD::RenderCharacterHUD(CombatStage* stage, Character* character, VectorPainter* painter)
 {
-	glm::vec2 textPosition = (character->screenPosition + characterNameOffset) * 2.f - glm::vec2(1.f, 1.f);
+	glm::vec2 textPosition = (character->baseScreenPosition + characterNameOffset) * 2.f - glm::vec2(1.f, 1.f);
 	FontRenderer::Get()->AddText(character->name, textPosition);
 
 	float healthPercent = (float)character->GetHealth() / (float)character->GetMaxHealth();
-	glm::vec2 basePosition = character->screenPosition + healthBarOffset;
+	glm::vec2 basePosition = character->baseScreenPosition + healthBarOffset;
 
 	painter->SetFillColor(Color((uint8_t)130, 40, 40, 255));
 	painter->BeginPath();

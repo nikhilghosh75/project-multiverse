@@ -24,7 +24,8 @@ public:
 	CharacterType type;
 	std::string name;
 
-	glm::vec2 screenPosition;
+	glm::vec2 baseScreenPosition;
+	glm::vec2 screenOffset;
 
 	virtual int Damage(int damage); // Returns the actual amount of damage done
 	virtual void DeductActionPoints(int actionPoints);
