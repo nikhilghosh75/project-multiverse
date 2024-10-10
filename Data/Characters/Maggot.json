@@ -6,12 +6,12 @@
     "power_rating": 2,
     "actions": [{
         "name": "Shot",
-        "type": "gun",
+        "type": "melee",
         "cost": 2,
-        "base_damage": 2,
-        "damage_variance": 3,
-        "base_shots": 2,
-        "shots_variance": 1
+        "base_damage": 4,
+        "variance": 2,
+        "visual_type": "crash",
+        "crash_time": 0.7
     }],
     "sprite": "Data/Sprites/Enemies/Maggot.png"
 }
