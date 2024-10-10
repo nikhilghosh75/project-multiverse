@@ -3,6 +3,8 @@
 
 std::chrono::high_resolution_clock::time_point lastTimePoint;
 
+static const int DEFAULT_FRAMERATE = 60;
+
 float Time::GetTime()
 {
 	return time;
@@ -10,6 +12,11 @@ float Time::GetTime()
 
 float Time::GetDeltaTime()
 {
+	if (deltaTime > 1.f)
+	{
+		return 1.0f / DEFAULT_FRAMERATE;
+	}
+
 	return deltaTime;
 }
 
