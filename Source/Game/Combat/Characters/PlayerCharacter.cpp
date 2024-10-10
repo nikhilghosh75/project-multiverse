@@ -17,7 +17,8 @@ PlayerCharacter::PlayerCharacter()
 	texture = new Texture("Data/Sprites/Player/Wolvey.png");
 	type = CharacterType::Player;
 
-	screenPosition = playerScreenPosition;
+	baseScreenPosition = playerScreenPosition;
+	screenOffset = glm::vec2(0, 0);
 
 	AddTempAbilities();
 }
@@ -28,7 +29,8 @@ PlayerCharacter::PlayerCharacter(PlayerState* _playerState)
 	texture = new Texture("Data/Sprites/Player/Wolvey.png");
 	type = CharacterType::Player;
 
-	screenPosition = playerScreenPosition;
+	baseScreenPosition = playerScreenPosition;
+	screenOffset = glm::vec2(0, 0);
 
 	health = playerState->health;
 	maxHealth = playerState->maxHealth;
@@ -41,7 +43,7 @@ PlayerCharacter::PlayerCharacter(PlayerState* _playerState)
 void PlayerCharacter::Render()
 {
 	// Render Player Sprite
-	ScreenCoordinate playerPosition = ScreenCoordinate(glm::vec2(0, 0), playerScreenPosition);
+	ScreenCoordinate playerPosition = ScreenCoordinate(glm::vec2(0, 0), playerScreenPosition + screenOffset);
 	Rect rect = ScreenCoordinate::CreateRect(playerPosition, glm::vec2(80, 120), glm::vec2(0.5, 0.5));
 
 	ImageRenderingOptions options;

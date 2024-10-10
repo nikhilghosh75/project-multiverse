@@ -15,7 +15,12 @@ CompanionCharacter::CompanionCharacter()
 CompanionCharacter::CompanionCharacter(const CompanionCharacter* baseCharacter)
 {
 	type = CharacterType::Companion;
-	actions = baseCharacter->actions;
+	
+	for (int i = 0; i < baseCharacter->actions.size(); i++)
+	{
+		actions.push_back(baseCharacter->actions[i]);
+	}
+
 	actionPointsPerTurn = baseCharacter->actionPointsPerTurn;
 	name = baseCharacter->name;
 	maxHealth = baseCharacter->maxHealth;
@@ -23,13 +28,15 @@ CompanionCharacter::CompanionCharacter(const CompanionCharacter* baseCharacter)
 
 	texture = baseCharacter->texture;
 
-	screenPosition = companionPosition;
+	baseScreenPosition = companionPosition;
+	screenOffset = glm::vec2(0, 0);
 }
 
 CompanionCharacter::CompanionCharacter(const rapidjson::Document& data)
 {
 	type = CharacterType::Companion;
-	screenPosition = companionPosition;
+	baseScreenPosition = companionPosition;
+	screenOffset = glm::vec2(0, 0);
 	SetFromJsonData(data);
 }
 
@@ -40,7 +47,7 @@ void CompanionCharacter::Render()
 		return;
 	}
 
-	ScreenCoordinate companionScreenPosition = ScreenCoordinate(glm::vec2(0, 0), screenPosition);
+	ScreenCoordinate companionScreenPosition = ScreenCoordinate(glm::vec2(0, 0), baseScreenPosition + screenOffset);
 	Rect rect = ScreenCoordinate::CreateRect(companionScreenPosition, glm::vec2(80, 120), glm::vec2(0.5, 0.5));
 
 	ImageRenderingOptions options;
