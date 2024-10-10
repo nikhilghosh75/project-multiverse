@@ -31,6 +31,8 @@ GuardAction::GuardAction(std::string name, int defenseIncrease, int cost, std::s
 
 void GuardAction::StartExecute(CombatStage* stage, Character* executor)
 {
+	Action::StartExecute(stage, executor);
+
 	executor->IncreaseDefense(defenseIncrease);
 	executor->DeductActionPoints(cost);
 }
