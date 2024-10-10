@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "rapidjson/document.h"
 
+class ActionVisual;
 class CombatStage;
 class Character;
 
@@ -15,6 +16,7 @@ protected:
 	bool immediatelyEndsTurn = false;
 
 	Texture* icon;
+	ActionVisual* visual;
 public:
 	static Action* CreateFromJson(const rapidjson::Value& data);
 
@@ -33,4 +35,21 @@ public:
 	bool RequiresTarget() const;
 	bool EndsTurn() const;
 	bool Instant() const;
+
+private:
+	static ActionVisual* CreateVisualFromJson(const rapidjson::Value& data);
+
+	Character* currentTarget;
+};
+
+class ActionVisual
+{
+public:
+	virtual void Start(Action* action, Character* executor, Character* target);
+
+	virtual void Update(Action* action, Character* executor, Character* target);
+
+	virtual void End(Action* action, Character* executor, Character* target);
+
+	virtual float GetVisualTime() const { return 0.0f; }
 };

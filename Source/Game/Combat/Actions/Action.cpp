@@ -1,6 +1,7 @@
 #include "Action.h"
 #include "Combat/CombatStage.h"
 #include "Combat/Characters/Character.h"
+#include "CrashActionVisual.h"
 #include "GuardAction.h"
 #include "GunAttack.h"
 #include "MeleeAttack.h"
@@ -30,6 +31,7 @@ Action* Action::CreateFromJson(const rapidjson::Value& data)
 	if (action)
 	{
 		action->SetFromJson(data);
+		action->visual = CreateVisualFromJson(data);
 	}
 
 	return action;
@@ -37,15 +39,28 @@ Action* Action::CreateFromJson(const rapidjson::Value& data)
 
 void Action::StartExecute(CombatStage* stage, Character* executor)
 {
-	
+	if (visual != nullptr)
+	{
+		visual->Start(this, executor, nullptr);
+	}
 }
 
 void Action::StartExecuteOnTarget(CombatStage* stage, Character* executor, Character* target)
 {
+	currentTarget = target;
+
+	if (visual != nullptr)
+	{
+		visual->Start(this, executor, target);
+	}
 }
 
 void Action::UpdateExecute(CombatStage* stage, Character* executor)
 {
+	if (visual != nullptr)
+	{
+		visual->Update(this, executor, currentTarget);
+	}
 }
 
 Texture* Action::GetTexture() const
@@ -71,4 +86,34 @@ bool Action::EndsTurn() const
 bool Action::Instant() const
 {
 	return instant;
+}
+
+ActionVisual* Action::CreateVisualFromJson(const rapidjson::Value& data)
+{
+	ActionVisual* actionVisual = nullptr;
+
+	if (!data.HasMember("visual_type"))
+	{
+		return nullptr;
+	}
+
+	if (strcmp(data["visual_type"].GetString(), "crash") == 0)
+	{
+		actionVisual = new CrashActionVisual(data);
+	}
+
+	return actionVisual;
+}
+
+void ActionVisual::Start(Action* action, Character* executor, Character* target)
+{
+}
+
+void ActionVisual::Update(Action* action, Character* executor, Character* target)
+{
+
+}
+
+void ActionVisual::End(Action* action, Character* executor, Character* target)
+{
 }

@@ -11,23 +11,32 @@ const float cooldownTime = 2.5f;
 EnemyCharacter::EnemyCharacter()
 {
 	type = CharacterType::Enemy;
+	screenOffset = glm::vec2(0, 0);
 }
 
 EnemyCharacter::EnemyCharacter(const EnemyCharacter* baseCharacter)
 {
 	type = CharacterType::Enemy;
-	actions = baseCharacter->actions;
+	
+	for (int i = 0; i < baseCharacter->actions.size(); i++)
+	{
+		actions.push_back(baseCharacter->actions[i]);
+	}
+
 	actionPointsPerTurn = baseCharacter->actionPointsPerTurn;
 	name = baseCharacter->name;
 	maxHealth = baseCharacter->maxHealth;
 	health = baseCharacter->health;
 
 	texture = baseCharacter->texture;
+
+	screenOffset = glm::vec2(0, 0);
 }
 
 EnemyCharacter::EnemyCharacter(const rapidjson::Document& data)
 {
 	type = CharacterType::Enemy;
+	screenOffset = glm::vec2(0, 0);
 	SetFromJsonData(data);
 }
 
@@ -38,7 +47,7 @@ void EnemyCharacter::Render()
 		return;
 	}
 
-	ScreenCoordinate enemyPosition = ScreenCoordinate(glm::vec2(0, 0), screenPosition);
+	ScreenCoordinate enemyPosition = ScreenCoordinate(glm::vec2(0, 0), baseScreenPosition + screenOffset);
 	Rect rect = ScreenCoordinate::CreateRect(enemyPosition, glm::vec2(80, 120), glm::vec2(0.5, 0.5));
 
 	ImageRenderingOptions options;

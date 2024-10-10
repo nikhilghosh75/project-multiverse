@@ -34,12 +34,14 @@ MeleeAttack::MeleeAttack(std::string name, int damage, int variance, int cost, s
 
 void MeleeAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* target)
 {
+	Action::StartExecuteOnTarget(combatStage, executor, target);
+
 	CalculateDamage();
 
 	int actualDamage = target->Damage(lastDamage);
 	executor->DeductActionPoints(cost);
 
-	glm::vec2 damageNumberPosition = target->screenPosition + glm::vec2(0.05, -0.05);
+	glm::vec2 damageNumberPosition = target->baseScreenPosition + glm::vec2(0.05, -0.05);
 	damageNumberPosition = damageNumberPosition * 2.f - glm::vec2(1.f, 1.f);
 	CombatHUD::AddDamageNumber(FloatingDamageNumber(actualDamage, damageNumberPosition, 2.f));
 }

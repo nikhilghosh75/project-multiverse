@@ -37,6 +37,8 @@ GunAttack::GunAttack(std::string name, int damage, int variance, int shots, int 
 
 void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character)
 {
+	Action::StartExecuteOnTarget(combatStage, executor, target);
+
 	target = character;
 	time = timeBetweenShots;
 	currentShot = 0;
@@ -48,8 +50,9 @@ void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* execut
 
 void GunAttack::UpdateExecute(CombatStage* combatStage, Character* executor)
 {
+	Action::UpdateExecute(combatStage, executor);
+
 	time -= Time::GetDeltaTime();
-	
 
 	if (time < 0)
 	{
@@ -89,7 +92,7 @@ void GunAttack::ExecuteShot(CombatStage* combatStage, Character* executor)
 		int damage = baseDamage + std::rand() % damageVariance;
 		int actualDamage = target->Damage(damage);
 
-		glm::vec2 damageNumberPosition = target->screenPosition + glm::vec2(0.05, -0.05);
+		glm::vec2 damageNumberPosition = target->baseScreenPosition + glm::vec2(0.05, -0.05);
 		damageNumberPosition = damageNumberPosition * 2.f - glm::vec2(1.f, 1.f);
 		CombatHUD::AddDamageNumber(FloatingDamageNumber(actualDamage, damageNumberPosition, 2.f));
 
