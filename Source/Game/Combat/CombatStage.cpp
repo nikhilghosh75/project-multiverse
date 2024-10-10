@@ -24,7 +24,7 @@ CombatStage::CombatStage(EncounterInfo& info)
 	{
 		glm::vec2 position = enemyPositions[info.enemies.size()][i];
 		EnemyCharacter* enemyCharacter = new EnemyCharacter(info.enemies[i].character);
-		enemyCharacter->screenPosition = position;
+		enemyCharacter->baseScreenPosition = position;
 		enemies.push_back(enemyCharacter);
 	}
 
