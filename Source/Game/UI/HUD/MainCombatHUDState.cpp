@@ -1,6 +1,7 @@
 #include "MainCombatHUDState.h"
 #include "Combat/CombatStage.h"
 #include "Combat/Actions/PassAction.h"
+#include "DebugRenderer.h"
 #include "FontRenderer.h"
 #include "ImageRenderer.h"
 #include "VectorRenderer.h"
@@ -66,6 +67,9 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		bottomRight = bottomRight * 2.f - glm::vec2(1, 1);
 		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.006, 0.012), 24);
+
+		Rect screenRect = ScreenCoordinate::ConvertRectBetweenSpaces(rect, ScreenSpace::Screen, ScreenSpace::Rendering);
+		DebugRenderer::Get()->AddBox(screenRect);
 
 		position += glm::vec2(0.1, 0);
 	}

@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DebugRenderer.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontRenderer.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="VectorRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugRenderer.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontRenderer.h" />
     <ClInclude Include="ImageRenderer.h" />

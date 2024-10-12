@@ -50,6 +50,16 @@ void RenderPipeline::SetColorBlendingEnabled(bool enabled)
     colorBlendingEnabled = enabled;
 }
 
+void RenderPipeline::SetTopology(VkPrimitiveTopology topology)
+{
+    primitiveTopology = topology;
+}
+
+void RenderPipeline::SetPolygonMode(VkPolygonMode mode)
+{
+    polygonMode = mode;
+}
+
 void RenderPipeline::Create()
 {
     VkDevice vulkanDevice = Device::Get()->GetVulkanDevice();
@@ -75,7 +85,7 @@ void RenderPipeline::Create()
     // Describes what types of primatives (point, line, etc.)
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    inputAssembly.topology = primitiveTopology;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
     // Describes the region of the framebuffer that will be used
@@ -105,7 +115,7 @@ void RenderPipeline::Create()
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.polygonMode = polygonMode;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
