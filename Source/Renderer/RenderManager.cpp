@@ -11,10 +11,12 @@ RenderManager::~RenderManager()
 	delete fontRenderer;
 	delete imageRenderer;
 	delete vectorRenderer;
+	delete debugRenderer;
 }
 
 void RenderManager::Setup()
 {	
+	debugRenderer = new DebugRenderer();
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
 	vectorRenderer = new VectorRenderer();
