@@ -35,7 +35,6 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(50, 83.3), glm::vec2(0.5, 0.5));
 		Texture* texture = actions[i]->GetTexture() == nullptr ? noIconTexture : actions[i]->GetTexture();
 
-		/*
 		ImageRenderingResult result = ImageRenderer::Get()->AddImage(texture, rect, options);
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
@@ -53,7 +52,6 @@ void MainCombatHUDState::Render(CombatStage* stage)
 			glm::vec2 textPosition = ScreenCoordinate::ConvertPointBetweenSpace(position + glm::vec2(0, 0.15), ScreenSpace::Screen, ScreenSpace::Rendering);
 			FontRenderer::Get()->AddText(actions[i]->GetDisplayName(), textPosition);
 		}
-		*/
 
 		position += glm::vec2(0.1, 0);
 	}
