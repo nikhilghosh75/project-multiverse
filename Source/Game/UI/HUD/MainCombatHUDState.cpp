@@ -1,6 +1,7 @@
 #include "MainCombatHUDState.h"
 #include "Combat/CombatStage.h"
 #include "Combat/Actions/PassAction.h"
+#include "DebugRenderer.h"
 #include "FontRenderer.h"
 #include "ImageRenderer.h"
 #include "VectorRenderer.h"
@@ -34,6 +35,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(50, 83.3), glm::vec2(0.5, 0.5));
 		Texture* texture = actions[i]->GetTexture() == nullptr ? noIconTexture : actions[i]->GetTexture();
 
+		/*
 		ImageRenderingResult result = ImageRenderer::Get()->AddImage(texture, rect, options);
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
@@ -51,6 +53,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 			glm::vec2 textPosition = ScreenCoordinate::ConvertPointBetweenSpace(position + glm::vec2(0, 0.15), ScreenSpace::Screen, ScreenSpace::Rendering);
 			FontRenderer::Get()->AddText(actions[i]->GetDisplayName(), textPosition);
 		}
+		*/
 
 		position += glm::vec2(0.1, 0);
 	}
@@ -66,6 +69,9 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		bottomRight = bottomRight * 2.f - glm::vec2(1, 1);
 		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.006, 0.012), 24);
+
+		Rect screenRect = ScreenCoordinate::ConvertRectBetweenSpaces(rect, ScreenSpace::Screen, ScreenSpace::Rendering);
+		DebugRenderer::Get()->AddBox(screenRect);
 
 		position += glm::vec2(0.1, 0);
 	}
