@@ -8,7 +8,7 @@ TempDefeatStage::TempDefeatStage()
 
 void TempDefeatStage::Update()
 {
-	FontRenderer::Get()->AddText("You have lost", glm::vec2(0, 0));
+	FontRenderer::Get()->AddText("You have lost", glm::vec2(0, 0), 48);
 }
 
 void TempDefeatStage::Render()

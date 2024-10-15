@@ -65,7 +65,7 @@ void CombatHUD::AddDamageNumber(FloatingDamageNumber damageNumber)
 
 void CombatHUD::RenderTargetSelection(CombatStage* stage)
 {
-	FontRenderer::Get()->AddText("Select a target", glm::vec2(-0.2, -0.8), 27);
+	FontRenderer::Get()->AddText("Select a target", glm::vec2(-0.2, -0.8), 81);
 
 	std::vector<glm::vec2>& enemyPositions = stage->GetEnemyPositions();
 	std::vector<EnemyCharacter*> enemies = stage->GetEnemyCharacters();
@@ -78,7 +78,7 @@ void CombatHUD::RenderTargetSelection(CombatStage* stage)
 
 		if (enemyRect.IsPointInside(mouseNormalizedPosition.x, mouseNormalizedPosition.y))
 		{
-			FontRenderer::Get()->AddText(enemies[i]->name, glm::vec2(-0.1, -0.7), 18);
+			FontRenderer::Get()->AddText(enemies[i]->name, glm::vec2(-0.1, -0.7), 54);
 			RenderCrosshair(enemyPositions[i]);
 
 			if (Input::GetMouseButtonDown(MouseButton::Left))
@@ -109,7 +109,7 @@ void CombatHUD::RenderDamageNumbers(CombatStage* stage)
 			continue;
 		}
 
-		FontRenderer::Get()->AddText(std::to_string(damageNumbers[i].damage), damageNumbers[i].startingPosition, 36);
+		FontRenderer::Get()->AddText(std::to_string(damageNumbers[i].damage), damageNumbers[i].startingPosition, 108);
 	}
 
 	if (indexToDelete != -1)
@@ -153,7 +153,7 @@ void CombatHUD::RenderCharacterHUDs(CombatStage* stage)
 void CombatHUD::RenderCharacterHUD(CombatStage* stage, Character* character, VectorPainter* painter)
 {
 	glm::vec2 textPosition = (character->baseScreenPosition + characterNameOffset) * 2.f - glm::vec2(1.f, 1.f);
-	FontRenderer::Get()->AddText(character->name, textPosition);
+	FontRenderer::Get()->AddText(character->name, textPosition, 48);
 
 	float healthPercent = (float)character->GetHealth() / (float)character->GetMaxHealth();
 	glm::vec2 basePosition = character->baseScreenPosition + healthBarOffset;
@@ -178,7 +178,7 @@ void CombatHUD::RenderCharacterHUD(CombatStage* stage, Character* character, Vec
 
 	if (character->type == CharacterType::Player || character->type == CharacterType::Companion)
 	{
-		FontRenderer::Get()->AddText(std::to_string(character->GetActionPoints()) + " AP", textPosition + glm::vec2(0, 0.04));
+		FontRenderer::Get()->AddText(std::to_string(character->GetActionPoints()) + " AP", textPosition + glm::vec2(0, 0.04), 72);
 	}
 }
 
