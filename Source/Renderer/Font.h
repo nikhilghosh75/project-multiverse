@@ -38,11 +38,9 @@ public:
 	{
 	public:
 		unsigned int charCode;
-		float xAdvance;
+		float xAdvance; // In Pixels
 		Rect uvCoordinates;
 		glm::vec2 offset;
-		int ascent;
-		int decent;
 
 		bool operator<(const Character& other) const
 		{

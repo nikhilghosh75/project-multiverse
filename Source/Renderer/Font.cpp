@@ -5,9 +5,15 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H 
+
 #define FONT_MIN_RESOLUTION 32
 #define FONT_MAX_RESOLUTION 65536
 #define FONT_MIN_RESOLUTION_PER_CHARACTER 32
+
+static FT_Library library;
+static bool libraryInitialized = false;
 
 Font::Font()
 {
@@ -63,57 +69,80 @@ float Font::GetBitmapHeight() const
 
 void Font::ReadFromTTFBuffer(void* data, uint32_t size)
 {
-	stbtt_fontinfo fontInfo;
-	stbtt_InitFont(&fontInfo, reinterpret_cast<unsigned char*>(data), 0);
+	if (!libraryInitialized)
+	{
+		if (FT_Init_FreeType(&library))
+		{
+			// TODO: Handle Error
+		}
 
-	// TODO: Maybe change this later
+		libraryInitialized = true;
+	}
+
+	FT_Face face;
+	FT_New_Memory_Face(library, (FT_Byte*)data, size, 0, &face);
+	// TODO: Handle face loading errors
+
+	// TODO: Change later
 	defaultSize = 36.f;
+	FT_Set_Pixel_Sizes(face, 0, 36);
 
-	characters.reserve(fontInfo.numGlyphs);
+	// TODO: Change later
+	bitmapResolution = GetIdealBitmapResolution(233);
 
-	int _bitmapResolution = GetIdealBitmapResolution(fontInfo.numGlyphs);
-	float scale = stbtt_ScaleForPixelHeight(&fontInfo, defaultSize);
-	unsigned char* bitmap = (unsigned char*)malloc(_bitmapResolution * _bitmapResolution * sizeof(unsigned char));
-	stbtt_bakedchar* bakedChars = new stbtt_bakedchar[fontInfo.numGlyphs];
-	int result = stbtt_BakeFontBitmap(reinterpret_cast<unsigned char*>(data), 0, 60, bitmap, _bitmapResolution, _bitmapResolution, 32, fontInfo.numGlyphs, bakedChars);
+	const int textureDimensions = 1024;
+	std::vector<unsigned char> textureData(textureDimensions * textureDimensions, 0);
 
-	bitmapResolution = static_cast<float>(_bitmapResolution);
-	texture = new Texture(bitmap, _bitmapResolution, _bitmapResolution, 1);
-	int currentChar = 1;
+	int offsetX = 0, offsetY = 0;
+	int maxRowHeight = 0;
 
 	for (int i = 33; i < 256; i++)
 	{
-		int glyphIndex = stbtt_FindGlyphIndex(&fontInfo, i);
-		if (glyphIndex == 0)
+		if (FT_Load_Char(face, i, FT_LOAD_RENDER))
+		{
+			// TODO: Handle error
 			continue;
+		}
 
-		stbtt_bakedchar& bakedChar = bakedChars[currentChar];
+		FT_Bitmap& bitmap = face->glyph->bitmap;
+
+		if (offsetX + bitmap.width >= textureDimensions)
+		{
+			offsetX = 0;
+			offsetY += maxRowHeight;
+			maxRowHeight = 0;
+		}
+
+		if (bitmap.rows > maxRowHeight) 
+		{
+			maxRowHeight = bitmap.rows;
+		}
+
+		for (int y = 0; y < bitmap.rows; ++y) 
+		{
+			for (int x = 0; x < bitmap.width; ++x) 
+			{
+				textureData[(offsetY + y) * textureDimensions + (offsetX + x)] = bitmap.buffer[y * bitmap.pitch + x];
+			}
+		}
 
 		Font::Character charInfo;
 		charInfo.charCode = i;
+		charInfo.xAdvance = face->glyph->advance.x >> 6;
+		charInfo.offset.x = face->glyph->bitmap_left;
+		charInfo.offset.y = face->glyph->bitmap_top;
 
-		if ((char)charInfo.charCode == 'o')
-		{
-			charInfo.charCode = i;
-		}
-
-		charInfo.xAdvance = bakedChar.xadvance;
-
-		charInfo.uvCoordinates.left = (float)bakedChar.x0 / bitmapResolution;
-		charInfo.uvCoordinates.bottom = (float)bakedChar.y0 / bitmapResolution;
-		charInfo.uvCoordinates.right = (float)bakedChar.x1 / bitmapResolution;
-		charInfo.uvCoordinates.top = (float)bakedChar.y1 / bitmapResolution;
-		charInfo.offset = glm::vec2((float)bakedChar.xoff, (float)bakedChar.yoff);
-
-		int x0, x1; // Unused currently
-		stbtt_GetCodepointBitmapBox(&fontInfo, glyphIndex, scale, scale, &x0, &charInfo.ascent, &x1, &charInfo.decent);
-
+		charInfo.uvCoordinates.top = (float)offsetY / (float)textureDimensions;
+		charInfo.uvCoordinates.left = (float)offsetX / (float)textureDimensions;
+		charInfo.uvCoordinates.right = (float)(offsetX + bitmap.width) / (float)textureDimensions;
+		charInfo.uvCoordinates.bottom = (float)(offsetY + bitmap.rows) / (float)textureDimensions;
+		
 		characters.push_back(charInfo);
 
-		currentChar++;
+		offsetX += bitmap.width + 1;
 	}
 
-	delete[] bakedChars;
+	texture = new Texture(textureData.data(), textureDimensions, textureDimensions, 1);
 }
 
 int Font::GetIdealBitmapResolution(int numCharacters)

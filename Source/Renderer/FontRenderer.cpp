@@ -6,7 +6,8 @@ const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT,
 
 std::array<FontRenderRequest, FontRenderRequest::MAX_FONT_REQUESTS> FontRenderRequest::requests;
 
-const float letterSpacingFactor = 0.6f;
+const float letterSpacingFactor = 0.2f;
+const float spaceSpacingFactor = 12.0f;
 
 bool FontRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
@@ -108,7 +109,7 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 
 		if (c == 32)
 		{
-			currentCursorLocation += glm::vec2(32 * (fontScale / width), 0);
+			currentCursorLocation += glm::vec2(spaceSpacingFactor * (fontScale / width), 0);
 			continue;
 		}
 
@@ -130,10 +131,10 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 			character.offset.y * (fontScale / height));
 		// glm::vec2 normalizedOffset = glm::vec2(0, 0);
 
-		float yOffset = 0;
+		float yOffset = normalizedOffset.y;
 		if (c == 'p' || c == 'g' || c == 'q' || c == 'j')
 		{
-			yOffset = -0.021f * fontScale;
+			// yOffset = -0.021f * fontScale;
 		}
 
 		float bottom = currentCursorLocation.y - normalizedCharHeight - yOffset;
@@ -153,12 +154,12 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 
 		unsigned int vertexIndex = indices.size() / 6;
 
-		indices.push_back(vertexIndex * 4 + 2);
 		indices.push_back(vertexIndex * 4 + 1);
-		indices.push_back(vertexIndex * 4 + 3);
 		indices.push_back(vertexIndex * 4 + 2);
 		indices.push_back(vertexIndex * 4 + 3);
+		indices.push_back(vertexIndex * 4 + 2);
 		indices.push_back(vertexIndex * 4 + 0);
+		indices.push_back(vertexIndex * 4 + 3);
 
 		currentCursorLocation.x += normalizedCharWidth + character.xAdvance * letterSpacingFactor * (fontScale / width);
 	}
