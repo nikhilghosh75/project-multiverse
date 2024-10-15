@@ -12,7 +12,7 @@ void StartScreenStage::Update()
 	// TODO: Support Localization
 	const char* text = "CLICK ANYWHERE TO START";
 
-	FontRenderer::Get()->AddText(text, glm::vec2(-0.3f, 0.5f), 24);
+	FontRenderer::Get()->AddText(text, glm::vec2(-0.3f, 0.5f), 72);
 
 	if (Input::GetMouseButtonDown(MouseButton::Left))
 	{
