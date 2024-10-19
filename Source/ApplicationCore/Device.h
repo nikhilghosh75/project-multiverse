@@ -102,6 +102,8 @@ private:
 	bool HasNecessaryDeviceExtensions(VkPhysicalDevice device);
 	bool SupportsSwapChain(VkPhysicalDevice device);
 
+	static const int MAX_SINGLE_TIME_BUFFERS = 20;
+
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkDevice vulkanDevice;
@@ -115,8 +117,10 @@ private:
 	std::vector<VkCommandBuffer> registeredCommandBuffers;
 
 	std::array<DeviceFrame, MAX_FRAMES_IN_FLIGHT> frameObjects;
+	std::array<VkCommandBuffer, MAX_SINGLE_TIME_BUFFERS> singleTimeCommandBuffers;
 
 	uint32_t currentImageIndex;
+	uint32_t currentSingleTimeCommandIndex = 0;
 
 	// Image Loading
 	VkBuffer stagingBuffer;

@@ -280,14 +280,9 @@ void Device::AllocateMemory(VkMemoryRequirements memoryRequirements, VkDeviceMem
 /// </summary>
 VkCommandBuffer Device::BeginSingleTimeCommands()
 {
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = commandPool;
-    allocInfo.commandBufferCount = 1;
+    VkCommandBuffer commandBuffer = singleTimeCommandBuffers[currentSingleTimeCommandIndex];
 
-    VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &commandBuffer);
+    vkResetCommandBuffer(commandBuffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -295,11 +290,13 @@ VkCommandBuffer Device::BeginSingleTimeCommands()
 
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
+    currentSingleTimeCommandIndex = (currentSingleTimeCommandIndex + 1) % MAX_SINGLE_TIME_BUFFERS;
+
     return commandBuffer;
 }
 
 /// <summary>
-/// Ends a command buffer by submitting the commands to the GPU
+/// Ends a command buffer by submitting the commands to the GPU. Does not free the command buffer
 /// </summary>
 void Device::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 {
@@ -316,9 +313,6 @@ void Device::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 
     vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(graphicsQueue);
-
-    vkFreeCommandBuffers(vulkanDevice, commandPool, 1, &commandBuffer);
-    vkResetCommandPool(vulkanDevice, commandPool, VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT);
 }
 
 /// <summary>
@@ -620,9 +614,22 @@ void Device::SetupCommandBuffers()
         if (vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &frameObjects[i].commandBuffer))
         {
             // TODO: Output the following error code
-            // "Vulkan, failed to create command pool
+            // "Vulkan, failed to create command buffers
             exit(0);
         }
+    }
+
+    VkCommandBufferAllocateInfo singleTimeAllocInfo{};
+    singleTimeAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    singleTimeAllocInfo.commandPool = commandPool;
+    singleTimeAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    singleTimeAllocInfo.commandBufferCount = MAX_SINGLE_TIME_BUFFERS;
+
+    if (vkAllocateCommandBuffers(vulkanDevice, &singleTimeAllocInfo, singleTimeCommandBuffers.data()))
+    {
+        // TODO: Output the following error code
+            // "Vulkan, failed to create single time command buffers
+        exit(0);
     }
 }
 
