@@ -156,6 +156,11 @@
     <ClInclude Include="SwapChain.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Vendor\imgui\ImGui.vcxproj">
+      <Project>{3965a3c2-180e-47cd-bb86-2ffd1992abb9}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
