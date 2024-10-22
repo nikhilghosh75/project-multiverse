@@ -1,5 +1,6 @@
 #include "Device.h"
 #include "Window.h"
+#include "imgui.h"
 #include <array>
 #include <cstdlib>
 #include <iostream>
@@ -154,6 +155,11 @@ VkDevice Device::GetVulkanDevice() const
     return vulkanDevice;
 }
 
+VkInstance Device::GetVulkanInstance() const
+{
+    return instance;
+}
+
 VkRenderPass& Device::GetRenderPass()
 {
     return swapChain.GetRenderPass();
@@ -199,6 +205,11 @@ VkQueue Device::GetGraphicsQueue() const
     return graphicsQueue;
 }
 
+VkPhysicalDevice Device::GetPhysicalDevice() const
+{
+    return physicalDevice;
+}
+
 VkPhysicalDeviceProperties Device::GetPhysicalDeviceProperties()
 {
     VkPhysicalDeviceProperties properties{};
@@ -209,6 +220,11 @@ VkPhysicalDeviceProperties Device::GetPhysicalDeviceProperties()
 VkSemaphore Device::GetCurrentImageAvailableSemaphore() const
 {
     return frameObjects[currentFrame % MAX_FRAMES_IN_FLIGHT].imageAvailableSemaphore;
+}
+
+VkSurfaceKHR Device::GetSurface() const
+{
+    return surface;
 }
 
 size_t Device::GetFrameNumber()

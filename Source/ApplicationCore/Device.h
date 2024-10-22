@@ -42,6 +42,7 @@ public:
 	static Device* Get();
 
 	VkDevice GetVulkanDevice() const;
+	VkInstance GetVulkanInstance() const;
 	VkRenderPass& GetRenderPass();
 	VkExtent2D GetSwapChainExtent() const;
 	VkFormat GetSwapChainFormat() const;
@@ -51,8 +52,10 @@ public:
 	VkCommandPool GetCommandPool() const;
 	VkCommandBuffer GetCurrentCommandBuffer() const;
 	VkQueue GetGraphicsQueue() const;
+	VkPhysicalDevice GetPhysicalDevice() const;
 	VkPhysicalDeviceProperties GetPhysicalDeviceProperties();
 	VkSemaphore GetCurrentImageAvailableSemaphore() const;
+	VkSurfaceKHR GetSurface() const;
 
 	static size_t GetFrameNumber();
 

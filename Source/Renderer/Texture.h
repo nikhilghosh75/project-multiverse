@@ -31,6 +31,8 @@ public:
 	uint32_t GetTextureWidth() inline const { return textureWidth; }
 	uint32_t GetTextureHeight() inline const { return textureHeight; }
 
+	VkImageLayout GetImageLayout() inline const { return currentLayout; }
+
 	void TransitionLayout(VkImageLayout newLayout);
 
 private:

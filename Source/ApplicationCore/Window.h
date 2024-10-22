@@ -12,6 +12,8 @@ class Window
 public:
 	static bool windowRunning;
 
+	static bool imguiEnabled;
+
 	Window();
 
 	~Window();
@@ -27,6 +29,9 @@ public:
 	static void OnResize(unsigned int width, unsigned int height);
 
 	static KeyCode SystemParamToKeycode(unsigned int param);
+
+	static HWND GetWindowHandle();
+
 private:
 	static inline Window* window;
 

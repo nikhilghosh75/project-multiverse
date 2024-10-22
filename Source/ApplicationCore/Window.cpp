@@ -1,12 +1,14 @@
 #include "Window.h"
 #include "Device.h"
 #include "Input.h"
+#include "backends/imgui_impl_win32.h"
 #include <windowsx.h>
 
 HINSTANCE g_window_instance;
 HWND g_window;
 
 bool Window::windowRunning = false;
+bool Window::imguiEnabled = false;
 
 const KeyCode SYSTEM_TO_KEYCODE[] =
 {
@@ -146,6 +148,11 @@ KeyCode Window::SystemParamToKeycode(unsigned int param)
 	return KeyCode();
 }
 
+HWND Window::GetWindowHandle()
+{
+	return g_window;
+}
+
 void Window::OnResize(unsigned int width, unsigned int height)
 {
 	if (window == nullptr)
@@ -156,8 +163,16 @@ void Window::OnResize(unsigned int width, unsigned int height)
 	window->device->shouldResizeFramebuffer = true;
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT WndProc(HWND window, int wm, WPARAM wParam, LPARAM lParam)
 {
+	if (Window::imguiEnabled)
+	{
+		if (ImGui_ImplWin32_WndProcHandler(window, wm, wParam, lParam))
+			return true;
+	}
+
 	switch (wm)
 	{
 	case WM_DESTROY:
