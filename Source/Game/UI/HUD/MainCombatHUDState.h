@@ -13,5 +13,5 @@ private:
 
 	void OnTargetSelected(CombatStage* stage, Character* character);
 
-	Texture* noIconTexture;
+	static inline Texture* noIconTexture;
 };

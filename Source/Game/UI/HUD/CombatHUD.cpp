@@ -27,6 +27,17 @@ void CombatHUD::Initialize()
 	triangleTexture = new Texture("Data/Sprites/UI/Red Triangle.png");
 }
 
+void CombatHUD::Cleanup()
+{
+	if (currentState != nullptr)
+	{
+		delete currentState;
+	}
+
+	delete crosshairTexture;
+	delete triangleTexture;
+}
+
 void CombatHUD::Render(CombatStage* stage)
 {
 	if (previousState)
@@ -187,7 +198,7 @@ CombatHUDState::CombatHUDState()
 {
 }
 
-void CombatHUDState::StartExecuteAction(Action* action, CombatStage* combatStage)
+void CombatHUDState::StartExecuteAction(std::shared_ptr<Action> action, CombatStage* combatStage)
 {
 	this->action = action;
 

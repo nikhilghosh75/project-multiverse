@@ -12,7 +12,10 @@ Character::Character()
 
 Character::~Character()
 {
-
+	if (texture != nullptr)
+	{
+		delete texture;
+	}
 }
 
 int Character::Damage(int damage)
@@ -50,7 +53,7 @@ void Character::OnTurnUpdate(CombatStage* stage)
 	}
 }
 
-void Character::StartAction(Action* action)
+void Character::StartAction(std::shared_ptr<Action> action)
 {
 	currentAction = action;
 }

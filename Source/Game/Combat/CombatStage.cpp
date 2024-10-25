@@ -35,6 +35,18 @@ CombatStage::CombatStage(EncounterInfo& info)
 	RunManager::OnBattleStart(this);
 }
 
+CombatStage::~CombatStage()
+{
+	CombatHUD::Cleanup();
+
+	delete playerCharacter;
+	
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		delete enemies[i];
+	}
+}
+
 void CombatStage::Update()
 {
 	currentTurnCharacter->OnTurnUpdate(this);

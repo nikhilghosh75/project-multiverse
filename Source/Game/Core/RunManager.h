@@ -16,11 +16,11 @@ public:
 
 	static void OnBattleOver(CombatStage* stage);
 
-	static PlayerState* GetPlayerState() { return playerState; }
+	static PlayerState* GetPlayerState() { return &playerState; }
 private:
 	static inline bool isInRun = false;
 
-	static inline PlayerState* playerState;
+	static inline PlayerState playerState;
 
 	static inline int currentEncounter = -1;
 };

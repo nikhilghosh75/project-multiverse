@@ -7,25 +7,38 @@
 #include "MeleeAttack.h"
 #include "PassAction.h"
 
-Action* Action::CreateFromJson(const rapidjson::Value& data)
+Action::~Action()
 {
-	Action* action = nullptr;
+	if (visual != nullptr)
+	{
+		delete visual;
+	}
+
+	if (icon != nullptr)
+	{
+		delete icon;
+	}
+}
+
+std::shared_ptr<Action> Action::CreateFromJson(const rapidjson::Value& data)
+{
+	std::shared_ptr<Action> action;
 
 	if ((std::string)data["type"].GetString() == "melee")
 	{
-		action = new MeleeAttack();
+		action = std::make_shared<MeleeAttack>();
 	}
 	else if ((std::string)data["type"].GetString() == "gun")
 	{
-		action = new GunAttack();
+		action = std::make_shared<GunAttack>();
 	}
 	else if ((std::string)data["type"].GetString() == "guard")
 	{
-		action = new GuardAction();
+		action = std::make_shared<GuardAction>();
 	}
 	else if ((std::string)data["type"].GetString() == "pass")
 	{
-		action = new PassAction();
+		action = std::make_shared<PassAction>();
 	}
 
 	if (action)

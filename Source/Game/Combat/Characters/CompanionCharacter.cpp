@@ -81,5 +81,5 @@ void CompanionCharacter::SetFromJsonData(const rapidjson::Document& data)
 	{
 		actions.push_back(Action::CreateFromJson(it));
 	}
-	actions.push_back(new PassAction());
+	actions.push_back(std::make_shared<PassAction>());
 }

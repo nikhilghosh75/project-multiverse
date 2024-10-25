@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 #include "Combat/Actions/Action.h"
 #include "glm/glm.hpp"
 #include "Texture.h"
@@ -19,7 +20,7 @@ class Character
 public:
 	Character();
 
-	~Character();
+	virtual ~Character();
 
 	CharacterType type;
 	std::string name;
@@ -36,7 +37,7 @@ public:
 
 	virtual void OnDeath() { }
 
-	virtual void StartAction(Action* action);
+	virtual void StartAction(std::shared_ptr<Action> action);
 	virtual void EndAction(CombatStage* stage);
 
 	int GetHealth() const;
@@ -48,7 +49,7 @@ public:
 
 	bool IsDead() const;
 
-	std::vector<Action*> actions;
+	std::vector<std::shared_ptr<Action>> actions;
 
 	template<typename T> T* FindFirstActionOfType()
 	{
@@ -77,5 +78,5 @@ protected:
 	int defense;
 
 	Texture* texture;
-	Action* currentAction;
+	std::shared_ptr<Action> currentAction;
 };

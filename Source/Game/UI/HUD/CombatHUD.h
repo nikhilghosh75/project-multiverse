@@ -1,5 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
+#include <memory>
 #include <vector>
 
 class CombatStage;
@@ -13,16 +14,16 @@ class CombatHUDState
 public:
 	CombatHUDState();
 
-	void StartExecuteAction(Action* action, CombatStage* combatStage);
+	void StartExecuteAction(std::shared_ptr<Action> action, CombatStage* combatStage);
 
 	virtual void Render(CombatStage* stage) = 0;
 
 	virtual void OnTurnAdvanced(CombatStage* stage) { }
 	virtual void OnTargetSelected(CombatStage* stage, Character* character) { }
-	virtual void OnActionEnded(CombatStage* stage, Character* character, Action* action) { }
+	virtual void OnActionEnded(CombatStage* stage, Character* character, std::shared_ptr<Action> action) { }
 
 protected:
-	Action* action;
+	std::shared_ptr<Action> action;
 
 private:
 	bool isSelectingTarget;
@@ -46,6 +47,8 @@ class CombatHUD
 {
 public:
 	static void Initialize();
+
+	static void Cleanup();
 
 	static void Render(CombatStage* stage);
 
