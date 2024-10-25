@@ -9,10 +9,10 @@ void RunManager::StartRun()
 {
 	isInRun = true;
 
-	playerState = new PlayerState();
-	playerState->health = startingHealth;
-	playerState->maxHealth = startingHealth;
-	playerState->apPerTurn = startingAPPerTurn;
+	playerState = PlayerState();
+	playerState.health = startingHealth;
+	playerState.maxHealth = startingHealth;
+	playerState.apPerTurn = startingAPPerTurn;
 
 	EncounterGenerator::Initialize();
 
@@ -28,5 +28,5 @@ void RunManager::OnBattleStart(CombatStage* stage)
 
 void RunManager::OnBattleOver(CombatStage* stage)
 {
-	playerState->SetFromPlayerCharacter(stage->GetPlayerCharacter());
+	playerState.SetFromPlayerCharacter(stage->GetPlayerCharacter());
 }
