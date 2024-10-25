@@ -7,6 +7,19 @@
 #include "MeleeAttack.h"
 #include "PassAction.h"
 
+Action::~Action()
+{
+	if (visual != nullptr)
+	{
+		delete visual;
+	}
+
+	if (icon != nullptr)
+	{
+		delete icon;
+	}
+}
+
 std::shared_ptr<Action> Action::CreateFromJson(const rapidjson::Value& data)
 {
 	std::shared_ptr<Action> action;

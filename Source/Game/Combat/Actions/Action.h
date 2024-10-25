@@ -19,6 +19,8 @@ protected:
 	Texture* icon;
 	ActionVisual* visual;
 public:
+	virtual ~Action();
+
 	static std::shared_ptr<Action> CreateFromJson(const rapidjson::Value& data);
 
 	virtual void StartExecute(CombatStage* stage, Character* executor);
