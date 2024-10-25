@@ -11,6 +11,8 @@ class CombatStage : public Stage
 public:
 	CombatStage(EncounterInfo& info);
 
+	~CombatStage();
+
 	void Update();
 
 	void Render();
