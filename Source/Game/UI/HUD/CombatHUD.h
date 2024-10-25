@@ -48,6 +48,8 @@ class CombatHUD
 public:
 	static void Initialize();
 
+	static void Cleanup();
+
 	static void Render(CombatStage* stage);
 
 	static void SetCurrentState(CombatHUDState* newState);

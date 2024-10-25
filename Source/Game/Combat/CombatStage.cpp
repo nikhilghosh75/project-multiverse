@@ -37,6 +37,8 @@ CombatStage::CombatStage(EncounterInfo& info)
 
 CombatStage::~CombatStage()
 {
+	CombatHUD::Cleanup();
+
 	delete playerCharacter;
 	
 	for (int i = 0; i < enemies.size(); i++)
