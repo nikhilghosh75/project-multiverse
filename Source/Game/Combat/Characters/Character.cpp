@@ -12,7 +12,10 @@ Character::Character()
 
 Character::~Character()
 {
-
+	if (texture != nullptr)
+	{
+		delete texture;
+	}
 }
 
 int Character::Damage(int damage)
