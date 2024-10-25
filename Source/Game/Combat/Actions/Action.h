@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include "Texture.h"
 #include "rapidjson/document.h"
@@ -18,7 +19,7 @@ protected:
 	Texture* icon;
 	ActionVisual* visual;
 public:
-	static Action* CreateFromJson(const rapidjson::Value& data);
+	static std::shared_ptr<Action> CreateFromJson(const rapidjson::Value& data);
 
 	virtual void StartExecute(CombatStage* stage, Character* executor);
 

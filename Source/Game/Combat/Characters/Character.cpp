@@ -50,7 +50,7 @@ void Character::OnTurnUpdate(CombatStage* stage)
 	}
 }
 
-void Character::StartAction(Action* action)
+void Character::StartAction(std::shared_ptr<Action> action)
 {
 	currentAction = action;
 }

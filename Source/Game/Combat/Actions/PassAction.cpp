@@ -2,6 +2,8 @@
 
 PassAction::PassAction()
 {
+	this->icon = nullptr;
+
 	this->cost = 0;
 	this->requiresTarget = false;
 	this->instant = true;

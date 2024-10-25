@@ -187,7 +187,7 @@ CombatHUDState::CombatHUDState()
 {
 }
 
-void CombatHUDState::StartExecuteAction(Action* action, CombatStage* combatStage)
+void CombatHUDState::StartExecuteAction(std::shared_ptr<Action> action, CombatStage* combatStage)
 {
 	this->action = action;
 

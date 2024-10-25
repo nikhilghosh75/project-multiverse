@@ -28,7 +28,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 	VectorPainter painter;
 	painter.SetFillColor(Color(1.0f, 0.0f, 0.0f, 1.0f));
 
-	std::vector<Action*>& actions = stage->GetCurrentTurnCharacter()->actions;
+	std::vector<std::shared_ptr<Action>>& actions = stage->GetCurrentTurnCharacter()->actions;
 	for (int i = 0; i < actions.size(); i++)
 	{
 		ScreenCoordinate coordinate = ScreenCoordinate(glm::vec2(10, 10), position);
