@@ -6,6 +6,7 @@
 #include "GunAttack.h"
 #include "MeleeAttack.h"
 #include "PassAction.h"
+#include "ProjectileActionVisual.h"
 
 Action::~Action()
 {
@@ -76,6 +77,11 @@ void Action::UpdateExecute(CombatStage* stage, Character* executor)
 	}
 }
 
+void Action::SetActionVisual(ActionVisual* _actionVisual)
+{
+	visual = _actionVisual;
+}
+
 Texture* Action::GetTexture() const
 {
 	return icon;
@@ -113,6 +119,11 @@ ActionVisual* Action::CreateVisualFromJson(const rapidjson::Value& data)
 	if (strcmp(data["visual_type"].GetString(), "crash") == 0)
 	{
 		actionVisual = new CrashActionVisual(data);
+	}
+
+	if (strcmp(data["visual_type"].GetString(), "projectile") == 0)
+	{
+		actionVisual = new ProjectileActionVisual(data);
 	}
 
 	return actionVisual;

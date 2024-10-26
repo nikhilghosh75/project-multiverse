@@ -26,7 +26,6 @@ void CrashActionVisual::Update(Action* action, Character* executor, Character* t
 {
 	currentTime += Time::GetDeltaTime();
 	
-
 	if (currentTime < crashTime / 2)
 	{
 		float positionX = Math::Lerp(0, targetOffset.x, currentTime / (crashTime / 2));

@@ -6,6 +6,7 @@
 #include "Combat/Actions/GunAttack.h"
 #include "Combat/Actions/MeleeAttack.h"
 #include "Combat/Actions/PassAction.h"
+#include "Combat/Actions/ProjectileActionVisual.h"
 #include "Combat/CombatStage.h"
 #include "UI/HUD/CombatHUD.h"
 
@@ -66,4 +67,6 @@ void PlayerCharacter::AddTempAbilities()
 	actions.push_back(std::make_shared<GuardAction>("Weak Guard", 2, 1, "Data/Sprites/UI/Icons/Icon Shield Small.png"));
 	actions.push_back(std::make_shared<GuardAction>("Strong Guard", 4, 2, "Data/Sprites/UI/Icons/Icon Shield Big.png"));
 	actions.push_back(std::make_shared<PassAction>());
+
+	actions[2]->SetActionVisual(new ProjectileActionVisual("Data/Sprites/Projectiles/Blubberbus Projectile.png", glm::vec2(50, 50), 0.8f));
 }

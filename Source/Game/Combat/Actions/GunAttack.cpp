@@ -37,7 +37,7 @@ GunAttack::GunAttack(std::string name, int damage, int variance, int shots, int 
 
 void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* executor, Character* character)
 {
-	Action::StartExecuteOnTarget(combatStage, executor, target);
+	Action::StartExecuteOnTarget(combatStage, executor, character);
 
 	target = character;
 	time = timeBetweenShots;

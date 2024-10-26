@@ -33,6 +33,8 @@ public:
 
 	virtual void SetFromJson(const rapidjson::Value& data) = 0;
 
+	void SetActionVisual(ActionVisual* actionVisual);
+
 	Texture* GetTexture() const;
 	int GetCost() const;
 	bool RequiresTarget() const;
