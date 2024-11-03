@@ -17,6 +17,10 @@
         "base_damage": 8,
         "variance": 5,
         "icon": "Data/Sprites/UI/Icons/Icon Jump Kick.png"
+    }, {
+        "type": "transfer",
+        "transfer_amount": 2,
+        "icon":"Data/Sprites/UI/Icons/Icon Transfer.png"
     }],
     "sprite": "Data/Sprites/Companions/Brawler.png"
 }
