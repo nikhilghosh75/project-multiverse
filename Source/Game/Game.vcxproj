@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Combat\Actions\Action.cpp" />
+    <ClCompile Include="Combat\Actions\APTransferAction.cpp" />
     <ClCompile Include="Combat\Actions\CrashActionVisual.cpp" />
     <ClCompile Include="Combat\Actions\GuardAction.cpp" />
     <ClCompile Include="Combat\Actions\GunAttack.cpp" />
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Combat\Actions\Action.h" />
+    <ClInclude Include="Combat\Actions\APTransferAction.h" />
     <ClInclude Include="Combat\Actions\CrashActionVisual.h" />
     <ClInclude Include="Combat\Actions\GuardAction.h" />
     <ClInclude Include="Combat\Actions\GunAttack.h" />
