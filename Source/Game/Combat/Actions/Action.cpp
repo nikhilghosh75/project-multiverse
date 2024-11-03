@@ -1,6 +1,7 @@
 #include "Action.h"
 #include "Combat/CombatStage.h"
 #include "Combat/Characters/Character.h"
+#include "APTransferAction.h"
 #include "CrashActionVisual.h"
 #include "GuardAction.h"
 #include "GunAttack.h"
@@ -36,6 +37,10 @@ std::shared_ptr<Action> Action::CreateFromJson(const rapidjson::Value& data)
 	else if ((std::string)data["type"].GetString() == "guard")
 	{
 		action = std::make_shared<GuardAction>();
+	}
+	else if ((std::string)data["type"].GetString() == "transfer")
+	{
+		action = std::make_shared<APTransferAction>();
 	}
 	else if ((std::string)data["type"].GetString() == "pass")
 	{

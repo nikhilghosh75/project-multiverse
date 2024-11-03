@@ -39,6 +39,11 @@ void Character::DeductActionPoints(int actionCost)
 		actionPoints = 0;
 }
 
+void Character::IncreaseActionPoints(int actionPointIncrease)
+{
+	actionPoints += actionPointIncrease;
+}
+
 void Character::OnTurnStart(CombatStage* stage)
 {
 	actionPoints += actionPointsPerTurn;
