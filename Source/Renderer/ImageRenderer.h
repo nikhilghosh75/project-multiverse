@@ -73,6 +73,8 @@ private:
 	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> indexBuffers;
 	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> indexBufferMemories;
 
+	std::array<VkCommandBuffer, MAX_REQUESTS_IN_FLIGHT> commandBuffers;
+
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;

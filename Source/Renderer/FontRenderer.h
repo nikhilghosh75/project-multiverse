@@ -61,6 +61,7 @@ private:
 	};
 
 	void CreatePipeline();
+	void CreateCommandBuffers();
 
 	void UpdateDescriptorSets();
 	void PopulateBuffers();
@@ -85,6 +86,8 @@ private:
 	VkDescriptorSetLayout descriptorSetLayout;
 	std::vector<VkDescriptorSet> descriptorSets;
 	VkSampler sampler;
+
+	std::array<VkCommandBuffer, MAX_REQUESTS_IN_FLIGHT> commandBuffers;
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;

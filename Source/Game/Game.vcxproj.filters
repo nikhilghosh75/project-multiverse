@@ -96,6 +96,9 @@
     <ClCompile Include="Combat\Actions\ProjectileActionVisual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Combat\Actions\APTransferAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Temp\TempStage.h">
@@ -174,6 +177,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Combat\Actions\ProjectileActionVisual.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Combat\Actions\APTransferAction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

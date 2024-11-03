@@ -78,11 +78,17 @@ FontRenderer::FontRenderer()
 	}
 
 	CreatePipeline();
+	CreateCommandBuffers();
 }
 
 FontRenderer::~FontRenderer()
 {
 	delete defaultFont;
+
+	vkDestroyPipeline(Device::Get()->GetVulkanDevice(), graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(Device::Get()->GetVulkanDevice(), pipelineLayout, nullptr);
+
+	vkFreeCommandBuffers(Device::Get()->GetVulkanDevice(), Device::Get()->GetCommandPool(), commandBuffers.size(), commandBuffers.data());
 }
 
 FontRenderer* FontRenderer::Get()
@@ -349,6 +355,20 @@ void FontRenderer::CreatePipeline()
 	}
 }
 
+void FontRenderer::CreateCommandBuffers()
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = Device::Get()->GetCommandPool();
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+	if (vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+	{
+		exit(0);
+	}
+}
+
 void FontRenderer::UpdateDescriptorSets()
 {
 	std::array<VkWriteDescriptorSet, 1> setWrites;
@@ -378,14 +398,7 @@ void FontRenderer::PopulateBuffers()
 
 void FontRenderer::DispatchCommands()
 {
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = Device::Get()->GetCommandPool();
-	allocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, &commandBuffer);
+	VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
 
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -437,7 +450,8 @@ void FontRenderer::DispatchCommands()
 
 	vkCmdEndRenderPass(commandBuffer);
 
-	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
+	VkResult result = vkEndCommandBuffer(commandBuffer);
+	if (result != VK_SUCCESS)
 	{
 		// TODO: Output the following error code
 		// "Vulkan, failed to end command buffer

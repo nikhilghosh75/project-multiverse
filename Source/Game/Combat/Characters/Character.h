@@ -30,6 +30,7 @@ public:
 
 	virtual int Damage(int damage); // Returns the actual amount of damage done
 	virtual void DeductActionPoints(int actionPoints);
+	virtual void IncreaseActionPoints(int actionPoints);
 
 	virtual void OnTurnStart(CombatStage* stage);
 

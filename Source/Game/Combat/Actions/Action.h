@@ -16,8 +16,8 @@ protected:
 	bool instant = false;
 	bool immediatelyEndsTurn = false;
 
-	Texture* icon;
-	ActionVisual* visual;
+	Texture* icon = nullptr;
+	ActionVisual* visual = nullptr;
 public:
 	virtual ~Action();
 

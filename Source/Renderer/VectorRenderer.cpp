@@ -98,6 +98,7 @@ VectorRenderer::VectorRenderer()
 
 VectorRenderer::~VectorRenderer()
 {
+	vkFreeCommandBuffers(Device::Get()->GetVulkanDevice(), Device::Get()->GetCommandPool(), commandBuffers.size(), commandBuffers.data());
 }
 
 VectorRenderer* VectorRenderer::Get()
@@ -142,6 +143,17 @@ void VectorRenderer::CreateBuffers()
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 			indexBuffers[i],
 			indexBufferMemories[i]);
+	}
+
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = Device::Get()->GetCommandPool();
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+	if (vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+	{
+		exit(0);
 	}
 }
 
@@ -222,14 +234,7 @@ void VectorRenderer::PopulateBuffers()
 
 void VectorRenderer::DispatchCommands()
 {
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = Device::Get()->GetCommandPool();
-	allocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, &commandBuffer);
+	VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
 
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 MeleeAttack::MeleeAttack()
+	: name(""), attackDamage(0), variance(0), lastDamage(0)
 {
 	this->requiresTarget = true;
 	this->immediatelyEndsTurn = false;
