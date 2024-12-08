@@ -1,0 +1,21 @@
+[{
+    "ExecutablePath": "{{VULKAN_SDK}}/Bin/glslc.exe",
+    "Extension": ".frag",
+    "ResultExtension": "_frag.spv",
+    "FolderPath": "Data/Shaders",
+    "ResultAggregate": false
+},{
+    "ExecutablePath": "{{VULKAN_SDK}}/Bin/glslc.exe",
+    "Extension": ".vert",
+    "ResultExtension": "_vert.spv",
+    "FolderPath": "Data/Shaders",
+    "ResultAggregate": false
+},{
+    "ExecutablePath": "LocalizationConverter.exe",
+    "ProjectName": "LocalizationConverter",
+    "Extension": ".txt",
+    "ResultExtension": ".locbin",
+    "FolderPath": "Data/Languages",
+    "ResultAggregate": false
+}
+]
