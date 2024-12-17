@@ -29,6 +29,8 @@ int main()
 		device.StartFrame();
 		renderingManager.StartFrame();
 
+		BuildSystem::Get()->UpdateBuild();
+
 		buildUI.Render();
 
 		renderingManager.EndFrame();

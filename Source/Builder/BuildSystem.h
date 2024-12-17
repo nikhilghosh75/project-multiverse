@@ -1,7 +1,8 @@
 #pragma once
 
+#include "BuildGraph.h"
+
 #include <optional>
-#include <string>
 #include <vector>
 
 class BuildSystem
@@ -13,25 +14,19 @@ public:
 
 	void StartBuild();
 
+	void UpdateBuild();
+
 	std::string buildFolderPath;
 
 private:
-	void BuildGame();
-
-	class BuildConfig
-	{
-	public:
-		std::string executablePath;
-		std::string extension;
-		std::string resultExtension;
-		std::string folderPath;
-		std::optional<std::string> projectPath;
-		bool aggregateResults;
-	};
-
-	std::string ParseFilepath(const std::string& baseFilepath, bool isProject);
+	std::string ParseFilepath(const std::string& baseFilepath, std::optional<std::string>& project);
 
 	std::vector<BuildConfig> configs;
+	std::vector<std::string> foldersToCopy;
+
+	BuildGraph buildGraph;
+
+	bool isBuildInProgress = false;
 
 	static inline BuildSystem* instance;
 };

@@ -1,12 +1,14 @@
 #include "BuildSystem.h"
 
 #include "BuildProcess.h"
+#include "FileUtils.h"
 #include "Registry.h"
 
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 #ifdef max
 #undef max
@@ -44,21 +46,56 @@ void BuildSystem::Init()
 		rapidjson::Document d;
 		d.Parse(buffer.data());
 
-		for (rapidjson::SizeType i = 0; i < d.Size(); i++)
+		rapidjson::Value& steps = d["Steps"];
+
+		for (rapidjson::SizeType i = 0; i < steps.Size(); i++)
 		{
 			BuildConfig config;
-			if (d[i].HasMember("ProjectName"))
+			if (steps[i].HasMember("ProjectPath"))
 			{
-				config.projectPath = d[i]["ProjectName"].GetString();
+				config.projectPath = steps[i]["ProjectPath"].GetString();
 			}
 
-			config.executablePath = ParseFilepath(d[i]["ExecutablePath"].GetString(), config.projectPath.has_value());
-			config.extension = d[i]["Extension"].GetString();
-			config.resultExtension = d[i]["ResultExtension"].GetString();
-			config.folderPath = d[i]["FolderPath"].GetString();
-			config.aggregateResults = d[i]["ResultAggregate"].GetBool();
+			config.executablePath = ParseFilepath(steps[i]["ExecutablePath"].GetString(), config.projectPath);
+			config.extension = steps[i]["Extension"].GetString();
+			config.resultExtension = steps[i]["ResultExtension"].GetString();
+			config.folderPath = steps[i]["FolderPath"].GetString();
+			config.aggregateResults = steps[i]["ResultAggregate"].GetBool();
+
+			if (steps[i].HasMember("FlagsBefore"))
+			{
+				config.beforeArguments = steps[i]["FlagsBefore"].GetString();
+			}
+			else
+			{
+				config.beforeArguments = "";
+			}
+
+			if (steps[i].HasMember("FlagsBetween"))
+			{
+				config.betweenArguments = steps[i]["FlagsBetween"].GetString();
+			}
+			else
+			{
+				config.betweenArguments = "";
+			}
+
+			if (steps[i].HasMember("FlagsAfter"))
+			{
+				config.afterArguments = steps[i]["FlagsAfter"].GetString();
+			}
+			else
+			{
+				config.afterArguments = "";
+			}
 
 			configs.push_back(config);
+		}
+
+		rapidjson::Value& copyFolders = d["FoldersToCopy"];
+		for (rapidjson::SizeType i = 0; i < copyFolders.Size(); i++)
+		{
+			foldersToCopy.push_back(copyFolders[i].GetString());
 		}
 	}
 
@@ -69,40 +106,40 @@ void BuildSystem::Init()
 
 void BuildSystem::StartBuild()
 {
-	BuildGame();
-}
-
-void BuildSystem::BuildGame()
-{
-	// Build the Game Project
-	std::string projectFile = "Source/Game/Game.vcxproj";
-	std::string msBuildPath = Registry::QueryValue("SOFTWARE\\Microsoft\\MSBuild\\4.0", "MSBuildOverrideTasksPath");
-	std::string command = msBuildPath + "\\" + "msbuild.exe " + projectFile + " /property:Configuration=Release";
-
-	BuildProcess vsProcess(command);
-	while (vsProcess.StillRunning())
-	{
-		std::cout << "Visual Studio Running" << std::endl;
-	}
-
-	// TODO: Parse Result
-
-
-	// Iterate through the configs
+	buildGraph.Initialize(buildFolderPath);
 	for (BuildConfig& config : configs)
 	{
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(config.folderPath))
-		{
-			size_t extensionPosition = entry.path().string().find(config.extension);
-			if (extensionPosition != std::string::npos)
-			{
-			}
-		}
+		buildGraph.AddBuildConfig(config, buildFolderPath);
+	}
+
+	for (std::string& folderPath : foldersToCopy)
+	{
+		buildGraph.AddFolderPath(folderPath, buildFolderPath);
+	}
+
+	std::filesystem::create_directory(buildFolderPath);
+	std::filesystem::create_directory(buildFolderPath + "/Data");
+
+	buildGraph.StartBuild();
+
+	isBuildInProgress = true;
+}
+
+void BuildSystem::UpdateBuild()
+{
+	if (isBuildInProgress)
+	{
+		buildGraph.UpdateBuild();
 	}
 }
 
-std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, bool isProject)
+std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, std::optional<std::string>& projectPath)
 {
+	if (projectPath)
+	{
+		return projectPath.value() + "/" + baseFilepath;
+	}
+
 	std::string filepath = "";
 	int pathIndex = 0;
 	int endPathIndex = 0;
@@ -121,11 +158,13 @@ std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, bool isP
 			if (envValue != nullptr)
 			{
 				filepath += envValue;
-				pathIndex = endPathIndex;
+				pathIndex = endPathIndex + 2;
 			}
 		}
 	}
 	while (pathIndex != std::string::npos);
+
+	File::EnforceForwardSlash(filepath);
 
 	return filepath;
 }

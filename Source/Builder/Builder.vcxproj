@@ -131,17 +131,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AssetGroupGraphNode.cpp" />
     <ClCompile Include="Builder.cpp" />
+    <ClCompile Include="BuildGraph.cpp" />
     <ClCompile Include="BuildProcess.cpp" />
     <ClCompile Include="BuildSystem.cpp" />
     <ClCompile Include="BuildUI.cpp" />
+    <ClCompile Include="CopyFolderGraphNode.cpp" />
+    <ClCompile Include="CopyVSGraphNode.cpp" />
     <ClCompile Include="Registry.cpp" />
+    <ClCompile Include="VSProjectGraphNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AssetGroupGraphNode.h" />
+    <ClInclude Include="BuildGraph.h" />
     <ClInclude Include="BuildProcess.h" />
     <ClInclude Include="BuildSystem.h" />
     <ClInclude Include="BuildUI.h" />
+    <ClInclude Include="CopyFolderGraphNode.h" />
+    <ClInclude Include="CopyVSGraphNode.h" />
     <ClInclude Include="Registry.h" />
+    <ClInclude Include="VSProjectGraphNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Vendor\imgui\ImGui.vcxproj">
