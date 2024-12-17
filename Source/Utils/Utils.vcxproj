@@ -134,6 +134,7 @@
     <ClCompile Include="BinaryFileStream.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CRC.cpp" />
+    <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Rect.cpp" />
   </ItemGroup>
@@ -141,6 +142,7 @@
     <ClInclude Include="BinaryFileStream.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CRC.h" />
+    <ClInclude Include="FileUtils.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Rect.h" />
   </ItemGroup>
