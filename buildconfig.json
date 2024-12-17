@@ -1,0 +1,25 @@
+{ "Steps":[
+    {
+        "ExecutablePath": "{{VULKAN_SDK}}/Bin/glslc.exe",
+        "Extension": ".frag",
+        "ResultExtension": "_frag.spv",
+        "FlagsBetween": "-o",
+        "FolderPath": "Data/Shaders",
+        "ResultAggregate": false
+    },{
+        "ExecutablePath": "{{VULKAN_SDK}}/Bin/glslc.exe",
+        "Extension": ".vert",
+        "ResultExtension": "_vert.spv",
+        "FlagsBetween": "-o",
+        "FolderPath": "Data/Shaders",
+        "ResultAggregate": false
+    },{
+        "ExecutablePath": "LocalizationConverter.exe",
+        "ProjectPath": "Source/Tools/LocalizationConverter",
+        "Extension": ".txt",
+        "ResultExtension": ".locbin",
+        "FolderPath": "Data/Languages",
+        "ResultAggregate": false
+    }],
+    "FoldersToCopy": ["Data/Characters", "Data/Fonts", "Data/Sprites"]
+}
