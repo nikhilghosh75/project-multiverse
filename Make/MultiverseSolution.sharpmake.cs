@@ -1,6 +1,7 @@
 using Sharpmake;
 using System.Collections.Generic;
 
+[module: Sharpmake.Include("ApplicationCore.sharpmake.cs")]
 [module: Sharpmake.Include("Utils.sharpmake.cs")]
 
 [Generate]
@@ -24,5 +25,6 @@ public class MultiverseSolution : Solution
         conf.SolutionPath = @"[solution.SharpmakeCsPath]/../Generated/";
         
         conf.AddProject<Utils>(target);
+        conf.AddProject<ApplicationCore>(target);
     }
 }
