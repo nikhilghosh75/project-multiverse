@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 [module: Sharpmake.Include("ApplicationCore.sharpmake.cs")]
 [module: Sharpmake.Include("Utils.sharpmake.cs")]
+[module: Sharpmake.Include("Renderer.sharpmake.cs")]
 
 [Generate]
 public class MultiverseSolution : Solution
@@ -26,5 +27,6 @@ public class MultiverseSolution : Solution
         
         conf.AddProject<Utils>(target);
         conf.AddProject<ApplicationCore>(target);
+        conf.AddProject<Renderer>(target);
     }
 }
