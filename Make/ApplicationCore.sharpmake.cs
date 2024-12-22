@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 [module: Sharpmake.Include("MultiverseUtils.sharpmake.cs")]
 [module: Sharpmake.Include("Utils.sharpmake.cs")]
+[module: Sharpmake.Include("ImGui.sharpmake.cs")]
 [module: Sharpmake.Include("ProjectCommon.sharpmake.cs")]
 
 [Generate]
@@ -29,6 +30,10 @@ public class ApplicationCore: ProjectCommon
         conf.IncludePaths.Add(@"[project.SharpmakeCsPath]/../Vendor/glm");
         conf.IncludePaths.Add(@"[project.SharpmakeCsPath]/../Vendor/imgui");
 
+        conf.LibraryPaths.Add(MultiverseUtils.GetVulkanSDKPath() + "/Lib");
+
+        conf.LibraryFiles.Add("vulkan-1.lib");
+
         // Define preprocessor macros
         conf.Defines.Add("_CRT_SECURE_NO_WARNINGS");
 
@@ -36,5 +41,6 @@ public class ApplicationCore: ProjectCommon
 
         // Add Dependencies
         conf.AddPublicDependency<Utils>(target);
+        conf.AddPublicDependency<ImGui>(target);
     }
 }
