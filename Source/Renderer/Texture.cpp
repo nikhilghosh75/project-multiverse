@@ -1,5 +1,7 @@
 #include "Texture.h"
+
 #include "Device.h"
+#include "VulkanUtils.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -75,7 +77,7 @@ void Texture::SetupVulkanTexture(unsigned char* pixels)
 	Device::Get()->CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	void* data;
-	VkResult result = vkMapMemory(Device::Get()->GetVulkanDevice(), stagingBufferMemory, 0, imageSize, 0, &data);
+	VULKAN_CALL(vkMapMemory(Device::Get()->GetVulkanDevice(), stagingBufferMemory, 0, imageSize, 0, &data));
 	memcpy(data, pixels, static_cast<size_t>(imageSize));
 	vkUnmapMemory(Device::Get()->GetVulkanDevice(), stagingBufferMemory);
 
@@ -96,12 +98,7 @@ void Texture::SetupVulkanTexture(unsigned char* pixels)
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 
-	if (vkCreateImage(Device::Get()->GetVulkanDevice(), &imageInfo, nullptr, &textureImage))
-	{
-		// TODO: Output the following error code
-		// "Vulkan, cannot create image"
-		exit(0);
-	}
+	VULKAN_CALL_MSG(vkCreateImage(Device::Get()->GetVulkanDevice(), &imageInfo, nullptr, &textureImage), "Failed to create image");
 
 	VkMemoryRequirements memRequirements;
 	vkGetImageMemoryRequirements(Device::Get()->GetVulkanDevice(), textureImage, &memRequirements);
@@ -128,12 +125,7 @@ void Texture::SetupVulkanTexture(unsigned char* pixels)
 	viewInfo.subresourceRange.baseArrayLayer = 0;
 	viewInfo.subresourceRange.layerCount = 1;
 
-	if (vkCreateImageView(Device::Get()->GetVulkanDevice(), &viewInfo, nullptr, &textureImageView))
-	{
-		// TODO: Output the following error code
-		// "Vulkan, cannot create image view"
-		exit(0);
-	}
+	VULKAN_CALL_MSG(vkCreateImageView(Device::Get()->GetVulkanDevice(), &viewInfo, nullptr, &textureImageView), "Cannot create image view");
 
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -153,12 +145,7 @@ void Texture::SetupVulkanTexture(unsigned char* pixels)
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = 0.0f;
 
-	if (vkCreateSampler(Device::Get()->GetVulkanDevice(), &samplerInfo, nullptr, &textureSampler))
-	{
-		// TODO: Output the following error code
-		// "Vulkan, cannot create image sampler"
-		exit(0);
-	}
+	VULKAN_CALL_MSG(vkCreateSampler(Device::Get()->GetVulkanDevice(), &samplerInfo, nullptr, &textureSampler), "Cannot create image sampler");
 
 	textureFilter = TextureFilter::Linear;
 }

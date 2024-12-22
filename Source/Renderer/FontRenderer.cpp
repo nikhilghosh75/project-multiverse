@@ -1,5 +1,7 @@
 #include "FontRenderer.h"
+
 #include "Device.h"
+#include "VulkanUtils.h"
 #include "Window.h"
 
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
@@ -186,10 +188,7 @@ void FontRenderer::CreatePipeline()
 	layoutInfo.bindingCount = 1;
 	layoutInfo.pBindings = &uboLayoutBinding;
 
-	if (vkCreateDescriptorSetLayout(Device::Get()->GetVulkanDevice(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
-	{
-		// TODO: Handle Vulkan Error
-	}
+	VULKAN_CALL(vkCreateDescriptorSetLayout(Device::Get()->GetVulkanDevice(), &layoutInfo, nullptr, &descriptorSetLayout));
 
 	VkDescriptorPoolSize poolSize{};
 	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -201,10 +200,7 @@ void FontRenderer::CreatePipeline()
 	poolInfo.pPoolSizes = &poolSize;
 	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-	if (vkCreateDescriptorPool(Device::Get()->GetVulkanDevice(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-	{
-		// TODO: Handle Vulkan Error
-	}
+	VULKAN_CALL(vkCreateDescriptorPool(Device::Get()->GetVulkanDevice(), &poolInfo, nullptr, &descriptorPool));
 
 	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo{};
@@ -214,10 +210,7 @@ void FontRenderer::CreatePipeline()
 	allocInfo.pSetLayouts = layouts.data();
 
 	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(Device::Get()->GetVulkanDevice(), &allocInfo, descriptorSets.data()) != VK_SUCCESS)
-	{
-		// TODO: Handle Vulkan Error
-	}
+	VULKAN_CALL(vkAllocateDescriptorSets(Device::Get()->GetVulkanDevice(), &allocInfo, descriptorSets.data()));
 
 	Shader vertexShader = Shader::ReadShader("C:\\Users\\debgh\\source\\repos\\Project Multiverse\\Data\\Shaders\\font_vert.spv", Device::Get()->GetVulkanDevice());
 	Shader fragShader = Shader::ReadShader("C:\\Users\\debgh\\source\\repos\\Project Multiverse\\Data\\Shaders\\font_frag.spv", Device::Get()->GetVulkanDevice());
@@ -227,11 +220,7 @@ void FontRenderer::CreatePipeline()
 	pipelineLayoutInfo.setLayoutCount = 1;
 	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
 
-	if (vkCreatePipelineLayout(Device::Get()->GetVulkanDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
-	{
-		// TODO: Vulkan
-		exit(0);
-	}
+	VULKAN_CALL(vkCreatePipelineLayout(Device::Get()->GetVulkanDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout))
 
 	VkDevice vulkanDevice = Device::Get()->GetVulkanDevice();
 	VkExtent2D swapChainExtent = Device::Get()->GetSwapChainExtent();
@@ -347,12 +336,7 @@ void FontRenderer::CreatePipeline()
 	pipelineInfo.renderPass = Device::Get()->GetRenderPass();
 	pipelineInfo.subpass = 0;
 
-	if (vkCreateGraphicsPipelines(vulkanDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
-	{
-		// TODO: Output the following error code
-		// "Vulkan, failed to create graphics pipelines"
-		exit(0);
-	}
+	VULKAN_CALL_MSG(vkCreateGraphicsPipelines(vulkanDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline), "Failed to create graphics pipeline");
 }
 
 void FontRenderer::CreateCommandBuffers()
@@ -363,10 +347,7 @@ void FontRenderer::CreateCommandBuffers()
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-	if (vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
-	{
-		exit(0);
-	}
+	VULKAN_CALL(vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, commandBuffers.data()));
 }
 
 void FontRenderer::UpdateDescriptorSets()
@@ -403,10 +384,7 @@ void FontRenderer::DispatchCommands()
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
-	{
-		// TODO: Error Code
-	}
+	VULKAN_CALL(vkBeginCommandBuffer(commandBuffer, &beginInfo));
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -450,13 +428,7 @@ void FontRenderer::DispatchCommands()
 
 	vkCmdEndRenderPass(commandBuffer);
 
-	VkResult result = vkEndCommandBuffer(commandBuffer);
-	if (result != VK_SUCCESS)
-	{
-		// TODO: Output the following error code
-		// "Vulkan, failed to end command buffer
-		exit(0);
-	}
+	VULKAN_CALL_MSG(vkEndCommandBuffer(commandBuffer), "Failed to end command buffer");
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
