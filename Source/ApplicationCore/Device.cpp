@@ -1,6 +1,8 @@
 #include "Device.h"
+#include "VulkanUtils.h"
 #include "Window.h"
 #include "imgui.h"
+
 #include <array>
 #include <cstdlib>
 #include <iostream>
@@ -29,12 +31,7 @@ void Device::ConnectWin32(HWND hwnd, HINSTANCE hinstance)
     createInfo.hwnd = hwnd;
     createInfo.hinstance = hinstance;
 
-    if (vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, cannot create a Win32 surface
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface), "Failed to create a win32 surface");
 
     SetupPhysicalDevice();
     SetupLogicalDevice();
@@ -65,7 +62,7 @@ void Device::StartFrame()
 
     swapChain.PresentNextImage(currentImageIndex);
 
-    vkResetFences(vulkanDevice, 1, &frameObject.inFlightFence);
+    VULKAN_CALL(vkResetFences(vulkanDevice, 1, &frameObject.inFlightFence));
 
     vkResetCommandBuffer(frameObject.commandBuffer, 0);
 }
@@ -89,13 +86,7 @@ void Device::EndFrame()
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, frameObject.inFlightFence);
-    if (result != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, failed to submit draw command buffer
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkQueueSubmit(graphicsQueue, 1, &submitInfo, frameObject.inFlightFence), "Failed to submit draw command buffer");
 
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -108,7 +99,7 @@ void Device::EndFrame()
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &currentImageIndex;
 
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    VULKAN_CALL(vkQueuePresentKHR(presentQueue, &presentInfo));
 
     currentFrame++;
 }
@@ -248,12 +239,7 @@ void Device::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryP
     bufferInfo.usage = usage;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (vkCreateBuffer(vulkanDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, cannot create buffer"
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkCreateBuffer(vulkanDevice, &bufferInfo, nullptr, &buffer), "Failed to create buffer");
 
     VkMemoryRequirements memoryRequirements;
     vkGetBufferMemoryRequirements(vulkanDevice, buffer, &memoryRequirements);
@@ -263,12 +249,7 @@ void Device::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryP
     allocInfo.allocationSize = memoryRequirements.size;
     allocInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, properties);
 
-    if (vkAllocateMemory(vulkanDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, cannot allocate buffer memory"
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkAllocateMemory(vulkanDevice, &allocInfo, nullptr, &bufferMemory), "Cannot allocate buffer memory");
 
     vkBindBufferMemory(vulkanDevice, buffer, bufferMemory, 0);
 }
@@ -283,12 +264,7 @@ void Device::AllocateMemory(VkMemoryRequirements memoryRequirements, VkDeviceMem
     allocInfo.allocationSize = memoryRequirements.size;
     allocInfo.memoryTypeIndex = FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    if (vkAllocateMemory(vulkanDevice, &allocInfo, nullptr, &deviceMemory) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, cannot allocate buffer memory"
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkAllocateMemory(vulkanDevice, &allocInfo, nullptr, &deviceMemory), "Cannot allocate buffer memory");
 }
 
 /// <summary>
@@ -316,11 +292,7 @@ VkCommandBuffer Device::BeginSingleTimeCommands()
 /// </summary>
 void Device::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 {
-    VkResult result = vkEndCommandBuffer(commandBuffer);
-    if (result != VK_SUCCESS)
-    {
-        std::cout << "Result" << std::endl;
-    }
+    VULKAN_CALL(vkEndCommandBuffer(commandBuffer));
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -476,21 +448,14 @@ void Device::CreateInstance()
 
     if (!HasStandardValidationLayer())
     {
-        // TODO: Output the following error code
-        // "Vulkan, does not have standard validation layer"
-        exit(0);
+        ErrorManager::Get()->ReportError(ErrorSeverity::Severe, "Device::HasStandardValidationLayer", "Device", 0, "Device does not have standard validation layers");
     }
 
     // TODO: Disable validation layers in release mode
     createInfo.enabledLayerCount = validationLayers.size();
     createInfo.ppEnabledLayerNames = validationLayers.data();
 
-    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, cannot create instance"
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkCreateInstance(&createInfo, nullptr, &instance), "Cannot create instance");
 }
 
 /// <summary>
@@ -523,8 +488,7 @@ void Device::SetupPhysicalDevice()
 
     if (deviceCount == 0)
     {
-        // TODO: Output the following error code
-        // "Vulkan, cannot find GPU"
+        ErrorManager::Get()->ReportError(ErrorSeverity::Severe, "Device::SetupPhysicalDevice", "Device", 0, "Device Count is 0");
         exit(0);
     }
 
@@ -542,8 +506,7 @@ void Device::SetupPhysicalDevice()
 
     if (physicalDevice == VK_NULL_HANDLE)
     {
-        // TODO: Output the following error code
-        // "Vulkan, no suitable GPU found
+        ErrorManager::Get()->ReportError(ErrorSeverity::Severe, "Device::SetupPhysicalDevice", "Device", 0, "No suitable GPU found");
         exit(0);
     }
 }
@@ -586,12 +549,7 @@ void Device::SetupLogicalDevice()
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &vulkanDevice) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, no suitable logical device found
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkCreateDevice(physicalDevice, &createInfo, nullptr, &vulkanDevice), "No suitable logical device found");
 
     vkGetDeviceQueue(vulkanDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
     vkGetDeviceQueue(vulkanDevice, indices.presentFamily.value(), 0, &presentQueue);
@@ -609,12 +567,7 @@ void Device::SetupCommandPool()
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
 
-    if (vkCreateCommandPool(vulkanDevice, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, failed to create command pool"
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkCreateCommandPool(vulkanDevice, &poolInfo, nullptr, &commandPool), "Failed to create command pool");
 }
 
 void Device::SetupCommandBuffers()
@@ -627,12 +580,7 @@ void Device::SetupCommandBuffers()
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = 1;
 
-        if (vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &frameObjects[i].commandBuffer))
-        {
-            // TODO: Output the following error code
-            // "Vulkan, failed to create command buffers
-            exit(0);
-        }
+        VULKAN_CALL_MSG(vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &frameObjects[i].commandBuffer), "Failed to create command buffers");
     }
 
     VkCommandBufferAllocateInfo singleTimeAllocInfo{};
@@ -641,12 +589,7 @@ void Device::SetupCommandBuffers()
     singleTimeAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     singleTimeAllocInfo.commandBufferCount = MAX_SINGLE_TIME_BUFFERS;
 
-    if (vkAllocateCommandBuffers(vulkanDevice, &singleTimeAllocInfo, singleTimeCommandBuffers.data()))
-    {
-        // TODO: Output the following error code
-            // "Vulkan, failed to create single time command buffers
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkAllocateCommandBuffers(vulkanDevice, &singleTimeAllocInfo, singleTimeCommandBuffers.data()), "Failed to create a single time command buffer");
 }
 
 void Device::SetupSyncObjects()
@@ -660,28 +603,11 @@ void Device::SetupSyncObjects()
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        if (vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].imageAvailableSemaphore) != VK_SUCCESS)
-        {
-            // TODO: Output the following error code
-            // "Vulkan, failed to create semaphore
-            exit(0);
-        }
-        if (vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].renderFinishedSemaphore) != VK_SUCCESS)
-        {
-            // TODO: Output the following error code
-            // "Vulkan, failed to create semaphore
-            exit(0);
-        }
-        if (vkCreateFence(vulkanDevice, &fenceInfo, nullptr, &frameObjects[i].inFlightFence) != VK_SUCCESS)
-        {
-            // TODO: Output the following error code
-            // "Vulkan, failed to create fence
-            exit(0);
-        }
+        VULKAN_CALL_MSG(vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].imageAvailableSemaphore), "Failed to create semaphore");
+        VULKAN_CALL_MSG(vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].renderFinishedSemaphore), "Failed to create semaphore");
+        VULKAN_CALL_MSG(vkCreateFence(vulkanDevice, &fenceInfo, nullptr, &frameObjects[i].inFlightFence), "Failed to create fence");
     }
 }
-
-
 
 void Device::EnumerateExtensions()
 {

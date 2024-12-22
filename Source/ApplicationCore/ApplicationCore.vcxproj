@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Device.cpp" />
+    <ClCompile Include="ErrorManager.cpp" />
     <ClCompile Include="ImGuiDevice.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="SwapChain.cpp" />
@@ -154,6 +155,8 @@
     <ClInclude Include="ImGuiDevice.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="SwapChain.h" />
+    <ClInclude Include="ErrorManager.h" />
+    <ClInclude Include="VulkanUtils.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
