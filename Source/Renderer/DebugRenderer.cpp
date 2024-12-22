@@ -1,5 +1,7 @@
 #include "DebugRenderer.h"
+
 #include "Device.h"
+#include "VulkanUtils.h"
 
 DebugRenderer::DebugRenderer()
 {
@@ -92,10 +94,7 @@ void DebugRenderer::CreateDescriptorSetLayout()
 	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 	layoutInfo.pBindings = bindings.data();
 
-	if (vkCreateDescriptorSetLayout(Device::Get()->GetVulkanDevice(), &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
-	{
-		exit(0);
-	}
+	VULKAN_CALL(vkCreateDescriptorSetLayout(Device::Get()->GetVulkanDevice(), &layoutInfo, nullptr, &descriptorSetLayout));
 }
 
 void DebugRenderer::CreateDescriptorPool()
@@ -110,10 +109,7 @@ void DebugRenderer::CreateDescriptorPool()
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = 1;
 
-	if (vkCreateDescriptorPool(Device::Get()->GetVulkanDevice(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-	{
-		exit(0);
-	}
+	VULKAN_CALL(vkCreateDescriptorPool(Device::Get()->GetVulkanDevice(), &poolInfo, nullptr, &descriptorPool));
 }
 
 void DebugRenderer::CreateDescriptorSets()
@@ -124,12 +120,7 @@ void DebugRenderer::CreateDescriptorSets()
 	allocInfo.descriptorSetCount = 1;
 	allocInfo.pSetLayouts = &descriptorSetLayout;
 
-	VkResult result = vkAllocateDescriptorSets(Device::Get()->GetVulkanDevice(), &allocInfo, &descriptorSet);
-	if (result != VK_SUCCESS)
-	{
-		// TODO: Vulkan Error
-		exit(0);
-	}
+	VULKAN_CALL(vkAllocateDescriptorSets(Device::Get()->GetVulkanDevice(), &allocInfo, &descriptorSet));
 }
 
 void DebugRenderer::UpdateDescriptorSets()
@@ -157,10 +148,7 @@ void DebugRenderer::DispatchCommands()
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
-	{
-		// TODO: Error Code
-	}
+	VULKAN_CALL(vkBeginCommandBuffer(commandBuffer, &beginInfo));
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -204,12 +192,7 @@ void DebugRenderer::DispatchCommands()
 
 	vkCmdEndRenderPass(commandBuffer);
 
-	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
-	{
-		// TODO: Output the following error code
-		// "Vulkan, failed to end command buffer
-		exit(0);
-	}
+	VULKAN_CALL_MSG(vkEndCommandBuffer(commandBuffer), "Failed to end command buffer");
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
