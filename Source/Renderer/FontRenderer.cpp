@@ -223,7 +223,7 @@ void FontRenderer::CreatePipeline()
 	VULKAN_CALL(vkCreatePipelineLayout(Device::Get()->GetVulkanDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout))
 
 	VkDevice vulkanDevice = Device::Get()->GetVulkanDevice();
-	VkExtent2D swapChainExtent = Device::Get()->GetSwapChainExtent();
+	VkExtent2D swapChainExtent = Device::Get()->GetCurrentExtent();
 
 	// Setups the vertex shader as a code-based shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -391,7 +391,7 @@ void FontRenderer::DispatchCommands()
 	renderPassInfo.renderPass = Device::Get()->GetRenderPass();
 	renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
 	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = Device::Get()->GetSwapChainExtent();
+	renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
 
 	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
 	renderPassInfo.clearValueCount = 1;
@@ -404,15 +404,15 @@ void FontRenderer::DispatchCommands()
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(Device::Get()->GetSwapChainExtent().width);
-	viewport.height = static_cast<float>(Device::Get()->GetSwapChainExtent().height);
+	viewport.width = static_cast<float>(Device::Get()->GetCurrentExtent().width);
+	viewport.height = static_cast<float>(Device::Get()->GetCurrentExtent().height);
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
 	VkRect2D scissor{};
 	scissor.offset = { 0, 0 };
-	scissor.extent = Device::Get()->GetSwapChainExtent();
+	scissor.extent = Device::Get()->GetCurrentExtent();
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 	VkBuffer vertexBuffers[] = { fontVertexBuffers[currentIndex]};
