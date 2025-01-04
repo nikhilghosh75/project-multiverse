@@ -153,11 +153,21 @@ VkInstance Device::GetVulkanInstance() const
 
 VkRenderPass& Device::GetRenderPass()
 {
+    if (overrideRenderpass.has_value())
+    {
+        return overrideRenderpass.value().pass;
+    }
+
     return swapChain.GetRenderPass();
 }
 
-VkExtent2D Device::GetSwapChainExtent() const
+VkExtent2D Device::GetCurrentExtent() const
 {
+    if (overrideRenderpass.has_value())
+    {
+        return overrideRenderpass.value().extents;
+    }
+
     return swapChain.GetSwapExtent();
 }
 
@@ -168,6 +178,11 @@ VkFormat Device::GetSwapChainFormat() const
 
 VkFramebuffer Device::GetCurrentFramebuffer() const
 {
+    if (overrideRenderpass.has_value())
+    {
+        return overrideRenderpass.value().framebuffer;
+    }
+
     return swapChain.GetFramebuffer(currentImageIndex);
 }
 
@@ -398,6 +413,20 @@ void Device::TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout
         sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     }
+    else if (oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+    {
+        barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    }
+    else if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    {
+        barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
 
     vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
@@ -425,6 +454,16 @@ void Device::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, u
     vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
     EndSingleTimeCommands(commandBuffer);
+}
+
+void Device::SetOverrideRenderPass(RenderPass pass)
+{
+    overrideRenderpass = pass;
+}
+
+void Device::ClearOverrideRenderPass()
+{
+    overrideRenderpass = std::nullopt;
 }
 
 /// <summary>
@@ -534,6 +573,7 @@ void Device::SetupLogicalDevice()
 
     VkPhysicalDeviceFeatures deviceFeatures{};
     deviceFeatures.samplerAnisotropy = VK_TRUE;
+    deviceFeatures.fillModeNonSolid = VK_TRUE;
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

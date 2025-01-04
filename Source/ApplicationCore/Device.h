@@ -44,7 +44,7 @@ public:
 	VkDevice GetVulkanDevice() const;
 	VkInstance GetVulkanInstance() const;
 	VkRenderPass& GetRenderPass();
-	VkExtent2D GetSwapChainExtent() const;
+	VkExtent2D GetCurrentExtent() const;
 	VkFormat GetSwapChainFormat() const;
 	VkFramebuffer GetCurrentFramebuffer() const;
 	VkImage GetCurrentSwapChainImage() const;
@@ -80,6 +80,10 @@ public:
 	// Copy of the contents of a buffer into an image (using the buffer as pixel data)
 	void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
+	// Sets the override render (i.e. a renderpass not in the swap chain, and thus not rendered)
+	void SetOverrideRenderPass(RenderPass pass);
+	void ClearOverrideRenderPass();
+
 	// Create a buffer from a vector (uploading the contents of the vector into the buffer's memory)
 	template<typename T> void CreateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory, VkBufferUsageFlags flags);
 
@@ -114,6 +118,8 @@ private:
 	VkSurfaceKHR surface;
 	VkQueue presentQueue;
 	VkCommandPool commandPool;
+
+	std::optional<RenderPass> overrideRenderpass;
 
 	SwapChain swapChain;
 

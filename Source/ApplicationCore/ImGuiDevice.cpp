@@ -63,7 +63,7 @@ void ImGuiDevice::EndFrame()
     renderPassInfo.renderPass = imguiRenderPass;  // Use the render pass from the previous step
     renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();  // The framebuffer, typically tied to the swapchain image
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = Device::Get()->GetSwapChainExtent();  // Swapchain extent (width/height)
+    renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();  // Swapchain extent (width/height)
 
     VkClearValue clearValue = {};
     clearValue.color = { {0.0f, 0.0f, 0.0f, 1.0f} };  // Clear color (optional)

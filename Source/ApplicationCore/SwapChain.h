@@ -17,6 +17,13 @@ struct QueueFamilyIndices
 	}
 };
 
+struct RenderPass
+{
+	VkRenderPass pass = VK_NULL_HANDLE;
+	VkFramebuffer framebuffer = VK_NULL_HANDLE;
+	VkExtent2D extents = { 0, 0 };
+};
+
 class SwapChain
 {
 public:

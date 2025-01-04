@@ -51,7 +51,7 @@ Window::Window()
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.lpfnWndProc = (WNDPROC)WndProc;
 	wc.hInstance = GetModuleHandle(nullptr);
-	wc.lpszClassName = "Project Multiverse";
+	wc.lpszClassName = L"Project Multiverse";
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
@@ -66,8 +66,8 @@ Window::Window()
 
 	HWND hwnd = CreateWindowEx(
 		0,
-		"Project Multiverse",
-		"Project Multiverse",
+		L"Project Multiverse",
+		L"Project Multiverse",
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL, NULL, g_window_instance, NULL
