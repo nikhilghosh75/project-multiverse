@@ -441,14 +441,17 @@ void FontRenderer::DispatchCommands()
 
 void FontRenderer::Render()
 {
-	PopulateBuffers();
-	UpdateDescriptorSets();
-	DispatchCommands();
+	if (Device::Get()->shouldRenderFrame)
+	{
+		PopulateBuffers();
+		UpdateDescriptorSets();
+		DispatchCommands();
 
-	indices.clear();
-	vertices.clear();
+		indices.clear();
+		vertices.clear();
 
-	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
+		currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
+	}
 }
 
 FontVertex::FontVertex(glm::vec2 _position, glm::vec2 _uvCoordinate)

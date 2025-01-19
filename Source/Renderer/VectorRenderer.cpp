@@ -290,9 +290,12 @@ void VectorRenderer::DispatchCommands()
 
 void VectorRenderer::Render()
 {
-	UpdateDescriptorSets();
-	PopulateBuffers();
-	DispatchCommands();
+	if (Device::Get()->shouldRenderFrame)
+	{
+		UpdateDescriptorSets();
+		PopulateBuffers();
+		DispatchCommands();
+	}
 }
 
 bool VectorRenderer::IsValidPath(const VectorPainter::Path& path)

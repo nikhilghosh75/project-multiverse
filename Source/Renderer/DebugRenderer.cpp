@@ -210,9 +210,12 @@ void DebugRenderer::DispatchCommands()
 
 void DebugRenderer::Render()
 {
-	UpdateDescriptorSets();
-	PopulateBuffers();
-	DispatchCommands();
+	if (Device::Get()->shouldRenderFrame)
+	{
+		UpdateDescriptorSets();
+		PopulateBuffers();
+		DispatchCommands();
+	}
 }
 
 DebugRenderer::DebugVertex::DebugVertex(glm::vec2 position)

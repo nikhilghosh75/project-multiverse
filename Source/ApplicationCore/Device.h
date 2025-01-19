@@ -37,6 +37,8 @@ public:
 	// Should the current set of framebuffers be scrapped next frame for resizing
 	bool shouldResizeFramebuffer = false;
 
+	bool shouldRenderFrame = true;
+
 	~Device();
 
 	static Device* Get();

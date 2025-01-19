@@ -48,15 +48,16 @@ void Device::ConnectWin32(HWND hwnd, HINSTANCE hinstance)
 
 void Device::StartFrame()
 {
+    shouldRenderFrame = true;
     DeviceFrame& frameObject = frameObjects[currentFrame % MAX_FRAMES_IN_FLIGHT];
 
     vkWaitForFences(vulkanDevice, 1, &frameObject.inFlightFence, VK_TRUE, UINT64_MAX);
 
     VkResult result = vkAcquireNextImageKHR(vulkanDevice, swapChain.GetSwapChain(), UINT64_MAX, frameObject.imageAvailableSemaphore, VK_NULL_HANDLE, &currentImageIndex);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || shouldResizeFramebuffer)
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
-        shouldResizeFramebuffer = false;
         swapChain.Rebuild(physicalDevice, surface);
+        shouldRenderFrame = false;
         return;
     }
 
@@ -69,6 +70,11 @@ void Device::StartFrame()
 
 void Device::EndFrame()
 {
+    if (!shouldRenderFrame)
+    {
+        return;
+    }
+
     DeviceFrame& frameObject = frameObjects[currentFrame % MAX_FRAMES_IN_FLIGHT];
 
     VkSubmitInfo submitInfo{};
@@ -99,7 +105,16 @@ void Device::EndFrame()
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &currentImageIndex;
 
-    VULKAN_CALL(vkQueuePresentKHR(presentQueue, &presentInfo));
+    VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || shouldResizeFramebuffer)
+    {
+        swapChain.Rebuild(physicalDevice, surface);
+        shouldResizeFramebuffer = false;
+    }
+    else if (result != VK_SUCCESS)
+    {
+        ErrorManager::Get()->ReportError(ErrorSeverity::Severe, "vkQueuePresentKHR(presentQueue, &presentInfo)", "Vulkan", result, "Failed to present the queue");
+    }
 
     currentFrame++;
 }
