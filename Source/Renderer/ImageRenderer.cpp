@@ -70,9 +70,12 @@ ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageR
 
 void ImageRenderer::Render()
 {
-    UpdateDescriptorSets();
-    PopulateBuffers();
-    DispatchCommands();
+    if (Device::Get()->shouldRenderFrame)
+    {
+        UpdateDescriptorSets();
+        PopulateBuffers();
+        DispatchCommands();
+    }
 }
 
 Rect ImageRenderer::FitRectToTexture(Rect currentRect)

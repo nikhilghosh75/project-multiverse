@@ -6,6 +6,11 @@
 #include "Time.h"
 #include <windows.h>
 
+void Cleanup()
+{
+
+}
+
 int main()
 {
     Window window;
@@ -18,15 +23,17 @@ int main()
 
     while (Window::windowRunning)
     {
-        Time::Update();
+            Time::Update();
 
-        window.Process();
-        Device::Get()->StartFrame();
-        renderingManager.StartFrame();
+            window.Process();
+            Device::Get()->StartFrame();
+            renderingManager.StartFrame();
 
-        StageManager::Update();
+            StageManager::Update();
 
-        renderingManager.EndFrame();
-        Device::Get()->EndFrame();
+            renderingManager.EndFrame();
+            Device::Get()->EndFrame();
     }
+
+    Cleanup();
 }
