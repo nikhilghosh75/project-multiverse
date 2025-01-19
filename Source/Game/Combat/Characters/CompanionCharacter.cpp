@@ -57,7 +57,7 @@ void CompanionCharacter::Render()
 
 void CompanionCharacter::OnTurnStart(CombatStage* stage)
 {
-
+	Character::OnTurnStart(stage);
 }
 
 void CompanionCharacter::OnDeath()
