@@ -40,23 +40,31 @@ void GunAttack::StartExecuteOnTarget(CombatStage* combatStage, Character* execut
 	Action::StartExecuteOnTarget(combatStage, executor, character);
 
 	target = character;
-	time = timeBetweenShots;
+	timeUntilShot = timeBetweenShots;
 	currentShot = 0;
 
 	executor->DeductActionPoints(cost);
 
 	shotsThisAttack = baseShots + std::rand() % shotsVariance;
+	timeLeftInAttack = shotsThisAttack * timeBetweenShots +
+		(visual == nullptr ? 0.f : visual->GetVisualTime());
 }
 
 void GunAttack::UpdateExecute(CombatStage* combatStage, Character* executor)
 {
 	Action::UpdateExecute(combatStage, executor);
 
-	time -= Time::GetDeltaTime();
+	timeUntilShot -= Time::GetDeltaTime();
+	timeLeftInAttack -= Time::GetDeltaTime();
 
-	if (time < 0)
+	if (timeUntilShot < 0)
 	{
 		ExecuteShot(combatStage, executor);
+	}
+	
+	if (timeLeftInAttack < 0)
+	{
+		executor->EndAction(combatStage);
 	}
 }
 
@@ -96,10 +104,6 @@ void GunAttack::ExecuteShot(CombatStage* combatStage, Character* executor)
 		damageNumberPosition = damageNumberPosition * 2.f - glm::vec2(1.f, 1.f);
 		CombatHUD::AddDamageNumber(FloatingDamageNumber(actualDamage, damageNumberPosition, 2.f));
 
-		time += timeBetweenShots;
-	}
-	else
-	{
-		executor->EndAction(combatStage);
+		timeUntilShot += timeBetweenShots;
 	}
 }
