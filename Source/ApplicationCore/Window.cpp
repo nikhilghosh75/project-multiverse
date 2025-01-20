@@ -199,16 +199,6 @@ LRESULT WndProc(HWND window, int wm, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONUP:
 		Window::ChangeMouseState(MouseButton::Right, false);
 		break;
-	case WM_KEYDOWN:
-
-		break;
-	case WM_MOUSEMOVE:
-	{
-		int x = GET_X_LPARAM(lParam);
-		int y = GET_Y_LPARAM(lParam);
-		Window::ChangeMousePosition(x, y);
-	}
-		break;
 	case WM_SIZE:
 	{
 		unsigned int width = LOWORD(lParam);
