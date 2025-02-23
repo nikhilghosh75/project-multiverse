@@ -17,7 +17,7 @@ float Rect::Width() const
 
 float Rect::Height() const
 {
-	return top - bottom;
+	return  bottom - top;
 }
 
 void Rect::ResizeFromCenter(float newWidth, float newHeight)
