@@ -555,10 +555,10 @@ float TTFRasterizer::GetAlphaAtPoint(Glyph& glyph, int16_t x, int16_t y)
 	{
 		int contourStart = i == 0 ? 0 : glyph.contourEndIndices[i - 1] + 1;
 		int contourEnd = glyph.contourEndIndices[i];
-		for (int j = contourStart; j < contourEnd; j++)
+		for (int j = contourStart; j <= contourEnd; j++)
 		{
 			Point& point1 = glyph.points[j];
-			Point& point2 = glyph.points[j + 1 == contourEnd ? contourStart : j + 1];
+			Point& point2 = glyph.points[j == contourEnd ? contourStart : j + 1];
 
 			// If both points are on the curve, then it is a straight line
 			if (point1.onCurve && point2.onCurve)
@@ -622,7 +622,7 @@ float TTFRasterizer::GetAlphaAtPoint(Glyph& glyph, int16_t x, int16_t y)
 
 bool TTFRasterizer::DoesLineIntersectHorizontalRay(Point a, Point b, Point rayOrigin)
 {
-	if ((a.y > rayOrigin.y && b.y > rayOrigin.y) || (a.y < rayOrigin.y && b.y < rayOrigin.y)) 
+	if ((a.y >= rayOrigin.y && b.y >= rayOrigin.y) || (a.y < rayOrigin.y && b.y < rayOrigin.y)) 
 	{
 		// The segment is completely above or below the ray
 		return false;
