@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+#include <utility>
 
 namespace Math
 {
@@ -9,4 +11,6 @@ namespace Math
 	float Max(float a, float b);
 
 	float Min(float a, float b);
+
+	std::pair<std::optional<float>, std::optional<float>> QuadraticFormula(float a, float b, float c);
 }
