@@ -53,7 +53,7 @@ FontRenderer::FontRenderer()
 {
 	instance = this;
 
-	defaultFont = new Font("Data/Fonts/Roboto-Medium.ttf");
+	defaultFont = new Font("Data/Fonts/Roboto-Medium.ttf", {36});
 
 	Device::Get()->TransitionImageLayout(
 		defaultFont->texture->GetImage(),
@@ -137,13 +137,8 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 		glm::vec2 normalizedOffset = glm::vec2(
 			character.offset.x * (fontScale / width),
 			character.offset.y * (fontScale / height));
-		// glm::vec2 normalizedOffset = glm::vec2(0, 0);
 
 		float yOffset = normalizedOffset.y;
-		if (c == 'p' || c == 'g' || c == 'q' || c == 'j')
-		{
-			// yOffset = -0.021f * fontScale;
-		}
 
 		float bottom = currentCursorLocation.y - normalizedCharHeight - yOffset;
 		float left = currentCursorLocation.x + normalizedOffset.x;
