@@ -520,6 +520,11 @@ void TTFRasterizer::RenderGlyphToTexture(std::vector<unsigned char>& textureData
 	int16_t glyphWidth = glyph.maxX - glyph.minX;
 	int16_t glyphHeight = glyph.maxY - glyph.minY;
 
+	if (glyph.glyphIndex == 25)
+	{
+		glyphWidth = glyph.maxX - glyph.minX;
+	}
+
 	for (int y = pixelRect.top; y <= pixelRect.bottom; y++)
 	{
 		for (int x = pixelRect.left; x <= pixelRect.right; x++)
@@ -599,7 +604,7 @@ float TTFRasterizer::GetAlphaAtPoint(Glyph& glyph, int16_t x, int16_t y)
 				if (point3.onCurve)
 				{
 					float a = point1.y - 2 * point2.y + point3.y;
-					float b = 2 * (point2.y - point3.y);
+					float b = 2 * (point2.y - point1.y);
 					float c = point1.y - y;
 
 					std::pair<std::optional<float>, std::optional<float>> result = Math::QuadraticFormula(a, b, c);
