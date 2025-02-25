@@ -48,7 +48,7 @@ BinaryFileStream::BinaryFileStream(const char* filename, bool write, FileFlags f
 
 uint16_t BinaryFileStream::SwapEndian(uint16_t i)
 {
-	return (i << 8) | ((i >> 8));;
+	return (i << 8) | ((i >> 8) & 0xFF);
 }
 
 uint32_t BinaryFileStream::SwapEndian(uint32_t i)
@@ -72,6 +72,12 @@ void BinaryFileStream::ReverseSkip(uint32_t bytes)
 {
 	fseek(file, currentOffset - bytes, SEEK_SET);
 	currentOffset -= bytes;
+}
+
+void BinaryFileStream::GoTo(uint32_t offset)
+{
+	fseek(file, offset, SEEK_SET);
+	currentOffset = offset;
 }
 
 void BinaryFileStream::Sync()

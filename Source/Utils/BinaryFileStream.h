@@ -1,4 +1,7 @@
 #pragma once
+
+#include "FileUtils.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,22 +9,6 @@
 /*
 A filestream class designed specifically for binary files.
 */
-
-enum FileFlags
-{
-	LittleEndian = 1,
-	BigEndian = 2,
-};
-
-inline FileFlags operator|(FileFlags a, FileFlags b)
-{
-	return static_cast<FileFlags>(static_cast<int>(a) | static_cast<int>(b));
-}
-
-inline FileFlags operator&(FileFlags a, FileFlags b)
-{
-	return static_cast<FileFlags>(static_cast<int>(a) & static_cast<int>(b));
-}
 
 class BinaryFileStream
 {
@@ -40,6 +27,8 @@ public:
 
 	void Skip(uint32_t bytes);
 	void ReverseSkip(uint32_t bytes);
+
+	void GoTo(uint32_t offset);
 
 	void Sync();
 

@@ -152,6 +152,7 @@
     <ClCompile Include="ScreenCoordinate.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TTFRasterizer.cpp" />
     <ClCompile Include="VectorRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="ScreenCoordinate.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TTFRasterizer.h" />
     <ClInclude Include="VectorRenderer.h" />
   </ItemGroup>
   <ItemGroup>

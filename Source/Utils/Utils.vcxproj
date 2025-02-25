@@ -131,6 +131,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BezierUtils.cpp" />
+    <ClCompile Include="BinaryBufferStream.cpp" />
     <ClCompile Include="BinaryFileStream.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CRC.cpp" />
@@ -139,10 +141,13 @@
     <ClCompile Include="Rect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BezierUtils.h" />
+    <ClInclude Include="BinaryBufferStream.h" />
     <ClInclude Include="BinaryFileStream.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CRC.h" />
     <ClInclude Include="FileUtils.h" />
+    <ClInclude Include="FixedPoint.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Rect.h" />
   </ItemGroup>
