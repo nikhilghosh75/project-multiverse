@@ -520,7 +520,7 @@ void TTFRasterizer::RenderGlyphToTexture(std::vector<unsigned char>& textureData
 	int16_t glyphWidth = glyph.maxX - glyph.minX;
 	int16_t glyphHeight = glyph.maxY - glyph.minY;
 
-	if (glyph.glyphIndex == 25)
+	if (glyph.glyphIndex == 13)
 	{
 		glyphWidth = glyph.maxX - glyph.minX;
 	}
@@ -627,9 +627,15 @@ float TTFRasterizer::GetAlphaAtPoint(Glyph& glyph, int16_t x, int16_t y)
 
 bool TTFRasterizer::DoesLineIntersectHorizontalRay(Point a, Point b, Point rayOrigin)
 {
-	if ((a.y >= rayOrigin.y && b.y >= rayOrigin.y) || (a.y < rayOrigin.y && b.y < rayOrigin.y)) 
+	if ((a.y > rayOrigin.y && b.y > rayOrigin.y) || (a.y < rayOrigin.y && b.y < rayOrigin.y)) 
 	{
 		// The segment is completely above or below the ray
+		return false;
+	}
+
+	if ((a.y > b.y && b.y == rayOrigin.y) || (a.y < b.y && a.y == rayOrigin.y))
+	{
+		// The ray intersects the bottom of the segment, we say only the top segment intersects
 		return false;
 	}
 
