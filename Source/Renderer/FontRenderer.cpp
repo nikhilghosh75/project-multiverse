@@ -140,9 +140,9 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 
 		float yOffset = normalizedOffset.y;
 
-		float bottom = currentCursorLocation.y - normalizedCharHeight - yOffset;
+		float bottom = currentCursorLocation.y - yOffset;
 		float left = currentCursorLocation.x + normalizedOffset.x;
-		float top = currentCursorLocation.y - yOffset;
+		float top = currentCursorLocation.y + normalizedCharHeight - yOffset;
 		float right = left + normalizedCharWidth;
 
 		float uvBottom = character.uvCoordinates.bottom;
