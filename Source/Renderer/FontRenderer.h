@@ -89,6 +89,5 @@ private:
 
 	std::array<VkCommandBuffer, MAX_REQUESTS_IN_FLIGHT> commandBuffers;
 
-	VkPipelineLayout pipelineLayout;
-	VkPipeline graphicsPipeline;
+	RenderPipeline pipeline;
 };
