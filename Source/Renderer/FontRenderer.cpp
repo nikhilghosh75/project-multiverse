@@ -53,7 +53,7 @@ FontRenderer::FontRenderer()
 {
 	instance = this;
 
-	defaultFont = new Font("Data/Fonts/Roboto-Medium.ttf", {36});
+	defaultFont = new Font("Data/Fonts/Roboto-Medium.ttf", {60});
 
 	Device::Get()->TransitionImageLayout(
 		defaultFont->texture->GetImage(),
