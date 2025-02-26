@@ -90,8 +90,7 @@ Window::Window()
 	windowRunning = true;
 	window = this;
 
-	device = new Device();
-	device->ConnectWin32(hwnd, g_window_instance);
+	device = new Device(hwnd, g_window_instance);
 
 	Input::Initialize();
 }
