@@ -13,9 +13,8 @@ ScreenCoordinate::ScreenCoordinate(glm::vec2 relativePosition, Anchor _anchor)
 }
 
 ScreenCoordinate::ScreenCoordinate(glm::vec2 _relativePosition, glm::vec2 _relativeAnchor)
+	: relativePosition(_relativePosition), anchor(_relativeAnchor)
 {
-	relativePosition = _relativePosition;
-	anchor = _relativeAnchor;
 }
 
 glm::vec2 ScreenCoordinate::GetAbsolutePosition() const
@@ -68,7 +67,7 @@ glm::vec2 ScreenCoordinate::ConvertPointBetweenSpace(glm::vec2 point, ScreenSpac
 		{
 		case ScreenSpace::Rendering: return point;
 		case ScreenSpace::Screen: return glm::vec2((point.x + 1.f) / 2.f, (point.y + 1.f) / 2.f);
-		case ScreenSpace::Pixel: return point; // TODO: Implement this properly
+		case ScreenSpace::Pixel: return point; 
 		}
 		break;
 	}
@@ -120,9 +119,9 @@ glm::vec2 ScreenCoordinate::GetAnchoredPosition(Anchor anchor)
 {
 	switch (anchor)
 	{
-	case Anchor::BottomLeft: return glm::vec2(0, 0);
-	case Anchor::BottomMiddle: return glm::vec2(0.5f, 0);
-	case Anchor::BottomRight: return glm::vec2(1.f, 0);
+	case Anchor::BottomLeft: return glm::vec2(0.f, 0.f);
+	case Anchor::BottomMiddle: return glm::vec2(0.5f, 0.f);
+	case Anchor::BottomRight: return glm::vec2(1.f, 0.f);
 	case Anchor::MiddleLeft: return glm::vec2(0.f, 0.5f);
 	case Anchor::MiddleCenter: return glm::vec2(0.5f, 0.5f);
 	case Anchor::MiddleRight: return glm::vec2(1.f, 0.5f);
@@ -131,5 +130,5 @@ glm::vec2 ScreenCoordinate::GetAnchoredPosition(Anchor anchor)
 	case Anchor::TopRight: return glm::vec2(1.f, 1.f);
 	}
 
-	return glm::vec2(0, 0);
+	return glm::vec2(0.f, 0.f);
 }
