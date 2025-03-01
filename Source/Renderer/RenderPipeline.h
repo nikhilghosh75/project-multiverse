@@ -9,6 +9,8 @@ public:
 	RenderPipeline();
 	RenderPipeline(VkVertexInputBindingDescription _binding, std::vector<VkVertexInputAttributeDescription> _attributes);
 
+	~RenderPipeline();
+
 	void SetShader(Shader& shader, ShaderType type);
 	void SetDescriptorSet(VkDescriptorSetLayout layout);
 	void SetBinding(VkVertexInputBindingDescription _binding);
