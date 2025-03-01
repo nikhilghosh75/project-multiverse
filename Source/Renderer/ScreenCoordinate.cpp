@@ -59,6 +59,9 @@ Rect ScreenCoordinate::CreateRect(ScreenCoordinate position, glm::vec2 dimension
 
 glm::vec2 ScreenCoordinate::ConvertPointBetweenSpace(glm::vec2 point, ScreenSpace space1, ScreenSpace space2)
 {
+	int width, height;
+	Window::GetWindowSize(&width, &height);
+
 	switch (space1)
 	{
 	case ScreenSpace::Rendering:
@@ -67,7 +70,7 @@ glm::vec2 ScreenCoordinate::ConvertPointBetweenSpace(glm::vec2 point, ScreenSpac
 		{
 		case ScreenSpace::Rendering: return point;
 		case ScreenSpace::Screen: return glm::vec2((point.x + 1.f) / 2.f, (point.y + 1.f) / 2.f);
-		case ScreenSpace::Pixel: return point; 
+		case ScreenSpace::Pixel: return glm::vec2(((point.x + 1.f) / 2.f) * width, ((point.y + 1.f) / 2.f) * height);
 		}
 		break;
 	}
@@ -77,9 +80,18 @@ glm::vec2 ScreenCoordinate::ConvertPointBetweenSpace(glm::vec2 point, ScreenSpac
 		{
 		case ScreenSpace::Rendering: return glm::vec2(point.x * 2.f - 1.f, point.y * 2.f - 1.f);
 		case ScreenSpace::Screen: return point;
-		case ScreenSpace::Pixel: return point; // TODO: Implement this properly
+		case ScreenSpace::Pixel: return glm::vec2(point.x * width, point.y * height);
 		}
 		break;
+	}
+	case ScreenSpace::Pixel:
+	{
+		switch (space2)
+		{
+		case ScreenSpace::Rendering: return glm::vec2((point.x / width) * 2.f - 1.f, (point.y / height) * 2.f - 1.f);
+		case ScreenSpace::Screen: return glm::vec2(point.x / width, point.y / height);
+		case ScreenSpace::Pixel: return point;
+		}
 	}
 	}
 
