@@ -158,8 +158,8 @@ void VectorRenderer::CreateBuffers()
 
 void VectorRenderer::CreatePipeline()
 {
-	Shader vertexShader = Shader::ReadShader("Data/Shaders/vector_simple_vert.spv", Device::Get()->GetVulkanDevice());
-	Shader fragmentShader = Shader::ReadShader("Data/Shaders/vector_simple_frag.spv", Device::Get()->GetVulkanDevice());
+	Shader vertexShader = Shader("Data/Shaders/vector_simple_vert.spv", Device::Get()->GetVulkanDevice());
+	Shader fragmentShader = Shader("Data/Shaders/vector_simple_frag.spv", Device::Get()->GetVulkanDevice());
 
 	pipeline.SetShader(vertexShader, ShaderType::Vertex);
 	pipeline.SetShader(fragmentShader, ShaderType::Fragment);

@@ -204,8 +204,8 @@ void FontRenderer::CreatePipeline()
 	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 	VULKAN_CALL(vkAllocateDescriptorSets(Device::Get()->GetVulkanDevice(), &allocInfo, descriptorSets.data()));
 
-	Shader vertexShader = Shader::ReadShader("C:\\Users\\debgh\\source\\repos\\Project Multiverse\\Data\\Shaders\\font_vert.spv", Device::Get()->GetVulkanDevice());
-	Shader fragmentShader = Shader::ReadShader("C:\\Users\\debgh\\source\\repos\\Project Multiverse\\Data\\Shaders\\font_frag.spv", Device::Get()->GetVulkanDevice());
+	Shader vertexShader = Shader("C:\\Users\\debgh\\source\\repos\\Project Multiverse\\Data\\Shaders\\font_vert.spv", Device::Get()->GetVulkanDevice());
+	Shader fragmentShader = Shader("C:\\Users\\debgh\\source\\repos\\Project Multiverse\\Data\\Shaders\\font_frag.spv", Device::Get()->GetVulkanDevice());
 
 	pipeline.SetShader(vertexShader, ShaderType::Vertex);
 	pipeline.SetShader(fragmentShader, ShaderType::Fragment);

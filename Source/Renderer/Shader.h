@@ -15,19 +15,15 @@ enum class ShaderType
 class Shader
 {
 public:
+	Shader(const std::string& fileName, VkDevice device);
+
 	~Shader();
 
-	static Shader ReadShader(const std::string& fileName, VkDevice device);
-
 	VkShaderModule GetModule() const { return module; };
-
-	ShaderType type;
 
 private:
 	uint32_t size;
 	char* data;
 	VkShaderModule module;
-
-	void CreateModule(VkDevice device);
 };
 

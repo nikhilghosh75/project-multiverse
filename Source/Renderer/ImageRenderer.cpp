@@ -136,8 +136,8 @@ void ImageRenderer::CreateBuffers()
 
 void ImageRenderer::CreatePipeline()
 {
-    Shader vertexShader = Shader::ReadShader("Data/Shaders/texture_vert.spv", Device::Get()->GetVulkanDevice());
-    Shader fragmentShader = Shader::ReadShader("Data/Shaders/texture_frag.spv", Device::Get()->GetVulkanDevice());
+    Shader vertexShader = Shader("Data/Shaders/texture_vert.spv", Device::Get()->GetVulkanDevice());
+    Shader fragmentShader = Shader("Data/Shaders/texture_frag.spv", Device::Get()->GetVulkanDevice());
 
     pipeline.SetShader(vertexShader, ShaderType::Vertex);
     pipeline.SetShader(fragmentShader, ShaderType::Fragment);
