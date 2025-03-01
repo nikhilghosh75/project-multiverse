@@ -19,11 +19,6 @@
 static FT_Library library;
 static bool libraryInitialized = false;
 
-Font::Font()
-{
-	isInitialized = false;
-}
-
 Font::Font(const std::string& filepath, FontLoadingOptions options)
 {
 	std::filesystem::path path(filepath);
