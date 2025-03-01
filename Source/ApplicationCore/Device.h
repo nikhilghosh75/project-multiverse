@@ -26,10 +26,7 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 class Device
 {
 public:
-	Device();
-
-	// Called by the window class to connect it to the Win32 instance
-	void ConnectWin32(HWND hwnd, HINSTANCE hinstance);
+	Device(HWND hwnd, HINSTANCE hinstance);
 
 	void StartFrame();
 	void EndFrame();
@@ -97,8 +94,6 @@ private:
 	void SetupCommandPool();
 	void SetupCommandBuffers();
 	void SetupSyncObjects();
-
-	void EnumerateExtensions();
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 

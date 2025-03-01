@@ -22,6 +22,7 @@ enum class ScreenSpace
 	Pixel // 0 to (width, height)
 };
 
+// A class that represents a position on the screen.
 class ScreenCoordinate
 {
 public:
@@ -29,8 +30,8 @@ public:
 	ScreenCoordinate(glm::vec2 relativePosition, Anchor anchor);
 	ScreenCoordinate(glm::vec2 relativePosition, glm::vec2 relativeAnchor);
 
-	glm::vec2 relativePosition;
-	glm::vec2 anchor;
+	glm::vec2 relativePosition; // In pixels
+	glm::vec2 anchor; // Relative to screen space
 
 	glm::vec2 GetAbsolutePosition() const;
 	glm::vec2 GetScreenPosition() const;

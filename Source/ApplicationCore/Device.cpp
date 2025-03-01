@@ -15,17 +15,15 @@ const std::array<const char*, 4> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAM
 const std::array<const char*, 1> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
-Device::Device()
+Device::Device(HWND hwnd, HINSTANCE hinstance)
 {
     device = this;
     instance = nullptr;
 
+    // Several important subsystems 
     CreateInstance();
     SetupDebugMessenger();
-}
 
-void Device::ConnectWin32(HWND hwnd, HINSTANCE hinstance)
-{
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     createInfo.hwnd = hwnd;
@@ -35,7 +33,6 @@ void Device::ConnectWin32(HWND hwnd, HINSTANCE hinstance)
 
     SetupPhysicalDevice();
     SetupLogicalDevice();
-    EnumerateExtensions();
 
     swapChain.Setup(physicalDevice, surface);
 
@@ -587,6 +584,7 @@ void Device::SetupCommandPool()
 
 void Device::SetupCommandBuffers()
 {
+    // Allocate one command buffer for each frame that can be in transit
     for (int i = 0; i < frameObjects.size(); i++)
     {
         VkCommandBufferAllocateInfo allocInfo{};
@@ -621,21 +619,6 @@ void Device::SetupSyncObjects()
         VULKAN_CALL_MSG(vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].imageAvailableSemaphore), "Failed to create semaphore");
         VULKAN_CALL_MSG(vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].renderFinishedSemaphore), "Failed to create semaphore");
         VULKAN_CALL_MSG(vkCreateFence(vulkanDevice, &fenceInfo, nullptr, &frameObjects[i].inFlightFence), "Failed to create fence");
-    }
-}
-
-void Device::EnumerateExtensions()
-{
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
-    std::cout << "available extensions:\n";
-
-    for (const VkExtensionProperties& extension : extensions)
-    {
-        std::cout << '\t' << extension.extensionName << '\n';
     }
 }
 

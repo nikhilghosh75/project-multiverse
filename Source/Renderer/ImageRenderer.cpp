@@ -136,8 +136,8 @@ void ImageRenderer::CreateBuffers()
 
 void ImageRenderer::CreatePipeline()
 {
-    Shader vertexShader = Shader::ReadShader("Data/Shaders/texture_vert.spv", Device::Get()->GetVulkanDevice());
-    Shader fragmentShader = Shader::ReadShader("Data/Shaders/texture_frag.spv", Device::Get()->GetVulkanDevice());
+    Shader vertexShader = Shader("Data/Shaders/texture_vert.spv", Device::Get()->GetVulkanDevice());
+    Shader fragmentShader = Shader("Data/Shaders/texture_frag.spv", Device::Get()->GetVulkanDevice());
 
     pipeline.SetShader(vertexShader, ShaderType::Vertex);
     pipeline.SetShader(fragmentShader, ShaderType::Fragment);
@@ -266,7 +266,6 @@ void ImageRenderer::DispatchCommands()
 
     vkCmdBindIndexBuffer(commandBuffer, indexBuffers[currentIndex], 0, VK_INDEX_TYPE_UINT16);
 
-    // VkDescriptorSet& descriptorSet = descriptorSets[Device::GetFrameNumber() % MAX_FRAMES_IN_FLIGHT];
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);

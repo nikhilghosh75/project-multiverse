@@ -68,8 +68,8 @@ void DebugRenderer::AddBox(Rect rect)
 
 void DebugRenderer::CreatePipeline()
 {
-	Shader vertexShader = Shader::ReadShader("Data/Shaders/debug_vert.spv", Device::Get()->GetVulkanDevice());
-	Shader fragmentShader = Shader::ReadShader("Data/Shaders/debug_frag.spv", Device::Get()->GetVulkanDevice());
+	Shader vertexShader = Shader("Data/Shaders/debug_vert.spv", Device::Get()->GetVulkanDevice());
+	Shader fragmentShader = Shader("Data/Shaders/debug_frag.spv", Device::Get()->GetVulkanDevice());
 
 	pipeline.SetShader(vertexShader, ShaderType::Vertex);
 	pipeline.SetShader(fragmentShader, ShaderType::Fragment);
