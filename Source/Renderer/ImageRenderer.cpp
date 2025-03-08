@@ -11,10 +11,44 @@ const std::vector<uint16_t> indices =
     0, 1, 2, 2, 3, 0
 };
 
+std::array<ImageRenderRequest, ImageRenderRequest::MAX_IMAGE_REQUESTS> ImageRenderRequest::requests;
+
 ImageRenderingOptions::ImageRenderingOptions()
 {
     keepAspectRatio = false;
 }
+
+bool ImageRenderRequest::CanBeCombined(const RenderRequest* other) const
+{
+    return false;
+}
+
+void ImageRenderRequest::CombineWith(RenderRequest* other)
+{
+}
+
+void ImageRenderRequest::Render()
+{
+}
+
+ImageRenderRequest* ImageRenderRequest::CreateRequest()
+{
+    static const int DEFAULT_RECTS_RESERVE_SIZE = 20;
+
+    if (!requestsArrayInitialized)
+    {
+        for (int i = 0; i < MAX_IMAGE_REQUESTS; i++)
+        {
+            requests[i].hasBeenSubmitted = false;
+            requests[i].rects.reserve(DEFAULT_RECTS_RESERVE_SIZE);
+        }
+        requestsArrayInitialized = true;
+    }
+
+    lastIndex = (lastIndex + 1) % MAX_IMAGE_REQUESTS;
+    return &requests[lastIndex];
+}
+
 
 ImageRenderer::ImageRenderer()
 {

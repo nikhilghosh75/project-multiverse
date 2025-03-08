@@ -46,7 +46,21 @@ void FontRenderRequest::Render()
 
 FontRenderRequest* FontRenderRequest::CreateRequest()
 {
-	return nullptr;
+	static const int DEFAULT_VERTICES_RESERVE_SIZE = 256;
+
+	if (!requestsArrayInitialized)
+	{
+		for (int i = 0; i < MAX_FONT_REQUESTS; i++)
+		{
+			requests[i].hasBeenSubmitted = false;
+			requests[i].vertices.reserve(DEFAULT_VERTICES_RESERVE_SIZE * 6);
+			requests[i].indices.reserve(DEFAULT_VERTICES_RESERVE_SIZE * 4);
+		}
+		requestsArrayInitialized = true;
+	}
+
+	lastIndex = (lastIndex + 1) % MAX_FONT_REQUESTS;
+	return &requests[lastIndex];
 }
 
 FontRenderer::FontRenderer()

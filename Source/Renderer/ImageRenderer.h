@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include "Rect.h"
 #include "RenderPipeline.h"
+#include "RenderRequest.h"
 #include "Texture.h"
 #include <array>
 
@@ -18,6 +19,28 @@ class ImageRenderingResult
 public:
 	Rect finalRect;
 	bool rendered;
+};
+
+class ImageRenderRequest : public RenderRequest
+{
+public:
+	bool CanBeCombined(const RenderRequest* other) const override;
+
+	void CombineWith(RenderRequest* other) override;
+
+	void Render() override;
+
+	static ImageRenderRequest* CreateRequest();
+
+	Texture* texture;
+	std::vector<Rect> rects;
+
+	static const int MAX_IMAGE_REQUESTS = 50;
+
+private:
+	static std::array<ImageRenderRequest, MAX_IMAGE_REQUESTS> requests;
+	static inline bool requestsArrayInitialized = false;
+	static inline int lastIndex = 0;
 };
 
 class ImageRenderer
