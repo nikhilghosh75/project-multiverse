@@ -15,7 +15,17 @@ BuildUI::~BuildUI()
 
 void BuildUI::Render()
 {
-	ImGui::Begin("Test");
+	ImGui::Begin("Dashboard");
+
+	if (BuildSystem::Get()->previousBuilds.size() == 0)
+	{
+		ImGui::Text("No Recent Builds");
+	}
+	else
+	{
+		BuildInfo lastBuild = BuildSystem::Get()->previousBuilds.back();
+		ImGui::Text("Last Build %s", lastBuild.time.Str().c_str());
+	}
 
 	if (ImGui::Button("Build"))
 	{
