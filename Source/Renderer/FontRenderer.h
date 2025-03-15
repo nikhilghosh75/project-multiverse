@@ -2,7 +2,9 @@
 #include "Font.h"
 #include "RenderRequest.h"
 #include "RenderPipeline.h"
+
 #include <array>
+#include <mutex>
 
 class FontVertex
 {
@@ -27,16 +29,27 @@ public:
 
 	static FontRenderRequest* CreateRequest();
 
+	struct TextRequest
+	{
+		std::string text;
+		glm::vec2 position;
+		int fontSize;
+	};
+
 	Font* font;
-	
-	std::vector<FontVertex> vertices;
-	std::vector<unsigned int> indices;
+
+	std::vector<TextRequest> texts;
 private:
 	static const int MAX_FONT_REQUESTS = 50;
 
+	// Requests can be accessed by both the rendering thread and the game thread
 	static std::array<FontRenderRequest, MAX_FONT_REQUESTS> requests;
+	static std::mutex requestsMutex;
+
 	static inline bool requestsArrayInitialized = false;
 	static inline int lastIndex = 0;
+
+	friend class FontRenderer;
 };
 
 class FontRenderer
@@ -49,6 +62,8 @@ public:
 
 	// position is relative to the screen, and is the top left of the rect
 	void AddText(std::string text, glm::vec2 position, int fontSize = 16);
+
+	std::vector<RenderRequest*> GetRequestsThisFrame();
 private:
 	static inline FontRenderer* instance;
 

@@ -1,6 +1,21 @@
 #include "RenderManager.h"
 #include "Device.h"
 
+void RunRenderThread(RenderManager& manager)
+{
+	while (manager.isRendererRunning)
+	{
+		if (manager.canStartFrame)
+		{
+			manager.StartFrame();
+			manager.canStartFrame = false;
+		}
+
+		manager.EndFrame();
+
+	}
+}
+
 RenderManager::RenderManager()
 {
 
@@ -20,6 +35,11 @@ void RenderManager::Setup()
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
 	vectorRenderer = new VectorRenderer();
+}
+
+void RenderManager::RunRenderThread()
+{
+
 }
 
 void RenderManager::StartFrame()
@@ -51,10 +71,9 @@ void RenderManager::StartFrame()
 
 void RenderManager::EndFrame()
 {
-	// See if any requests can be combined
-
 	Device::Get()->TransitionImageLayout(
 		Device::Get()->GetCurrentSwapChainImage(),
 		Device::Get()->GetSwapChainFormat(),
 		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
+

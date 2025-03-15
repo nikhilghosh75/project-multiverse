@@ -46,15 +46,14 @@ void FontRenderRequest::Render()
 
 FontRenderRequest* FontRenderRequest::CreateRequest()
 {
-	static const int DEFAULT_VERTICES_RESERVE_SIZE = 256;
+	static const int DEFAULT_REQUESTS_RESERVE_SIZE = 8;
 
 	if (!requestsArrayInitialized)
 	{
 		for (int i = 0; i < MAX_FONT_REQUESTS; i++)
 		{
 			requests[i].hasBeenSubmitted = false;
-			requests[i].vertices.reserve(DEFAULT_VERTICES_RESERVE_SIZE * 6);
-			requests[i].indices.reserve(DEFAULT_VERTICES_RESERVE_SIZE * 4);
+			requests[i].texts.reserve(DEFAULT_REQUESTS_RESERVE_SIZE);
 		}
 		requestsArrayInitialized = true;
 	}
@@ -114,6 +113,13 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 	if (text.empty())
 		return;
 
+	// NEW CODE
+	FontRenderRequest::requestsMutex.lock();
+	FontRenderRequest* request = FontRenderRequest::CreateRequest();
+	request->texts.push_back({ text, position, fontSize });
+	FontRenderRequest::requestsMutex.unlock();
+
+	// OLD CODE
 	int width, height;
 	Window::GetWindowSize(&width, &height);
 	float normalizedFontSize = (static_cast<float>(fontSize) * 6.333f) / width;
@@ -179,6 +185,21 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 	}
 
 	Render();
+}
+
+std::vector<RenderRequest*> FontRenderer::GetRequestsThisFrame()
+{
+	std::vector<RenderRequest*> requests;
+
+	for (FontRenderRequest& request : FontRenderRequest::requests)
+	{
+		if (request.isActive && !request.isProcessing)
+		{
+			requests.push_back(&request);
+		}
+	}
+
+	return requests;
 }
 
 void FontRenderer::CreatePipeline()

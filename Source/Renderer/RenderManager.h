@@ -4,6 +4,8 @@
 #include "ImageRenderer.h"
 #include "VectorRenderer.h"
 
+void RunRenderThread(RenderManager& manager);
+
 class RenderManager
 {
 public:
@@ -14,7 +16,12 @@ public:
 
 	void StartFrame();
 	void EndFrame();
+
+	bool canStartFrame;
+	bool isRendererRunning = true;
 private:
+	void ProcessRequestsFromLastFrame();
+
 	DebugRenderer* debugRenderer;
 	FontRenderer* fontRenderer;
 	ImageRenderer* imageRenderer;

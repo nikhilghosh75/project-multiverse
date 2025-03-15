@@ -16,5 +16,6 @@ public:
 	virtual void Render() = 0;
 
 	RenderRequestType type;
-	bool hasBeenSubmitted;
+	bool isActive = false; // Does the request have data that is actively used
+	bool isProcessing = false; // Is the request being processed by the RenderingManager
 };
