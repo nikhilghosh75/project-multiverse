@@ -130,6 +130,12 @@ void BuildSystem::UpdateBuild()
 	if (isBuildInProgress)
 	{
 		buildGraph.UpdateBuild();
+
+		if (buildGraph.GetCurrentState() == BuildState::Complete)
+		{
+			isBuildInProgress = false;
+			ReportBuild();
+		}
 	}
 }
 
@@ -167,4 +173,15 @@ std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, std::opt
 	File::EnforceForwardSlash(filepath);
 
 	return filepath;
+}
+
+void BuildSystem::ReportBuild()
+{
+	std::cout << "BUILD COMPLETE";
+
+	BuildInfo info;
+	info.name = "";
+	info.time = DateTime::Now();
+
+	previousBuilds.push_back(info);
 }

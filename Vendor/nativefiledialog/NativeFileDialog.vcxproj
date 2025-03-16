@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0a28b938-6721-4a24-bfef-602c69eed630}</ProjectGuid>
-    <RootNamespace>Utils</RootNamespace>
+    <ProjectGuid>{a2c2abc2-dd47-4048-8c8f-ef97203857e7}</ProjectGuid>
+    <RootNamespace>NativeFileDialog</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -104,8 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Vendor/glm</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src; $(ProjectDir)src/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,8 +120,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Vendor/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src; $(ProjectDir)src/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,27 +131,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BezierUtils.cpp" />
-    <ClCompile Include="BinaryBufferStream.cpp" />
-    <ClCompile Include="BinaryFileStream.cpp" />
-    <ClCompile Include="Color.cpp" />
-    <ClCompile Include="CRC.cpp" />
-    <ClCompile Include="DateTime.cpp" />
-    <ClCompile Include="FileUtils.cpp" />
-    <ClCompile Include="MathUtils.cpp" />
-    <ClCompile Include="Rect.cpp" />
+    <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\include\nfd.h" />
+    <ClInclude Include="src\nfd_common.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BezierUtils.h" />
-    <ClInclude Include="BinaryBufferStream.h" />
-    <ClInclude Include="BinaryFileStream.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="CRC.h" />
-    <ClInclude Include="DateTime.h" />
-    <ClInclude Include="FileUtils.h" />
-    <ClInclude Include="FixedPoint.h" />
-    <ClInclude Include="MathUtils.h" />
-    <ClInclude Include="Rect.h" />
+    <ClCompile Include="src\nfd_common.c" />
+    <ClCompile Include="src\nfd_win.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
