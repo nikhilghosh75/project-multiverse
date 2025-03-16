@@ -100,25 +100,28 @@ void BuildSystem::Init()
 	}
 
 	file.close();
-
-	buildFolderPath = "C:/Users/debgh/source/repos/Project Multiverse/Builds/Build 0.03.0";
 }
 
 void BuildSystem::StartBuild()
 {
-	buildGraph.Initialize(buildFolderPath);
+	if (!CanBuildBeStarted())
+	{
+		return;
+	}
+
+	buildGraph.Initialize(*buildFolderPath);
 	for (BuildConfig& config : configs)
 	{
-		buildGraph.AddBuildConfig(config, buildFolderPath);
+		buildGraph.AddBuildConfig(config, *buildFolderPath);
 	}
 
 	for (std::string& folderPath : foldersToCopy)
 	{
-		buildGraph.AddFolderPath(folderPath, buildFolderPath);
+		buildGraph.AddFolderPath(folderPath, *buildFolderPath);
 	}
 
-	std::filesystem::create_directory(buildFolderPath);
-	std::filesystem::create_directory(buildFolderPath + "/Data");
+	std::filesystem::create_directory(*buildFolderPath);
+	std::filesystem::create_directory(*buildFolderPath + "/Data");
 
 	buildGraph.StartBuild();
 
@@ -184,4 +187,13 @@ void BuildSystem::ReportBuild()
 	info.time = DateTime::Now();
 
 	previousBuilds.push_back(info);
+}
+
+bool BuildSystem::CanBuildBeStarted()
+{
+	if (!buildFolderPath.has_value())
+	{
+		return false;
+	}
+	return true;
 }

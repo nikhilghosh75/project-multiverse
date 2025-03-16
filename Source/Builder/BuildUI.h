@@ -8,5 +8,6 @@ public:
 
 	void Render();
 
-	
+private:
+	void SetBuildFolder();
 };
