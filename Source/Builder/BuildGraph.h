@@ -4,6 +4,13 @@
 #include <string>
 #include <vector>
 
+enum class BuildState
+{
+	NotStarted,
+	InProgress,
+	Complete
+};
+
 class BuildConfig
 {
 public:
@@ -45,6 +52,8 @@ public:
 
 	void UpdateBuild();
 
+	BuildState GetCurrentState();
+
 private:
 	static const size_t MAX_NODES_AT_ONCE = 2;
 
@@ -53,4 +62,7 @@ private:
 	std::vector<BuildGraphNode*> nodesInProgress;
 
 	void AddNodeToBuild();
+	bool IsBuildComplete();
+
+	BuildState currentState;
 };

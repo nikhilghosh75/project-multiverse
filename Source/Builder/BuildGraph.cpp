@@ -9,6 +9,8 @@ void BuildGraph::Initialize(const std::string& buildFolderPath)
 {
 	rootNode = new VSProjectGraphNode("Source/Game/Game.vcxproj");
 	rootNode->children.push_back(new CopyVSGraphNode("Source/Game/Game.vcxproj", buildFolderPath));
+
+	currentState = BuildState::NotStarted;
 }
 
 void BuildGraph::AddBuildConfig(const BuildConfig& config, const std::string& buildFolderPath)
@@ -33,6 +35,8 @@ void BuildGraph::StartBuild()
 {
 	rootNode->Start();
 	nodesInProgress.push_back(rootNode);
+
+	currentState = BuildState::InProgress;
 }
 
 void BuildGraph::UpdateBuild()
@@ -57,6 +61,16 @@ void BuildGraph::UpdateBuild()
 	{
 		AddNodeToBuild();
 	}
+
+	if (IsBuildComplete())
+	{
+		currentState = BuildState::Complete;
+	}
+}
+
+BuildState BuildGraph::GetCurrentState()
+{
+	return currentState;
 }
 
 void BuildGraph::AddNodeToBuild()
@@ -88,6 +102,31 @@ void BuildGraph::AddNodeToBuild()
 			}
 		}
 	}
+}
+
+bool BuildGraph::IsBuildComplete()
+{
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+	bool isAnyNodeNotDone = false;
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		if (node->HasStarted() && !node->IsDone())
+		{
+			isAnyNodeNotDone = true;
+		}
+
+		nodesToSearch.pop_back();
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			nodesToSearch.push_back(node->children[i]);
+		}
+	}
+
+	return !isAnyNodeNotDone;
 }
 
 void BuildGraphNode::Start()

@@ -100,25 +100,28 @@ void BuildSystem::Init()
 	}
 
 	file.close();
-
-	buildFolderPath = "C:/Users/debgh/source/repos/Project Multiverse/Builds/Build 0.03.0";
 }
 
 void BuildSystem::StartBuild()
 {
-	buildGraph.Initialize(buildFolderPath);
+	if (!CanBuildBeStarted())
+	{
+		return;
+	}
+
+	buildGraph.Initialize(*buildFolderPath);
 	for (BuildConfig& config : configs)
 	{
-		buildGraph.AddBuildConfig(config, buildFolderPath);
+		buildGraph.AddBuildConfig(config, *buildFolderPath);
 	}
 
 	for (std::string& folderPath : foldersToCopy)
 	{
-		buildGraph.AddFolderPath(folderPath, buildFolderPath);
+		buildGraph.AddFolderPath(folderPath, *buildFolderPath);
 	}
 
-	std::filesystem::create_directory(buildFolderPath);
-	std::filesystem::create_directory(buildFolderPath + "/Data");
+	std::filesystem::create_directory(*buildFolderPath);
+	std::filesystem::create_directory(*buildFolderPath + "/Data");
 
 	buildGraph.StartBuild();
 
@@ -130,6 +133,12 @@ void BuildSystem::UpdateBuild()
 	if (isBuildInProgress)
 	{
 		buildGraph.UpdateBuild();
+
+		if (buildGraph.GetCurrentState() == BuildState::Complete)
+		{
+			isBuildInProgress = false;
+			ReportBuild();
+		}
 	}
 }
 
@@ -167,4 +176,24 @@ std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, std::opt
 	File::EnforceForwardSlash(filepath);
 
 	return filepath;
+}
+
+void BuildSystem::ReportBuild()
+{
+	std::cout << "BUILD COMPLETE";
+
+	BuildInfo info;
+	info.name = "";
+	info.time = DateTime::Now();
+
+	previousBuilds.push_back(info);
+}
+
+bool BuildSystem::CanBuildBeStarted()
+{
+	if (!buildFolderPath.has_value())
+	{
+		return false;
+	}
+	return true;
 }
