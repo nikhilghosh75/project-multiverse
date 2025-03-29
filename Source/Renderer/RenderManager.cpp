@@ -8,14 +8,14 @@
 #include <iostream>
 #include <thread>
 
+#include "tracy/Tracy.hpp"
+
 void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame);
 void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
 void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
 
 void RunRenderThread(RenderManager* manager)
 {
-	DateTime lastFrameStartTime = DateTime::Now();
-
 	manager->canStartRenderingFrame = false;
 	while (manager->isRendererRunning)
 	{
@@ -25,7 +25,7 @@ void RunRenderThread(RenderManager* manager)
 			std::this_thread::sleep_for(std::chrono::microseconds(100));
 		}
 
-		lastFrameStartTime = DateTime::Now();
+		ZoneScopedN("Render Loop");
 
 		std::vector<RenderRequest*> requestsLastFrame = manager->GetRenderRequests();
 		MarkRenderRequestsAsProcessing(requestsLastFrame);
@@ -49,11 +49,6 @@ void RunRenderThread(RenderManager* manager)
 
 			FreeRenderRequests(requestsLastFrame);
 		}
-		DateTime currentFrameTime = DateTime::Now();
-		uint64_t renderTimeMicroseconds = currentFrameTime.GetTicks() - lastFrameStartTime.GetTicks();
-		lastFrameStartTime = currentFrameTime;
-
-		std::cout << "Render Time: " << renderTimeMicroseconds << " microseconds" << std::endl;
 
 		manager->EndFrame();
 		manager->isFinishedRenderingFrame = true;
@@ -62,6 +57,7 @@ void RunRenderThread(RenderManager* manager)
 
 void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 {
+	ZoneScoped;
 	if (requestsLastFrame.size() > 0)
 	{
 		std::vector<int> indicesToRemove;
@@ -87,6 +83,7 @@ void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 
 void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 {
+	ZoneScoped;
 	for (RenderRequest* request : requestsLastFrame)
 	{
 		request->isActive = false;
@@ -97,6 +94,7 @@ void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 
 void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame)
 {
+	ZoneScoped;
 	for (RenderRequest* request : requestsLastFrame)
 	{
 		request->isProcessing = true;
@@ -126,6 +124,8 @@ void RenderManager::Setup()
 
 void RenderManager::StartFrame()
 {
+	ZoneScoped;
+
 	Device::Get()->TransitionImageLayout(
 		Device::Get()->GetCurrentSwapChainImage(),
 		Device::Get()->GetSwapChainFormat(),
