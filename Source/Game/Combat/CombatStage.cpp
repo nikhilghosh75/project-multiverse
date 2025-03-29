@@ -1,8 +1,11 @@
 #include "CombatStage.h"
+
 #include "Core/RunManager.h"
 #include "UI/HUD/CombatHUD.h"
 #include "Temp/TempDefeatStage.h"
 #include "Temp/TempVictoryStage.h"
+
+#include "tracy/Tracy.hpp"
 
 // TODO: Maybe change this to somewhere else
 std::vector<std::vector<glm::vec2>> enemyPositions =
@@ -49,6 +52,7 @@ CombatStage::~CombatStage()
 
 void CombatStage::Update()
 {
+	ZoneScoped;
 	currentTurnCharacter->OnTurnUpdate(this);
 
 	playerCharacter->Render();

@@ -1,5 +1,8 @@
 #include "Stage.h"
+
 #include "UI/Main Menu/StartScreenStage.h"
+
+#include "tracy/Tracy.hpp"
 
 void StageManager::Initialize()
 {
@@ -20,6 +23,7 @@ void StageManager::PopStage()
 
 void StageManager::Update()
 {
+	ZoneScoped;
 	startOfFrameCount = stages.size() - 1;
 
 	Stage* topStage = stages[stages.size() - 1];
