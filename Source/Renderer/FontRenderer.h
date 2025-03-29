@@ -26,6 +26,7 @@ public:
 	void CombineWith(RenderRequest* other) override;
 
 	void Render() override;
+	void Clean() override;
 
 	static FontRenderRequest* CreateRequest();
 
@@ -39,6 +40,8 @@ public:
 	Font* font;
 
 	std::vector<TextRequest> texts;
+
+	static std::vector<RenderRequest*> GetRequestsThisFrame();
 private:
 	static const int MAX_FONT_REQUESTS = 50;
 
@@ -63,7 +66,7 @@ public:
 	// position is relative to the screen, and is the top left of the rect
 	void AddText(std::string text, glm::vec2 position, int fontSize = 16);
 
-	std::vector<RenderRequest*> GetRequestsThisFrame();
+	void RenderFontRequest(FontRenderRequest* request);
 private:
 	static inline FontRenderer* instance;
 
@@ -75,14 +78,14 @@ private:
 
 	};
 
+	void PopulateBufferWithTextRequest(FontRenderRequest::TextRequest& text);
+
 	void CreatePipeline();
 	void CreateCommandBuffers();
 
 	void UpdateDescriptorSets();
 	void PopulateBuffers();
 	void DispatchCommands();
-
-	void Render();
 
 	std::vector<FontVertex> vertices;
 	std::vector<unsigned int> indices;

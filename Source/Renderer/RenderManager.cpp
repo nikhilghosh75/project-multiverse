@@ -1,18 +1,105 @@
 #include "RenderManager.h"
+
 #include "Device.h"
 
-void RunRenderThread(RenderManager& manager)
+#include "DateTime.h"
+
+#include <chrono>
+#include <iostream>
+#include <thread>
+
+void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame);
+void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
+void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
+
+void RunRenderThread(RenderManager* manager)
 {
-	while (manager.isRendererRunning)
+	DateTime lastFrameStartTime = DateTime::Now();
+
+	manager->canStartRenderingFrame = false;
+	while (manager->isRendererRunning)
 	{
-		if (manager.canStartFrame)
+		// Wait until the game thread signals that we can start the frame
+		while (!manager->canStartRenderingFrame)
 		{
-			manager.StartFrame();
-			manager.canStartFrame = false;
+			std::this_thread::sleep_for(std::chrono::microseconds(100));
 		}
 
-		manager.EndFrame();
+		lastFrameStartTime = DateTime::Now();
 
+		std::vector<RenderRequest*> requestsLastFrame = manager->GetRenderRequests();
+		MarkRenderRequestsAsProcessing(requestsLastFrame);
+
+		manager->StartFrame();
+		manager->canStartRenderingFrame = false;
+		manager->isFinishedRenderingFrame = false;
+
+		if (Device::Get()->shouldRenderFrame)
+		{
+			int requestsBeforeCombining = requestsLastFrame.size();
+			CombineRenderRequests(requestsLastFrame);
+			int requestsAfterCombining = requestsLastFrame.size();
+
+			std::cout << requestsBeforeCombining << " before, " << requestsAfterCombining << " after" << std::endl;
+
+			for (int i = 0; i < requestsLastFrame.size(); i++)
+			{
+				requestsLastFrame[i]->Render();
+			}
+
+			FreeRenderRequests(requestsLastFrame);
+		}
+		DateTime currentFrameTime = DateTime::Now();
+		uint64_t renderTimeMicroseconds = currentFrameTime.GetTicks() - lastFrameStartTime.GetTicks();
+		lastFrameStartTime = currentFrameTime;
+
+		std::cout << "Render Time: " << renderTimeMicroseconds << " microseconds" << std::endl;
+
+		manager->EndFrame();
+		manager->isFinishedRenderingFrame = true;
+	}
+}
+
+void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
+{
+	if (requestsLastFrame.size() > 0)
+	{
+		std::vector<int> indicesToRemove;
+		for (int i = 0; i < requestsLastFrame.size() - 1; i++)
+		{
+			if (requestsLastFrame[i]->CanBeCombined(requestsLastFrame[i + 1]))
+			{
+				requestsLastFrame[i + 1]->CombineWith(requestsLastFrame[i]);
+
+				requestsLastFrame[i]->isActive = false;
+				requestsLastFrame[i]->isProcessing = false;
+				requestsLastFrame[i]->Clean();
+				indicesToRemove.push_back(i);
+			}
+		}
+
+		for (int i = indicesToRemove.size() - 1; i >= 0; i--)
+		{
+			requestsLastFrame.erase(requestsLastFrame.begin() + indicesToRemove[i]);
+		}
+	}
+}
+
+void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
+{
+	for (RenderRequest* request : requestsLastFrame)
+	{
+		request->isActive = false;
+		request->isProcessing = false;
+		request->Clean();
+	}
+}
+
+void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame)
+{
+	for (RenderRequest* request : requestsLastFrame)
+	{
+		request->isProcessing = true;
 	}
 }
 
@@ -35,11 +122,6 @@ void RenderManager::Setup()
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
 	vectorRenderer = new VectorRenderer();
-}
-
-void RenderManager::RunRenderThread()
-{
-
 }
 
 void RenderManager::StartFrame()
@@ -75,5 +157,36 @@ void RenderManager::EndFrame()
 		Device::Get()->GetCurrentSwapChainImage(),
 		Device::Get()->GetSwapChainFormat(),
 		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+}
+
+std::vector<RenderRequest*> RenderManager::GetRenderRequests()
+{
+	std::vector<RenderRequest*> requests;
+
+	std::vector<RenderRequest*> imageRequests = ImageRenderRequest::GetRequestsThisFrame();
+	for (RenderRequest* request : imageRequests)
+	{
+		requests.push_back(request);
+	}
+
+	std::vector<RenderRequest*> simpleVectorRequests = SimpleVectorRenderRequest::GetRequestsThisFrame();
+	for (RenderRequest* request : simpleVectorRequests)
+	{
+		requests.push_back(request);
+	}
+
+	std::vector<RenderRequest*> fontRequests = FontRenderRequest::GetRequestsThisFrame();
+	for (RenderRequest* request : fontRequests)
+	{
+		requests.push_back(request);
+	}
+
+	std::vector<RenderRequest*> debugRequests = DebugRenderRequest::GetRequestsThisFrame();
+	for (RenderRequest* request : debugRequests)
+	{
+		requests.push_back(request);
+	}
+
+	return requests;
 }
 

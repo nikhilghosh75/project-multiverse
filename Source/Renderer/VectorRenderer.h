@@ -4,6 +4,7 @@
 #include "Color.h"
 #include "Rect.h"
 #include "RenderPipeline.h"
+#include "RenderRequest.h"
 #include "ScreenCoordinate.h"
 #include <array>
 
@@ -25,6 +26,15 @@ public:
 
 	void DrawRegularPolygon(glm::vec2 center, int sides, float radius, float angle = 0.0f);
 
+	class Path
+	{
+	public:
+		Color color;
+		std::vector<glm::vec2> points;
+
+		Path() { }
+	};
+
 private:
 	friend class VectorRenderer;
 
@@ -35,21 +45,36 @@ private:
 		Painting
 	};
 
-	class Path
-	{
-	public:
-		Color color;
-		std::vector<glm::vec2> points;
-
-		Path() { }
-	};
-
 	ScreenSpace screenSpace;
 
 	State state;
 	std::vector<Path> paths;
 
 	Color currentColor;
+};
+
+class SimpleVectorRenderRequest : public RenderRequest
+{
+public:
+	bool CanBeCombined(const RenderRequest* other) const override;
+
+	void CombineWith(RenderRequest* other) override;
+
+	void Render() override;
+	void Clean() override;
+
+	static SimpleVectorRenderRequest* CreateRequest();
+
+	std::vector<VectorPainter::Path> paths;
+	ScreenSpace space;
+
+	static std::vector<RenderRequest*> GetRequestsThisFrame();
+private:
+	static const int MAX_VECTOR_REQUESTS = 50;
+
+	static std::array<SimpleVectorRenderRequest, MAX_VECTOR_REQUESTS> requests;
+	static inline bool requestsArrayInitialized = false;
+	static inline int lastIndex = 0;
 };
 
 class VectorRenderer
@@ -62,6 +87,7 @@ public:
 
 	void SubmitPainter(const VectorPainter& painter);
 
+	void RenderSimpleVectorRequest(SimpleVectorRenderRequest* request);
 private:
 	class Vertex
 	{
@@ -91,8 +117,6 @@ private:
 	bool IsValidPath(const VectorPainter::Path& path);
 
 	void SubmitPath(const VectorPainter::Path& path, ScreenSpace space);
-
-	glm::vec2 ConvertToRenderSpace(glm::vec2 point, ScreenSpace space) const;
 
 	static const int MAX_REQUESTS_IN_FLIGHT = 5;
 	static const int MAX_VERTICES_IN_REQUEST = 4096;
