@@ -11,10 +11,63 @@ const std::vector<uint16_t> indices =
     0, 1, 2, 2, 3, 0
 };
 
+std::array<ImageRenderRequest, ImageRenderRequest::MAX_IMAGE_REQUESTS> ImageRenderRequest::requests;
+
 ImageRenderingOptions::ImageRenderingOptions()
 {
     keepAspectRatio = false;
 }
+
+bool ImageRenderRequest::CanBeCombined(const RenderRequest* other) const
+{
+    return false;
+}
+
+void ImageRenderRequest::CombineWith(RenderRequest* other)
+{
+}
+
+void ImageRenderRequest::Render()
+{
+    ImageRenderer::Get()->RenderImageRequest(this);
+}
+
+void ImageRenderRequest::Clean()
+{
+    texture = nullptr;
+}
+
+ImageRenderRequest* ImageRenderRequest::CreateRequest()
+{
+    if (!requestsArrayInitialized)
+    {
+        for (int i = 0; i < MAX_IMAGE_REQUESTS; i++)
+        {
+            requests[i].isActive = false;
+        }
+        requestsArrayInitialized = true;
+    }
+
+    lastIndex = (lastIndex + 1) % MAX_IMAGE_REQUESTS;
+    requests[lastIndex].isActive = true;
+    return &requests[lastIndex];
+}
+
+std::vector<RenderRequest*> ImageRenderRequest::GetRequestsThisFrame()
+{
+    std::vector<RenderRequest*> requestsThisFrame;
+
+    for (ImageRenderRequest& request : requests)
+    {
+        if (request.isActive && !request.isProcessing)
+        {
+            requestsThisFrame.push_back(&request);
+        }
+    }
+
+    return requestsThisFrame;
+}
+
 
 ImageRenderer::ImageRenderer()
 {
@@ -39,11 +92,41 @@ ImageRenderer* ImageRenderer::Get()
 
 ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageRenderingOptions options)
 {
-    currentTexture = texture;
-
     if (options.keepAspectRatio)
-        rect = FitRectToTexture(rect);
+        rect = FitRectToTexture(rect, texture);
 
+    ImageRenderRequest* request = ImageRenderRequest::CreateRequest();
+    request->texture = texture;
+    request->rect = rect;
+
+    ImageRenderingResult result;
+    result.finalRect = rect;
+    result.rendered = true;
+
+    return result;
+}
+
+void ImageRenderer::RenderImageRequest(ImageRenderRequest* request)
+{
+    SetTexture(request->texture);
+    PopulateWithRect(request->rect);
+
+    UpdateDescriptorSets();
+    PopulateBuffers();
+    DispatchCommands();
+
+    vertices.clear();
+
+    currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
+}
+
+void ImageRenderer::SetTexture(Texture* texture)
+{
+    currentTexture = texture;
+}
+
+void ImageRenderer::PopulateWithRect(Rect rect)
+{
     glm::vec2 bottomLeft = glm::vec2(rect.left, rect.bottom);
     glm::vec2 topLeft = glm::vec2(rect.left, rect.top);
     glm::vec2 topRight = glm::vec2(rect.right, rect.top);
@@ -58,29 +141,11 @@ ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageR
     vertices.push_back(topLeftVertex);
     vertices.push_back(topRightVertex);
     vertices.push_back(bottomRightVertex);
-
-    Render();
-
-    ImageRenderingResult result;
-    result.finalRect = rect;
-    result.rendered = true;
-
-    return result;
 }
 
-void ImageRenderer::Render()
+Rect ImageRenderer::FitRectToTexture(Rect currentRect, Texture* texture)
 {
-    if (Device::Get()->shouldRenderFrame)
-    {
-        UpdateDescriptorSets();
-        PopulateBuffers();
-        DispatchCommands();
-    }
-}
-
-Rect ImageRenderer::FitRectToTexture(Rect currentRect)
-{
-    if (!currentTexture)
+    if (!texture)
         return currentRect;
 
     int width, height;
@@ -89,7 +154,7 @@ Rect ImageRenderer::FitRectToTexture(Rect currentRect)
     glm::vec2 screenDimensions = glm::vec2(
         (currentRect.right - currentRect.left) * (float)width, (currentRect.bottom - currentRect.top) * (float)height);
     float currentRatio = (float)screenDimensions.x / (float)screenDimensions.y;
-    float imageRatio = (float)currentTexture->GetTextureWidth() / (float)currentTexture->GetTextureHeight();
+    float imageRatio = (float)texture->GetTextureWidth() / (float)texture->GetTextureHeight();
 
     if (currentRatio > imageRatio)
     {
@@ -281,10 +346,6 @@ void ImageRenderer::DispatchCommands()
 
     vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
-
-    vertices.clear();
-
-    currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
 }
 
 ImageRenderer::Vertex::Vertex(glm::vec2 _position, glm::vec2 _uv)

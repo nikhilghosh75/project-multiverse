@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include "Rect.h"
 #include "RenderPipeline.h"
+#include "RenderRequest.h"
 #include "Texture.h"
 #include <array>
 
@@ -20,6 +21,30 @@ public:
 	bool rendered;
 };
 
+class ImageRenderRequest : public RenderRequest
+{
+public:
+	bool CanBeCombined(const RenderRequest* other) const override;
+
+	void CombineWith(RenderRequest* other) override;
+
+	void Render() override;
+	void Clean() override;
+
+	static ImageRenderRequest* CreateRequest();
+
+	Texture* texture;
+	Rect rect;
+
+	static std::vector<RenderRequest*> GetRequestsThisFrame();
+private:
+	static const int MAX_IMAGE_REQUESTS = 50;
+
+	static std::array<ImageRenderRequest, MAX_IMAGE_REQUESTS> requests;
+	static inline bool requestsArrayInitialized = false;
+	static inline int lastIndex = 0;
+};
+
 class ImageRenderer
 {
 	static inline ImageRenderingOptions defaultOptions;
@@ -32,7 +57,7 @@ public:
 
 	ImageRenderingResult AddImage(Texture* texture, Rect rect, ImageRenderingOptions options = defaultOptions);
 
-	void Render();
+	void RenderImageRequest(ImageRenderRequest* request);
 
 private:
 	class Vertex
@@ -47,7 +72,10 @@ private:
 		static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 	};
 
-	Rect FitRectToTexture(Rect currentRect);
+	void SetTexture(Texture* texture);
+	void PopulateWithRect(Rect rect);
+
+	Rect FitRectToTexture(Rect currentRect, Texture* texture);
 	
 	void CreateBuffers();
 	void CreatePipeline();

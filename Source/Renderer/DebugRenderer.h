@@ -1,10 +1,41 @@
 #pragma once
 #include "vulkan/vulkan.h"
 #include "RenderPipeline.h"
+#include "RenderRequest.h"
 #include "Rect.h"
 #include "glm/glm.hpp"
+
 #include <array>
+#include <mutex>
 #include <vector>
+
+class DebugRenderRequest : public RenderRequest
+{
+public:
+	bool CanBeCombined(const RenderRequest* other) const override;
+
+	void CombineWith(RenderRequest* other) override;
+
+	void Render() override;
+	void Clean() override;
+
+	static DebugRenderRequest* CreateRequest();
+
+	std::vector<Rect> rects;
+
+	static std::vector<RenderRequest*> GetRequestsThisFrame();
+private:
+	static const int MAX_DEBUG_REQUESTS = 50;
+
+	// Requests can be accessed by both the rendering thread and the game thread
+	static std::array<DebugRenderRequest, MAX_DEBUG_REQUESTS> requests;
+	static std::mutex requestsMutex;
+
+	static inline bool requestsArrayInitialized = false;
+	static inline int lastIndex = 0;
+
+	friend class DebugRenderer;
+};
 
 class DebugRenderer
 {
@@ -17,8 +48,11 @@ public:
 	// In Rendering Space
 	void AddBox(Rect rect);
 
+	void RenderDebugRequest(DebugRenderRequest* request);
 private:
 	static inline DebugRenderer* instance;
+
+	void PopulateWithBox(Rect rect);
 
 	void CreatePipeline();
 
@@ -29,8 +63,6 @@ private:
 	void UpdateDescriptorSets();
 	void PopulateBuffers();
 	void DispatchCommands();
-
-	void Render();
 
 	RenderPipeline pipeline;
 

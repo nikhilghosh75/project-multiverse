@@ -7,17 +7,13 @@
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
 std::array<FontRenderRequest, FontRenderRequest::MAX_FONT_REQUESTS> FontRenderRequest::requests;
+std::mutex FontRenderRequest::requestsMutex;
 
 const float letterSpacingFactor = 0.2f;
 const float spaceSpacingFactor = 12.0f;
 
 bool FontRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
-	if (other->type != RenderRequestType::Font)
-	{
-		return false;
-	}
-
 	// TODO: Add font merging
 	if (const FontRenderRequest* otherFont = dynamic_cast<const FontRenderRequest*>(other))
 	{
@@ -34,19 +30,61 @@ bool FontRenderRequest::CanBeCombined(const RenderRequest* other) const
 
 void FontRenderRequest::CombineWith(RenderRequest* other)
 {
-	if (const FontRenderRequest* otherFont = dynamic_cast<const FontRenderRequest*>(other))
+	if (const FontRenderRequest* otherFontRequest = dynamic_cast<const FontRenderRequest*>(other))
 	{
-
+		for (int i = 0; i < otherFontRequest->texts.size(); i++)
+		{
+			texts.push_back(otherFontRequest->texts[i]);
+		}
 	}
 }
 
 void FontRenderRequest::Render()
 {
+	FontRenderer::Get()->RenderFontRequest(this);
+}
+
+void FontRenderRequest::Clean()
+{
+	texts.clear();
 }
 
 FontRenderRequest* FontRenderRequest::CreateRequest()
 {
-	return nullptr;
+	static const int DEFAULT_REQUESTS_RESERVE_SIZE = 8;
+
+	requestsMutex.lock();
+
+	if (!requestsArrayInitialized)
+	{
+		for (int i = 0; i < MAX_FONT_REQUESTS; i++)
+		{
+			requests[i].isActive = false;
+			requests[i].texts.reserve(DEFAULT_REQUESTS_RESERVE_SIZE);
+		}
+		requestsArrayInitialized = true;
+	}
+
+	lastIndex = (lastIndex + 1) % MAX_FONT_REQUESTS;
+	requests[lastIndex].isActive = true;
+	requestsMutex.unlock();
+
+	return &requests[lastIndex];
+}
+
+std::vector<RenderRequest*> FontRenderRequest::GetRequestsThisFrame()
+{
+	std::vector<RenderRequest*> requestsThisFrame;
+
+	for (FontRenderRequest& request : requests)
+	{
+		if (request.isActive && !request.isProcessing)
+		{
+			requestsThisFrame.push_back(&request);
+		}
+	}
+
+	return requestsThisFrame;
 }
 
 FontRenderer::FontRenderer()
@@ -100,17 +138,40 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 	if (text.empty())
 		return;
 
+	FontRenderRequest* request = FontRenderRequest::CreateRequest();
+	request->texts.push_back({ text, position, fontSize });
+}
+
+void FontRenderer::RenderFontRequest(FontRenderRequest* request)
+{
+	for (FontRenderRequest::TextRequest& textRequest : request->texts)
+	{
+		PopulateBufferWithTextRequest(textRequest);
+	}
+
+	PopulateBuffers();
+	UpdateDescriptorSets();
+	DispatchCommands();
+
+	indices.clear();
+	vertices.clear();
+
+	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
+}
+
+void FontRenderer::PopulateBufferWithTextRequest(FontRenderRequest::TextRequest& request)
+{
 	int width, height;
 	Window::GetWindowSize(&width, &height);
-	float normalizedFontSize = (static_cast<float>(fontSize) * 6.333f) / width;
+	float normalizedFontSize = (static_cast<float>(request.fontSize) * 6.333f) / width;
 
-	glm::vec2 currentCursorLocation = position;
+	glm::vec2 currentCursorLocation = request.position;
 	Font* font = defaultFont;
-	float fontScale = font->GetPixelScale(static_cast<float>(fontSize));
+	float fontScale = font->GetPixelScale(static_cast<float>(request.fontSize));
 
-	for (int i = 0; i < text.size(); i++)
+	for (int i = 0; i < request.text.size(); i++)
 	{
-		char c = text[i];
+		char c = request.text[i];
 
 		if (c == 32)
 		{
@@ -163,8 +224,6 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 
 		currentCursorLocation.x += normalizedCharWidth + character.xAdvance * letterSpacingFactor * (fontScale / width);
 	}
-
-	Render();
 }
 
 void FontRenderer::CreatePipeline()
@@ -317,21 +376,6 @@ void FontRenderer::DispatchCommands()
 
 	vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 	vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
-}
-
-void FontRenderer::Render()
-{
-	if (Device::Get()->shouldRenderFrame)
-	{
-		PopulateBuffers();
-		UpdateDescriptorSets();
-		DispatchCommands();
-
-		indices.clear();
-		vertices.clear();
-
-		currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
-	}
 }
 
 FontVertex::FontVertex(glm::vec2 _position, glm::vec2 _uvCoordinate)
