@@ -12,7 +12,7 @@ public:
 
 	static DateTime Now();
 
-
+	uint64_t GetTicks() { return ticks; }
 
 private:
 	uint64_t ticks; // Microseconds since January 1st, 1970
