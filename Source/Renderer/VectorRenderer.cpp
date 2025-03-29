@@ -4,6 +4,7 @@
 #include "VulkanUtils.h"
 #include "Window.h"
 
+#include "tracy/Tracy.hpp"
 
 std::array<SimpleVectorRenderRequest, SimpleVectorRenderRequest::MAX_VECTOR_REQUESTS> SimpleVectorRenderRequest::requests;
 
@@ -113,6 +114,7 @@ void SimpleVectorRenderRequest::CombineWith(RenderRequest* other)
 
 void SimpleVectorRenderRequest::Render()
 {
+	ZoneScopedN("VectorRenderRequest::Render");
 	VectorRenderer::Get()->RenderSimpleVectorRequest(this);
 }
 

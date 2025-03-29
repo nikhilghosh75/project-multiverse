@@ -6,6 +6,8 @@
 
 #include <array>
 
+#include "tracy/Tracy.hpp"
+
 const std::vector<uint16_t> indices = 
 {
     0, 1, 2, 2, 3, 0
@@ -29,6 +31,7 @@ void ImageRenderRequest::CombineWith(RenderRequest* other)
 
 void ImageRenderRequest::Render()
 {
+    ZoneScopedN("ImageRenderRequest::Render");
     ImageRenderer::Get()->RenderImageRequest(this);
 }
 
@@ -127,6 +130,8 @@ void ImageRenderer::SetTexture(Texture* texture)
 
 void ImageRenderer::PopulateWithRect(Rect rect)
 {
+    ZoneScoped;
+
     glm::vec2 bottomLeft = glm::vec2(rect.left, rect.bottom);
     glm::vec2 topLeft = glm::vec2(rect.left, rect.top);
     glm::vec2 topRight = glm::vec2(rect.right, rect.top);
@@ -173,6 +178,7 @@ Rect ImageRenderer::FitRectToTexture(Rect currentRect, Texture* texture)
 
 void ImageRenderer::CreateBuffers()
 {
+    ZoneScoped;
     for (int i = 0; i < MAX_REQUESTS_IN_FLIGHT; i++)
     {
         VkDeviceSize vertexBufferSize = MAX_VERTICES_IN_REQUEST * sizeof(Vertex);
@@ -201,6 +207,7 @@ void ImageRenderer::CreateBuffers()
 
 void ImageRenderer::CreatePipeline()
 {
+    ZoneScoped;
     Shader vertexShader = Shader("Data/Shaders/texture_vert.spv", Device::Get()->GetVulkanDevice());
     Shader fragmentShader = Shader("Data/Shaders/texture_frag.spv", Device::Get()->GetVulkanDevice());
 
@@ -262,6 +269,7 @@ void ImageRenderer::CreateDescriptorSets()
 
 void ImageRenderer::UpdateDescriptorSets()
 {
+    ZoneScoped;
     VkDescriptorImageInfo imageInfo{};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = currentTexture->GetImageView();
@@ -283,12 +291,14 @@ void ImageRenderer::UpdateDescriptorSets()
 
 void ImageRenderer::PopulateBuffers()
 {
+    ZoneScoped;
     Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex]);
     Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
 }
 
 void ImageRenderer::DispatchCommands()
 {
+    ZoneScoped;
     VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
 
     VkCommandBufferBeginInfo beginInfo{};

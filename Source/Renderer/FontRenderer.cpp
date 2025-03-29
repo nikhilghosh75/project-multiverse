@@ -4,6 +4,8 @@
 #include "VulkanUtils.h"
 #include "Window.h"
 
+#include "tracy/Tracy.hpp"
+
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
 std::array<FontRenderRequest, FontRenderRequest::MAX_FONT_REQUESTS> FontRenderRequest::requests;
@@ -41,6 +43,7 @@ void FontRenderRequest::CombineWith(RenderRequest* other)
 
 void FontRenderRequest::Render()
 {
+	ZoneScopedN("FontRenderRequest::Render");
 	FontRenderer::Get()->RenderFontRequest(this);
 }
 

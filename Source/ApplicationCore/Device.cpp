@@ -39,6 +39,7 @@ Device::Device(HWND hwnd, HINSTANCE hinstance)
     SetupCommandPool();
     SetupCommandBuffers();
     SetupSyncObjects();
+    SetupStagingBuffers();
 
     isSetupComplete = true;
 }
@@ -121,6 +122,12 @@ Device::~Device()
     vkDeviceWaitIdle(vulkanDevice);
 
     swapChain.Cleanup();
+
+    for (int i = 0; i < stagingBuffers.size(); i++)
+    {
+        vkDestroyBuffer(vulkanDevice, stagingBuffers[i].buffer, nullptr);
+        vkFreeMemory(vulkanDevice, stagingBuffers[i].bufferMemory, nullptr);
+    }
 
     for (int i = 0; i < frameObjects.size(); i++)
     {
@@ -596,6 +603,7 @@ void Device::SetupCommandBuffers()
         VULKAN_CALL_MSG(vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &frameObjects[i].commandBuffer), "Failed to create command buffers");
     }
 
+    // Allocate the single time command buffers
     VkCommandBufferAllocateInfo singleTimeAllocInfo{};
     singleTimeAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     singleTimeAllocInfo.commandPool = commandPool;
@@ -619,6 +627,17 @@ void Device::SetupSyncObjects()
         VULKAN_CALL_MSG(vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].imageAvailableSemaphore), "Failed to create semaphore");
         VULKAN_CALL_MSG(vkCreateSemaphore(vulkanDevice, &semaphoreInfo, nullptr, &frameObjects[i].renderFinishedSemaphore), "Failed to create semaphore");
         VULKAN_CALL_MSG(vkCreateFence(vulkanDevice, &fenceInfo, nullptr, &frameObjects[i].inFlightFence), "Failed to create fence");
+    }
+}
+
+void Device::SetupStagingBuffers()
+{
+    const int STAGING_BUFFER_SIZE = 65536;
+
+    // Allocate the staging buffers
+    for (int i = 0; i < stagingBuffers.size(); i++)
+    {
+        CreateBuffer(STAGING_BUFFER_SIZE, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffers[i].buffer, stagingBuffers[i].bufferMemory);
     }
 }
 

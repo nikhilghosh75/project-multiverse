@@ -3,6 +3,8 @@
 #include "Device.h"
 #include "VulkanUtils.h"
 
+#include "tracy/Tracy.hpp"
+
 std::array<DebugRenderRequest, DebugRenderRequest::MAX_DEBUG_REQUESTS> DebugRenderRequest::requests;
 std::mutex DebugRenderRequest::requestsMutex;
 
@@ -29,6 +31,7 @@ void DebugRenderRequest::CombineWith(RenderRequest* other)
 
 void DebugRenderRequest::Render()
 {
+	ZoneScopedN("DebugRenderRequest::Render");
 	DebugRenderer::Get()->RenderDebugRequest(this);
 }
 

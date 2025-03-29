@@ -9,6 +9,8 @@
 #include "DateTime.h"
 #include "Time.h"
 
+#include "tracy/Tracy.hpp"
+
 #include <windows.h>
 
 int main()
@@ -22,11 +24,8 @@ int main()
     Time::Initialize();
     StageManager::Initialize();
 
-    DateTime lastFrameStartTime = DateTime::Now();
-
     while (Window::windowRunning)
     {
-        lastFrameStartTime = DateTime::Now();
         Time::Update();
 
         window.Process();
@@ -36,19 +35,14 @@ int main()
 
         StageManager::Update();
 
-        DateTime currentFrameTime = DateTime::Now();
-        uint64_t renderTimeMicroseconds = currentFrameTime.GetTicks() - lastFrameStartTime.GetTicks();
-        lastFrameStartTime = currentFrameTime;
-
-        std::cout << "Game Time: " << renderTimeMicroseconds << " microseconds" << std::endl;
-
         while (!renderingManager.isFinishedRenderingFrame)
         {
             std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
 
-        lastFrameStartTime = DateTime::Now();
         Device::Get()->EndFrame();
+
+        FrameMark;
     }
 
     renderingManager.isRendererRunning = false;
