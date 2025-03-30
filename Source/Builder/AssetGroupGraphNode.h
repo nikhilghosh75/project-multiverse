@@ -12,6 +12,8 @@ public:
 	void Update() override;
 	bool IsDone() override;
 
+	std::map<std::string, FileBuildState> GetFileStates() override;
+
 private:
 	BuildProcess* process;
 

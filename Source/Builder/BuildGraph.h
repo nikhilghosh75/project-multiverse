@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
@@ -25,12 +26,22 @@ public:
 	bool aggregateResults;
 };
 
+enum class FileBuildState
+{
+	NotStarted,
+	InProgress,
+	Succeeded,
+	Failed
+};
+
 class BuildGraphNode
 {
 public:
 	virtual void Start();
 	virtual void Update() = 0;
 	virtual bool IsDone() = 0;
+
+	virtual std::map<std::string, FileBuildState> GetFileStates() = 0;
 
 	bool HasStarted() { return hasStarted; }
 
@@ -53,6 +64,8 @@ public:
 	void UpdateBuild();
 
 	BuildState GetCurrentState();
+
+	std::map<std::string, FileBuildState> GetFileStates();
 
 private:
 	static const size_t MAX_NODES_AT_ONCE = 2;

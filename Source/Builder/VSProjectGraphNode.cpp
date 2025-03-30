@@ -7,7 +7,7 @@
 #include <filesystem>
 
 VSProjectGraphNode::VSProjectGraphNode(const std::string& projectFilePath)
-	: projectFilePath(projectFilePath), process(nullptr)
+	: projectFilePath(projectFilePath), process(nullptr), projectBuildState(FileBuildState::NotStarted)
 {
 
 }
@@ -34,7 +34,8 @@ void VSProjectGraphNode::Start()
 	{
 		delete process;
 	}
-	process = new BuildProcess(command);
+	process = new BuildProcess(command, std::bind(&VSProjectGraphNode::OnProjectBuildFinished, this, std::placeholders::_1, std::placeholders::_2));
+	projectBuildState = FileBuildState::InProgress;
 }
 
 void VSProjectGraphNode::Update()
@@ -49,4 +50,21 @@ bool VSProjectGraphNode::IsDone()
 	}
 
 	return !process->StillRunning();
+}
+
+std::map<std::string, FileBuildState> VSProjectGraphNode::GetFileStates()
+{
+	return { { projectFilePath, projectBuildState} };
+}
+
+void VSProjectGraphNode::OnProjectBuildFinished(BuildProcess& buildProcess, uint32_t exitCode)
+{
+	if (exitCode == 0)
+	{
+		projectBuildState = FileBuildState::Succeeded;
+	}
+	else
+	{
+		projectBuildState = FileBuildState::Failed;
+	}
 }

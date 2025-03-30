@@ -73,6 +73,40 @@ BuildState BuildGraph::GetCurrentState()
 	return currentState;
 }
 
+std::map<std::string, FileBuildState> BuildGraph::GetFileStates()
+{
+	std::map<std::string, FileBuildState> fileStates;
+
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		if (node != nullptr)
+		{
+			std::map<std::string, FileBuildState> nodeFileStates = node->GetFileStates();
+			for (std::pair<std::string, FileBuildState> it : nodeFileStates)
+			{
+				fileStates.insert(it);
+			}
+
+			nodesToSearch.pop_back();
+
+			for (int i = 0; i < node->children.size(); i++)
+			{
+				nodesToSearch.push_back(node->children[i]);
+			}
+		}
+		else
+		{
+			nodesToSearch.pop_back();
+		}
+	}
+
+	return fileStates;
+}
+
 void BuildGraph::AddNodeToBuild()
 {
 	std::vector<BuildGraphNode*> nodesToSearch;

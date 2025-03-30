@@ -33,3 +33,8 @@ bool CopyVSGraphNode::IsDone()
 {
 	return HasStarted();
 }
+
+std::map<std::string, FileBuildState> CopyVSGraphNode::GetFileStates()
+{
+	return { {projectFilePath, HasStarted() ? FileBuildState::Succeeded : FileBuildState::NotStarted } };
+}

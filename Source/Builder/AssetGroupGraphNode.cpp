@@ -63,6 +63,29 @@ bool AssetGroupGraphNode::IsDone()
 	return currentFileIndex >= files.size();
 }
 
+std::map<std::string, FileBuildState> AssetGroupGraphNode::GetFileStates()
+{
+	std::map<std::string, FileBuildState> fileStates;
+
+	for (int i = 0; i < files.size(); i++)
+	{
+		if (i < currentFileIndex)
+		{
+			fileStates.insert({ files[i], FileBuildState::Succeeded });
+		}
+		else if (i == currentFileIndex)
+		{
+			fileStates.insert({ files[i], FileBuildState::InProgress });
+		}
+		else
+		{
+			fileStates.insert({ files[i], FileBuildState::NotStarted });
+		}
+	}
+
+	return fileStates;
+}
+
 std::string AssetGroupGraphNode::GenerateCommandForFile(const std::string& filepath) const
 {
 	std::string command = "";
