@@ -14,8 +14,13 @@ public:
 	void Update() override;
 	bool IsDone() override;
 
+	std::map<std::string, FileBuildState> GetFileStates() override;
+
 private:
+	void OnProjectBuildFinished(BuildProcess& buildProcess, uint32_t exitCode);
+
 	BuildProcess* process;
 
+	FileBuildState projectBuildState;
 	std::string projectFilePath;
 };
