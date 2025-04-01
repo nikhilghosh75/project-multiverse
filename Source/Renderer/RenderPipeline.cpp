@@ -1,5 +1,6 @@
 #include "RenderPipeline.h"
 #include "Device.h"
+#include "VulkanUtils.h"
 
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
@@ -12,6 +13,11 @@ RenderPipeline::RenderPipeline(VkVertexInputBindingDescription _binding, std::ve
 {
     bindingDescription = _binding;
     attributeDescription = _attributes;
+}
+
+RenderPipeline::~RenderPipeline()
+{
+    vkDestroyPipelineLayout(Device::Get()->GetVulkanDevice(), pipelineLayout, nullptr);
 }
 
 void RenderPipeline::SetShader(Shader& shader, ShaderType type)
@@ -28,11 +34,7 @@ void RenderPipeline::SetDescriptorSet(VkDescriptorSetLayout layout)
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &descriptorLayout;
 
-    if (vkCreatePipelineLayout(Device::Get()->GetVulkanDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
-    {
-        // TODO: Add error handling
-        exit(0);
-    }
+    VULKAN_CALL(vkCreatePipelineLayout(Device::Get()->GetVulkanDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout));
 }
 
 void RenderPipeline::SetBinding(VkVertexInputBindingDescription _binding)
@@ -75,6 +77,7 @@ void RenderPipeline::Create()
         pipelineShaders[i].module = shaders[i].shader;
     }
 
+    // Describes the structure of the vertex data
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
@@ -179,12 +182,7 @@ void RenderPipeline::Create()
     pipelineInfo.renderPass = Device::Get()->GetRenderPass();
     pipelineInfo.subpass = 0;
 
-    if (vkCreateGraphicsPipelines(vulkanDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
-    {
-        // TODO: Output the following error code
-        // "Vulkan, failed to create graphics pipelines"
-        exit(0);
-    }
+    VULKAN_CALL_MSG(vkCreateGraphicsPipelines(vulkanDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline), "Vulkan, failed to create graphics pipelines");
 }
 
 VkPipeline RenderPipeline::GetPipeline() const

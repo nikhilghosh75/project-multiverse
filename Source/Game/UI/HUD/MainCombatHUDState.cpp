@@ -38,7 +38,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		ImageRenderingResult result = ImageRenderer::Get()->AddImage(texture, rect, options);
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
-		painter.DrawRegularPolygon(bottomRight, 6, 0.02f);
+		painter.DrawRegularPolygon(bottomRight, 6, 0.026f);
 
 		bool hovered = false;
 		Rect renderingRect = ScreenCoordinate::ConvertRectBetweenSpaces(result.finalRect, ScreenSpace::Screen, ScreenSpace::Rendering);
@@ -66,7 +66,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		bottomRight = bottomRight * 2.f - glm::vec2(1, 1);
-		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.009, 0.064), 72);
+		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.014, 0.034), 72);
 
 		Rect screenRect = ScreenCoordinate::ConvertRectBetweenSpaces(rect, ScreenSpace::Screen, ScreenSpace::Rendering);
 		// DebugRenderer::Get()->AddBox(screenRect);

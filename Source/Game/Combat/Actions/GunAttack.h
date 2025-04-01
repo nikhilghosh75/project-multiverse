@@ -28,7 +28,8 @@ private:
 	std::string name;
 
 	Character* target;
-	float time;
+	float timeUntilShot;
+	float timeLeftInAttack;
 	int currentShot;
 	int shotsThisAttack;
 

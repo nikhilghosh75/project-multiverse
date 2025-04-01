@@ -1,9 +1,16 @@
+#include <chrono>
 #include <iostream>
+#include <thread>
+
 #include "Device.h"
 #include "RenderManager.h"
 #include "Window.h"
 #include "Stage.h"
+#include "DateTime.h"
 #include "Time.h"
+
+#include "tracy/Tracy.hpp"
+
 #include <windows.h>
 
 int main()
@@ -12,6 +19,7 @@ int main()
 
     RenderManager renderingManager;
     renderingManager.Setup();
+    std::thread renderingThread(RunRenderThread, &renderingManager);
 
     Time::Initialize();
     StageManager::Initialize();
@@ -22,11 +30,21 @@ int main()
 
         window.Process();
         Device::Get()->StartFrame();
-        renderingManager.StartFrame();
+        renderingManager.canStartRenderingFrame = true;
+        renderingManager.isFinishedRenderingFrame = false;
 
         StageManager::Update();
 
-        renderingManager.EndFrame();
+        while (!renderingManager.isFinishedRenderingFrame)
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+        }
+
         Device::Get()->EndFrame();
+
+        FrameMark;
     }
+
+    renderingManager.isRendererRunning = false;
+    renderingThread.join();
 }

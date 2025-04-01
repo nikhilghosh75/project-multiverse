@@ -90,8 +90,7 @@ Window::Window()
 	windowRunning = true;
 	window = this;
 
-	device = new Device();
-	device->ConnectWin32(hwnd, g_window_instance);
+	device = new Device(hwnd, g_window_instance);
 
 	Input::Initialize();
 }
@@ -198,16 +197,6 @@ LRESULT WndProc(HWND window, int wm, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_RBUTTONUP:
 		Window::ChangeMouseState(MouseButton::Right, false);
-		break;
-	case WM_KEYDOWN:
-
-		break;
-	case WM_MOUSEMOVE:
-	{
-		int x = GET_X_LPARAM(lParam);
-		int y = GET_Y_LPARAM(lParam);
-		Window::ChangeMousePosition(x, y);
-	}
 		break;
 	case WM_SIZE:
 	{

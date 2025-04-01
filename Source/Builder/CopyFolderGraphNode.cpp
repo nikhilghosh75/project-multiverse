@@ -26,3 +26,8 @@ bool CopyFolderGraphNode::IsDone()
 {
 	return HasStarted();
 }
+
+std::map<std::string, FileBuildState> CopyFolderGraphNode::GetFileStates()
+{
+	return std::map<std::string, FileBuildState>();
+}

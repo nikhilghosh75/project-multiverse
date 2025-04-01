@@ -9,6 +9,8 @@ void BuildGraph::Initialize(const std::string& buildFolderPath)
 {
 	rootNode = new VSProjectGraphNode("Source/Game/Game.vcxproj");
 	rootNode->children.push_back(new CopyVSGraphNode("Source/Game/Game.vcxproj", buildFolderPath));
+
+	currentState = BuildState::NotStarted;
 }
 
 void BuildGraph::AddBuildConfig(const BuildConfig& config, const std::string& buildFolderPath)
@@ -33,6 +35,8 @@ void BuildGraph::StartBuild()
 {
 	rootNode->Start();
 	nodesInProgress.push_back(rootNode);
+
+	currentState = BuildState::InProgress;
 }
 
 void BuildGraph::UpdateBuild()
@@ -57,6 +61,50 @@ void BuildGraph::UpdateBuild()
 	{
 		AddNodeToBuild();
 	}
+
+	if (IsBuildComplete())
+	{
+		currentState = BuildState::Complete;
+	}
+}
+
+BuildState BuildGraph::GetCurrentState()
+{
+	return currentState;
+}
+
+std::map<std::string, FileBuildState> BuildGraph::GetFileStates()
+{
+	std::map<std::string, FileBuildState> fileStates;
+
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		if (node != nullptr)
+		{
+			std::map<std::string, FileBuildState> nodeFileStates = node->GetFileStates();
+			for (std::pair<std::string, FileBuildState> it : nodeFileStates)
+			{
+				fileStates.insert(it);
+			}
+
+			nodesToSearch.pop_back();
+
+			for (int i = 0; i < node->children.size(); i++)
+			{
+				nodesToSearch.push_back(node->children[i]);
+			}
+		}
+		else
+		{
+			nodesToSearch.pop_back();
+		}
+	}
+
+	return fileStates;
 }
 
 void BuildGraph::AddNodeToBuild()
@@ -88,6 +136,31 @@ void BuildGraph::AddNodeToBuild()
 			}
 		}
 	}
+}
+
+bool BuildGraph::IsBuildComplete()
+{
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+	bool isAnyNodeNotDone = false;
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		if (node->HasStarted() && !node->IsDone())
+		{
+			isAnyNodeNotDone = true;
+		}
+
+		nodesToSearch.pop_back();
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			nodesToSearch.push_back(node->children[i]);
+		}
+	}
+
+	return !isAnyNodeNotDone;
 }
 
 void BuildGraphNode::Start()

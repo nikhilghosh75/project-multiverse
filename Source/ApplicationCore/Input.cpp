@@ -42,7 +42,12 @@ bool Input::GetMouseButtonUp(MouseButton button)
 
 glm::vec2 Input::GetMousePosition()
 {
-	return Input::mousePosition;
+	POINT point;
+	GetCursorPos(&point);
+
+	ScreenToClient(Window::GetWindowHandle(), &point);
+
+	return glm::vec2(point.x, point.y);
 }
 
 glm::vec2 Input::GetMouseNormalizedPosition()
@@ -51,7 +56,7 @@ glm::vec2 Input::GetMouseNormalizedPosition()
 	int height;
 	Window::GetWindowSize(&width, &height);
 
-	return glm::vec2(Input::mousePosition.x / width, Input::mousePosition.y / height);
+	return glm::vec2(GetMousePosition().x / width, GetMousePosition().y / height);
 }
 
 void Input::Initialize()

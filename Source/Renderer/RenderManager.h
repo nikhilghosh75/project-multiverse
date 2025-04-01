@@ -14,9 +14,17 @@ public:
 
 	void StartFrame();
 	void EndFrame();
+
+	std::vector<RenderRequest*> GetRenderRequests();
+
+	bool canStartRenderingFrame = true;
+	bool isFinishedRenderingFrame = false;
+	bool isRendererRunning = true;
+
 private:
 	DebugRenderer* debugRenderer;
 	FontRenderer* fontRenderer;
 	ImageRenderer* imageRenderer;
 	VectorRenderer* vectorRenderer;
 };
+void RunRenderThread(RenderManager* manager);

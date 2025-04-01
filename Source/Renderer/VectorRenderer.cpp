@@ -4,6 +4,10 @@
 #include "VulkanUtils.h"
 #include "Window.h"
 
+#include "tracy/Tracy.hpp"
+
+std::array<SimpleVectorRenderRequest, SimpleVectorRenderRequest::MAX_VECTOR_REQUESTS> SimpleVectorRenderRequest::requests;
+
 VectorPainter::VectorPainter()
 	: state(State::WaitingToBegin), screenSpace(ScreenSpace::Screen)
 {
@@ -87,6 +91,69 @@ void VectorPainter::DrawRegularPolygon(glm::vec2 center, int sides, float radius
 	state = State::WaitingToBegin;
 }
 
+bool SimpleVectorRenderRequest::CanBeCombined(const RenderRequest* other) const
+{
+	if (const SimpleVectorRenderRequest* vectorRequest = dynamic_cast<const SimpleVectorRenderRequest*>(other))
+	{
+		// TODO: Allow vector requests of two different spaces to be combined
+		return vectorRequest->space == space;
+	}
+	return false;
+}
+
+void SimpleVectorRenderRequest::CombineWith(RenderRequest* other)
+{
+	if (SimpleVectorRenderRequest* otherRequest = dynamic_cast<SimpleVectorRenderRequest*>(other))
+	{
+		for (VectorPainter::Path& path : otherRequest->paths)
+		{
+			paths.push_back(path);
+		}
+	}
+}
+
+void SimpleVectorRenderRequest::Render()
+{
+	ZoneScopedN("VectorRenderRequest::Render");
+	VectorRenderer::Get()->RenderSimpleVectorRequest(this);
+}
+
+void SimpleVectorRenderRequest::Clean()
+{
+	paths.clear();
+}
+
+SimpleVectorRenderRequest* SimpleVectorRenderRequest::CreateRequest()
+{
+	if (!requestsArrayInitialized)
+	{
+		for (int i = 0; i < MAX_VECTOR_REQUESTS; i++)
+		{
+			requests[i].isActive = false;
+		}
+		requestsArrayInitialized = true;
+	}
+
+	lastIndex = (lastIndex + 1) % MAX_VECTOR_REQUESTS;
+	requests[lastIndex].isActive = true;
+	return &requests[lastIndex];
+}
+
+std::vector<RenderRequest*> SimpleVectorRenderRequest::GetRequestsThisFrame()
+{
+	std::vector<RenderRequest*> requestsThisFrame;
+
+	for (SimpleVectorRenderRequest& request : requests)
+	{
+		if (request.isActive && !request.isProcessing)
+		{
+			requestsThisFrame.push_back(&request);
+		}
+	}
+
+	return requestsThisFrame;
+}
+
 VectorRenderer::VectorRenderer()
 {
 	instance = this;
@@ -110,22 +177,39 @@ VectorRenderer* VectorRenderer::Get()
 
 void VectorRenderer::SubmitPainter(const VectorPainter& painter)
 {
-	maxLayers = painter.paths.size() + 1;
+	SimpleVectorRenderRequest* request = SimpleVectorRenderRequest::CreateRequest();
+	request->space = painter.screenSpace;
 
 	for (int i = 0; i < painter.paths.size(); i++)
 	{
-		const VectorPainter::Path& path = painter.paths[i];
-
-		if (IsValidPath(path))
+		if (IsValidPath(painter.paths[i]))
 		{
-			SubmitPath(path, painter.screenSpace);
+			request->paths.push_back(painter.paths[i]);
+		}
+	}
+}
+
+void VectorRenderer::RenderSimpleVectorRequest(SimpleVectorRenderRequest* request)
+{
+	maxLayers = request->paths.size() + 1;
+
+	for (int i = 0; i < request->paths.size(); i++)
+	{
+		if (IsValidPath(request->paths[i]))
+		{
+			SubmitPath(request->paths[i], request->space);
 		}
 	}
 
-	if (vertices.size() > 0)
-	{
-		Render();
-	}
+	UpdateDescriptorSets();
+	PopulateBuffers();
+	DispatchCommands();
+
+	vertices.clear();
+	indices.clear();
+	currentLayer = 0;
+	maxLayers = 0;
+	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
 }
 
 void VectorRenderer::CreateBuffers()
@@ -158,8 +242,8 @@ void VectorRenderer::CreateBuffers()
 
 void VectorRenderer::CreatePipeline()
 {
-	Shader vertexShader = Shader::ReadShader("Data/Shaders/vector_simple_vert.spv", Device::Get()->GetVulkanDevice());
-	Shader fragmentShader = Shader::ReadShader("Data/Shaders/vector_simple_frag.spv", Device::Get()->GetVulkanDevice());
+	Shader vertexShader = Shader("Data/Shaders/vector_simple_vert.spv", Device::Get()->GetVulkanDevice());
+	Shader fragmentShader = Shader("Data/Shaders/vector_simple_frag.spv", Device::Get()->GetVulkanDevice());
 
 	pipeline.SetShader(vertexShader, ShaderType::Vertex);
 	pipeline.SetShader(fragmentShader, ShaderType::Fragment);
@@ -280,19 +364,6 @@ void VectorRenderer::DispatchCommands()
 
 	vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 	vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
-
-	vertices.clear();
-	indices.clear();
-	currentLayer = 0;
-	maxLayers = 0;
-	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
-}
-
-void VectorRenderer::Render()
-{
-	UpdateDescriptorSets();
-	PopulateBuffers();
-	DispatchCommands();
 }
 
 bool VectorRenderer::IsValidPath(const VectorPainter::Path& path)
@@ -307,7 +378,7 @@ void VectorRenderer::SubmitPath(const VectorPainter::Path& path, ScreenSpace spa
 	// Upload Vertices
 	for (int i = 0; i < path.points.size(); i++)
 	{
-		glm::vec2 point = ConvertToRenderSpace(path.points[i], space);
+		glm::vec2 point = ScreenCoordinate::ConvertPointBetweenSpace(path.points[i], space, ScreenSpace::Rendering);
 		vertices.push_back(Vertex(point, (glm::vec4)path.color, currentLayer / maxLayers));
 	}
 
@@ -320,22 +391,6 @@ void VectorRenderer::SubmitPath(const VectorPainter::Path& path, ScreenSpace spa
 	}
 
 	currentLayer += 1.0f;
-}
-
-glm::vec2 VectorRenderer::ConvertToRenderSpace(glm::vec2 point, ScreenSpace space) const
-{
-	switch (space)
-	{
-	case ScreenSpace::Rendering: return point;
-	case ScreenSpace::Screen: return point * 2.f - glm::vec2(1.f, 1.f);
-	case ScreenSpace::Pixel:
-	{
-		// TODO: Write this code correctly
-		return glm::vec2(0, 0);
-	}
-	}
-
-	return glm::vec2();
 }
 
 VectorRenderer::Vertex::Vertex(glm::vec2 _position, glm::vec4 _color, float _layer)

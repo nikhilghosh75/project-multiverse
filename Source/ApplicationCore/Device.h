@@ -20,22 +20,29 @@ struct DeviceFrame
 	VkFence inFlightFence;
 };
 
+// A struct containing all the data about staging buffers
+// A staging buffer is a buffer used to stage data between the CPU and GPU
+struct StagingBuffer
+{
+	VkBuffer buffer;
+	VkDeviceMemory bufferMemory;
+};
+
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 // A class representing the Vulkan device
 class Device
 {
 public:
-	Device();
-
-	// Called by the window class to connect it to the Win32 instance
-	void ConnectWin32(HWND hwnd, HINSTANCE hinstance);
+	Device(HWND hwnd, HINSTANCE hinstance);
 
 	void StartFrame();
 	void EndFrame();
 
 	// Should the current set of framebuffers be scrapped next frame for resizing
 	bool shouldResizeFramebuffer = false;
+
+	bool shouldRenderFrame = true;
 
 	~Device();
 
@@ -99,8 +106,7 @@ private:
 	void SetupCommandPool();
 	void SetupCommandBuffers();
 	void SetupSyncObjects();
-
-	void EnumerateExtensions();
+	void SetupStagingBuffers();
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
@@ -110,6 +116,7 @@ private:
 	bool SupportsSwapChain(VkPhysicalDevice device);
 
 	static const int MAX_SINGLE_TIME_BUFFERS = 20;
+	static const int MAX_STAGING_BUFFERS = 10;
 
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -127,13 +134,11 @@ private:
 
 	std::array<DeviceFrame, MAX_FRAMES_IN_FLIGHT> frameObjects;
 	std::array<VkCommandBuffer, MAX_SINGLE_TIME_BUFFERS> singleTimeCommandBuffers;
+	std::array<StagingBuffer, MAX_STAGING_BUFFERS> stagingBuffers;
 
 	uint32_t currentImageIndex;
 	uint32_t currentSingleTimeCommandIndex = 0;
-
-	// Image Loading
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
+	uint32_t currentStagingBufferIndex = 0;
 
 	VkDebugUtilsMessengerEXT debugMessenger;
 
@@ -153,9 +158,8 @@ inline void Device::CreateBufferFromVector(const std::vector<T>& vector, VkBuffe
 {
 	VkDeviceSize bufferSize = sizeof(vector[0]) * vector.size();
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	VkBuffer stagingBuffer = stagingBuffers[currentStagingBufferIndex].buffer;
+	VkDeviceMemory stagingBufferMemory = stagingBuffers[currentStagingBufferIndex].bufferMemory;
 
 	void* data;
 	vkMapMemory(vulkanDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
@@ -166,8 +170,7 @@ inline void Device::CreateBufferFromVector(const std::vector<T>& vector, VkBuffe
 
 	CopyBuffer(stagingBuffer, buffer, bufferSize);
 
-	vkDestroyBuffer(vulkanDevice, stagingBuffer, nullptr);
-	vkFreeMemory(vulkanDevice, stagingBufferMemory, nullptr);
+	currentStagingBufferIndex = (currentStagingBufferIndex + 1) % MAX_STAGING_BUFFERS;
 }
 
 template<typename T>
@@ -175,9 +178,8 @@ inline void Device::PopulateBufferFromVector(const std::vector<T>& vector, VkBuf
 {
 	VkDeviceSize bufferSize = sizeof(vector[0]) * vector.size();
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	VkBuffer stagingBuffer = stagingBuffers[currentStagingBufferIndex].buffer;
+	VkDeviceMemory stagingBufferMemory = stagingBuffers[currentStagingBufferIndex].bufferMemory;
 
 	void* data;
 	vkMapMemory(vulkanDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
@@ -186,6 +188,4 @@ inline void Device::PopulateBufferFromVector(const std::vector<T>& vector, VkBuf
 
 	CopyBuffer(stagingBuffer, buffer, bufferSize);
 
-	vkDestroyBuffer(vulkanDevice, stagingBuffer, nullptr);
-	vkFreeMemory(vulkanDevice, stagingBufferMemory, nullptr);
 }

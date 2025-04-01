@@ -15,17 +15,15 @@ const std::array<const char*, 4> extensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAM
 const std::array<const char*, 1> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
-Device::Device()
+Device::Device(HWND hwnd, HINSTANCE hinstance)
 {
     device = this;
     instance = nullptr;
 
+    // Several important subsystems 
     CreateInstance();
     SetupDebugMessenger();
-}
 
-void Device::ConnectWin32(HWND hwnd, HINSTANCE hinstance)
-{
     VkWin32SurfaceCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     createInfo.hwnd = hwnd;
@@ -35,28 +33,29 @@ void Device::ConnectWin32(HWND hwnd, HINSTANCE hinstance)
 
     SetupPhysicalDevice();
     SetupLogicalDevice();
-    EnumerateExtensions();
 
     swapChain.Setup(physicalDevice, surface);
 
     SetupCommandPool();
     SetupCommandBuffers();
     SetupSyncObjects();
+    SetupStagingBuffers();
 
     isSetupComplete = true;
 }
 
 void Device::StartFrame()
 {
+    shouldRenderFrame = true;
     DeviceFrame& frameObject = frameObjects[currentFrame % MAX_FRAMES_IN_FLIGHT];
 
     vkWaitForFences(vulkanDevice, 1, &frameObject.inFlightFence, VK_TRUE, UINT64_MAX);
 
     VkResult result = vkAcquireNextImageKHR(vulkanDevice, swapChain.GetSwapChain(), UINT64_MAX, frameObject.imageAvailableSemaphore, VK_NULL_HANDLE, &currentImageIndex);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || shouldResizeFramebuffer)
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
-        shouldResizeFramebuffer = false;
         swapChain.Rebuild(physicalDevice, surface);
+        shouldRenderFrame = false;
         return;
     }
 
@@ -69,6 +68,11 @@ void Device::StartFrame()
 
 void Device::EndFrame()
 {
+    if (!shouldRenderFrame)
+    {
+        return;
+    }
+
     DeviceFrame& frameObject = frameObjects[currentFrame % MAX_FRAMES_IN_FLIGHT];
 
     VkSubmitInfo submitInfo{};
@@ -99,7 +103,16 @@ void Device::EndFrame()
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &currentImageIndex;
 
-    VULKAN_CALL(vkQueuePresentKHR(presentQueue, &presentInfo));
+    VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || shouldResizeFramebuffer)
+    {
+        swapChain.Rebuild(physicalDevice, surface);
+        shouldResizeFramebuffer = false;
+    }
+    else if (result != VK_SUCCESS)
+    {
+        ErrorManager::Get()->ReportError(ErrorSeverity::Severe, "vkQueuePresentKHR(presentQueue, &presentInfo)", "Vulkan", result, "Failed to present the queue");
+    }
 
     currentFrame++;
 }
@@ -109,6 +122,12 @@ Device::~Device()
     vkDeviceWaitIdle(vulkanDevice);
 
     swapChain.Cleanup();
+
+    for (int i = 0; i < stagingBuffers.size(); i++)
+    {
+        vkDestroyBuffer(vulkanDevice, stagingBuffers[i].buffer, nullptr);
+        vkFreeMemory(vulkanDevice, stagingBuffers[i].bufferMemory, nullptr);
+    }
 
     for (int i = 0; i < frameObjects.size(); i++)
     {
@@ -612,6 +631,7 @@ void Device::SetupCommandPool()
 
 void Device::SetupCommandBuffers()
 {
+    // Allocate one command buffer for each frame that can be in transit
     for (int i = 0; i < frameObjects.size(); i++)
     {
         VkCommandBufferAllocateInfo allocInfo{};
@@ -623,6 +643,7 @@ void Device::SetupCommandBuffers()
         VULKAN_CALL_MSG(vkAllocateCommandBuffers(vulkanDevice, &allocInfo, &frameObjects[i].commandBuffer), "Failed to create command buffers");
     }
 
+    // Allocate the single time command buffers
     VkCommandBufferAllocateInfo singleTimeAllocInfo{};
     singleTimeAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     singleTimeAllocInfo.commandPool = commandPool;
@@ -649,18 +670,14 @@ void Device::SetupSyncObjects()
     }
 }
 
-void Device::EnumerateExtensions()
+void Device::SetupStagingBuffers()
 {
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+    const int STAGING_BUFFER_SIZE = 65536;
 
-    std::cout << "available extensions:\n";
-
-    for (const VkExtensionProperties& extension : extensions)
+    // Allocate the staging buffers
+    for (int i = 0; i < stagingBuffers.size(); i++)
     {
-        std::cout << '\t' << extension.extensionName << '\n';
+        CreateBuffer(STAGING_BUFFER_SIZE, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffers[i].buffer, stagingBuffers[i].bufferMemory);
     }
 }
 

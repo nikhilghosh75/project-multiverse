@@ -3,6 +3,81 @@
 #include "Device.h"
 #include "VulkanUtils.h"
 
+#include "tracy/Tracy.hpp"
+
+std::array<DebugRenderRequest, DebugRenderRequest::MAX_DEBUG_REQUESTS> DebugRenderRequest::requests;
+std::mutex DebugRenderRequest::requestsMutex;
+
+bool DebugRenderRequest::CanBeCombined(const RenderRequest* other) const
+{
+	if (const DebugRenderRequest* otherDebugRequest = dynamic_cast<const DebugRenderRequest*>(other))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void DebugRenderRequest::CombineWith(RenderRequest* other)
+{
+	if (const DebugRenderRequest* otherDebugRequest = dynamic_cast<const DebugRenderRequest*>(other))
+	{
+		for (int i = 0; i < otherDebugRequest->rects.size(); i++)
+		{
+			rects.push_back(otherDebugRequest->rects[i]);
+		}
+	}
+}
+
+void DebugRenderRequest::Render()
+{
+	ZoneScopedN("DebugRenderRequest::Render");
+	DebugRenderer::Get()->RenderDebugRequest(this);
+}
+
+void DebugRenderRequest::Clean()
+{
+	rects.clear();
+}
+
+DebugRenderRequest* DebugRenderRequest::CreateRequest()
+{
+	static const int DEFAULT_RECTS_RESERVE_SIZE = 8;
+
+	requestsMutex.lock();
+
+	if (!requestsArrayInitialized)
+	{
+		for (int i = 0; i < MAX_DEBUG_REQUESTS; i++)
+		{
+			requests[i].isActive = false;
+			requests[i].rects.reserve(DEFAULT_RECTS_RESERVE_SIZE);
+		}
+		requestsArrayInitialized = true;
+	}
+
+	lastIndex = (lastIndex + 1) % MAX_DEBUG_REQUESTS;
+	requests[lastIndex].isActive = true;
+	requestsMutex.unlock();
+
+	return &requests[lastIndex];
+}
+
+std::vector<RenderRequest*> DebugRenderRequest::GetRequestsThisFrame()
+{
+	std::vector<RenderRequest*> requestsThisFrame;
+
+	for (DebugRenderRequest& request : requests)
+	{
+		if (request.isActive && !request.isProcessing)
+		{
+			requestsThisFrame.push_back(&request);
+		}
+	}
+
+	return requestsThisFrame;
+}
+
 DebugRenderer::DebugRenderer()
 {
 	instance = this;
@@ -41,6 +116,29 @@ DebugRenderer* DebugRenderer::Get()
 
 void DebugRenderer::AddBox(Rect rect)
 {
+	DebugRenderRequest* request = DebugRenderRequest::CreateRequest();
+	request->rects.push_back(rect);
+}
+
+void DebugRenderer::RenderDebugRequest(DebugRenderRequest* request)
+{
+	for (int i = 0; i < request->rects.size(); i++)
+	{
+		PopulateWithBox(request->rects[i]);
+	}
+
+	UpdateDescriptorSets();
+	PopulateBuffers();
+	DispatchCommands();
+
+	vertices.clear();
+	indices.clear();
+
+	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
+}
+
+void DebugRenderer::PopulateWithBox(Rect rect)
+{
 	glm::vec2 bottomLeft = glm::vec2(rect.left, rect.bottom);
 	glm::vec2 topLeft = glm::vec2(rect.left, rect.top);
 	glm::vec2 topRight = glm::vec2(rect.right, rect.top);
@@ -62,14 +160,12 @@ void DebugRenderer::AddBox(Rect rect)
 	indices.push_back(2);
 	indices.push_back(3);
 	indices.push_back(0);
-
-	Render();
 }
 
 void DebugRenderer::CreatePipeline()
 {
-	Shader vertexShader = Shader::ReadShader("Data/Shaders/debug_vert.spv", Device::Get()->GetVulkanDevice());
-	Shader fragmentShader = Shader::ReadShader("Data/Shaders/debug_frag.spv", Device::Get()->GetVulkanDevice());
+	Shader vertexShader = Shader("Data/Shaders/debug_vert.spv", Device::Get()->GetVulkanDevice());
+	Shader fragmentShader = Shader("Data/Shaders/debug_frag.spv", Device::Get()->GetVulkanDevice());
 
 	pipeline.SetShader(vertexShader, ShaderType::Vertex);
 	pipeline.SetShader(fragmentShader, ShaderType::Fragment);
@@ -201,18 +297,6 @@ void DebugRenderer::DispatchCommands()
 
 	vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 	vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
-
-	vertices.clear();
-	indices.clear();
-
-	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
-}
-
-void DebugRenderer::Render()
-{
-	UpdateDescriptorSets();
-	PopulateBuffers();
-	DispatchCommands();
 }
 
 DebugRenderer::DebugVertex::DebugVertex(glm::vec2 position)
@@ -245,3 +329,4 @@ std::vector<VkVertexInputAttributeDescription> DebugRenderer::DebugVertex::GetAt
 
 	return attributeDescriptions;
 }
+

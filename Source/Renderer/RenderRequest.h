@@ -1,11 +1,5 @@
 #pragma once
 
-enum class RenderRequestType : uint8_t
-{
-	Font,
-	Image
-};
-
 class RenderRequest
 {
 public:
@@ -14,7 +8,8 @@ public:
 	virtual void CombineWith(RenderRequest* other) = 0;
 
 	virtual void Render() = 0;
+	virtual void Clean() = 0;
 
-	RenderRequestType type;
-	bool hasBeenSubmitted;
+	bool isActive = false; // Does the request have data that is actively used
+	bool isProcessing = false; // Is the request being processed by the RenderingManager
 };
