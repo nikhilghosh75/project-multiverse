@@ -96,6 +96,8 @@ public:
 
 	template<typename T> void PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory);
 
+	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
 private:
 	static inline Device* device;
 
@@ -107,8 +109,6 @@ private:
 	void SetupCommandBuffers();
 	void SetupSyncObjects();
 	void SetupStagingBuffers();
-
-	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	bool HasStandardValidationLayer();
 	bool IsSuitableDevice(VkPhysicalDevice device);
