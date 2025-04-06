@@ -65,7 +65,7 @@ void RenderPipeline::SetPolygonMode(VkPolygonMode mode)
 void RenderPipeline::Create()
 {
     VkDevice vulkanDevice = Device::Get()->GetVulkanDevice();
-    VkExtent2D swapChainExtent = Device::Get()->GetSwapChainExtent();
+    VkExtent2D swapChainExtent = Device::Get()->GetCurrentExtent();
 
     std::vector<VkPipelineShaderStageCreateInfo> pipelineShaders(shaders.size());
 

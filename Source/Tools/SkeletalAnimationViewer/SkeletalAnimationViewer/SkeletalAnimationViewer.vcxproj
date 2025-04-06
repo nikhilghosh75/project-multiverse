@@ -143,7 +143,12 @@
   <ItemGroup>
     <ClCompile Include="PhotoshopAPI\LibDeflate.cpp" />
     <ClCompile Include="PhotoshopAPI\PhotoshopAPI.cpp" />
+    <ClCompile Include="SkeletalAnimationLoader.cpp" />
+    <ClCompile Include="SkeletalAnimationTab.cpp" />
     <ClCompile Include="SkeletalAnimationViewer.cpp" />
+    <ClCompile Include="Views\LayerHierarchyView.cpp" />
+    <ClCompile Include="Views\LayerImageView.cpp" />
+    <ClCompile Include="Views\MainView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Vendor\imgui\ImGui.vcxproj">
@@ -155,6 +160,13 @@
     <ProjectReference Include="..\..\..\Renderer\Renderer.vcxproj">
       <Project>{295aaa3e-57ec-468b-9023-54f2fc6f169e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SkeletalAnimationLoader.h" />
+    <ClInclude Include="SkeletalAnimationTab.h" />
+    <ClInclude Include="Views\LayerHierarchyView.h" />
+    <ClInclude Include="Views\LayerImageView.h" />
+    <ClInclude Include="Views\MainView.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -51,7 +51,7 @@ public:
 	VkDevice GetVulkanDevice() const;
 	VkInstance GetVulkanInstance() const;
 	VkRenderPass& GetRenderPass();
-	VkExtent2D GetSwapChainExtent() const;
+	VkExtent2D GetCurrentExtent() const;
 	VkFormat GetSwapChainFormat() const;
 	VkFramebuffer GetCurrentFramebuffer() const;
 	VkImage GetCurrentSwapChainImage() const;
@@ -87,10 +87,16 @@ public:
 	// Copy of the contents of a buffer into an image (using the buffer as pixel data)
 	void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
+	// Sets the override render (i.e. a renderpass not in the swap chain, and thus not rendered)
+	void SetOverrideRenderPass(RenderPass pass);
+	void ClearOverrideRenderPass();
+
 	// Create a buffer from a vector (uploading the contents of the vector into the buffer's memory)
 	template<typename T> void CreateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory, VkBufferUsageFlags flags);
 
 	template<typename T> void PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory);
+
+	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 private:
 	static inline Device* device;
@@ -103,8 +109,6 @@ private:
 	void SetupCommandBuffers();
 	void SetupSyncObjects();
 	void SetupStagingBuffers();
-
-	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	bool HasStandardValidationLayer();
 	bool IsSuitableDevice(VkPhysicalDevice device);
@@ -121,6 +125,8 @@ private:
 	VkSurfaceKHR surface;
 	VkQueue presentQueue;
 	VkCommandPool commandPool;
+
+	std::optional<RenderPass> overrideRenderpass;
 
 	SwapChain swapChain;
 

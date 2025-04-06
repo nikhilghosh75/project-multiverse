@@ -34,8 +34,13 @@ void ImGuiDevice::Setup(HWND hwnd, Device* device)
     init_info.Allocator = nullptr;
     init_info.MinImageCount = 2;
     init_info.ImageCount = 2;
+    init_info.Subpass = 0;
+    init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+    init_info.CheckVkResultFn = nullptr;
 
     ImGui_ImplVulkan_Init(&init_info);
+
+    ImGui_ImplVulkan_CreateFontsTexture();
 
     Window::imguiEnabled = true;
 }
@@ -49,56 +54,37 @@ void ImGuiDevice::StartFrame()
 
 void ImGuiDevice::EndFrame()
 {
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;  // We're recording commands for one-time use
-
-    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) 
-    {
-        // TODO: Handle Errors
-    }
+    VkCommandBufferBeginInfo info = {};
+    info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    vkBeginCommandBuffer(commandBuffer, &info);
 
     VkRenderPassBeginInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = imguiRenderPass;  // Use the render pass from the previous step
-    renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();  // The framebuffer, typically tied to the swapchain image
+    renderPassInfo.renderPass = imguiRenderPass;
+    renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = Device::Get()->GetSwapChainExtent();  // Swapchain extent (width/height)
-
-    VkClearValue clearValue = {};
-    clearValue.color = { {0.0f, 0.0f, 0.0f, 1.0f} };  // Clear color (optional)
-
+    renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
+    VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
     renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearValue;
-
+    renderPassInfo.pClearValues = &clearColor;
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    ImGui::Render();
-
+    // Record dear imgui primitives into command buffer
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
     vkCmdEndRenderPass(commandBuffer);
-
-    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
-    {
-        // TODO: Handle Errors
-    }
+    vkEndCommandBuffer(commandBuffer);
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };  // Ensure the swapchain image is available before rendering
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };  // Wait at color attachment stage
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.waitSemaphoreCount = 0;
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
-
-    VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };  // Signal that rendering has finished
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = signalSemaphores;
 
     if (vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
     {
