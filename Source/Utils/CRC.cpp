@@ -23,8 +23,3 @@ uint32_t CRC::Calculate(const void* data, size_t length)
 
 	return ~crc;
 }
-
-uint32_t CRC::CalculateRemainder(const void* data, size_t length)
-{
-	return 0;
-}

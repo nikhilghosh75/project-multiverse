@@ -1,5 +1,7 @@
 #include "DateTime.h"
 
+#include "AssertUtils.h"
+
 #include <ctime>
 #include <sstream>
 
@@ -9,6 +11,7 @@ const int DAYSTOMONTH[] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 33
 
 const uint64_t MICROSECONDS_IN_SECOND = 1000000;
 
+// The amount of seconds between January 1st, 1601 (the Windows epoch) and 1970 (the Unix epoch)
 const uint64_t SECONDS_SINCE_1601 = 11644473600;
 const uint64_t MICROSECONDS_SINCE_1601 = SECONDS_SINCE_1601 * MICROSECONDS_IN_SECOND;
 
@@ -44,5 +47,8 @@ DateTime DateTime::Now()
 	timeInt.HighPart = time.dwHighDateTime;
 	timeInt.LowPart = time.dwLowDateTime;
 
-	return DateTime((static_cast<uint64_t>(timeInt.QuadPart) / 10) - MICROSECONDS_SINCE_1601);
+	uint64_t microsecondsSinceEpoch = (static_cast<uint64_t>(timeInt.QuadPart) / 10);
+	ASSERT(microsecondsSinceEpoch > MICROSECONDS_SINCE_1601);
+
+	return DateTime(microsecondsSinceEpoch - MICROSECONDS_SINCE_1601);
 }

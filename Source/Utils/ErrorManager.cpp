@@ -38,7 +38,7 @@ void ErrorManager::ReportError(ErrorSeverity severity, std::string functionName,
 		break;
 	case ErrorSeverity::Severe:
 		std::cout << "SEVERE ERROR (code " << errorCode << "): " << moduleName << " - " << functionName << ": " << message << std::endl;
-		exit(0);
+		exit(1);
 		break;
 	default:
 		break;

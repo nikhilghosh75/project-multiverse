@@ -4,6 +4,8 @@
 #include "VulkanUtils.h"
 #include "Window.h"
 
+#include "AssertUtils.h"
+
 #include <array>
 
 #include "tracy/Tracy.hpp"
@@ -125,6 +127,7 @@ void ImageRenderer::RenderImageRequest(ImageRenderRequest* request)
 
 void ImageRenderer::SetTexture(Texture* texture)
 {
+    ASSERT(texture != nullptr);
     currentTexture = texture;
 }
 
