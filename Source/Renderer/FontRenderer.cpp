@@ -4,6 +4,8 @@
 #include "VulkanUtils.h"
 #include "Window.h"
 
+#include "AssertUtils.h"
+
 #include "tracy/Tracy.hpp"
 
 const std::array<VkDynamicState, 2> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
@@ -138,6 +140,8 @@ FontRenderer* FontRenderer::Get()
 
 void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 {
+	ASSERT(defaultFont != nullptr);
+
 	if (text.empty())
 		return;
 

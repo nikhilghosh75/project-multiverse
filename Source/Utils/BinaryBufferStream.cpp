@@ -1,5 +1,7 @@
 #include "BinaryBufferStream.h"
 
+#include "AssertUtils.h"
+
 BinaryBufferStream::BinaryBufferStream()
 	: buffer(nullptr), size(0), bigEndian(false), currentOffset(0)
 {
@@ -21,6 +23,8 @@ BinaryBufferStream::BinaryBufferStream(void* buffer, size_t size, FileFlags flag
 
 void BinaryBufferStream::Read(void* bytes, uint32_t size)
 {
+	ASSERT(buffer != nullptr);
+
 	void* source = (char*)buffer + currentOffset;
 	memcpy(bytes, source, size);
 
@@ -44,6 +48,8 @@ void BinaryBufferStream::GoTo(uint32_t offset)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(char& c)
 {
+	ASSERT(buffer != nullptr);
+
 	char* ptr = (char*)buffer + currentOffset;
 	c = *ptr;
 	currentOffset += 1;
@@ -52,6 +58,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(char& c)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(unsigned char& c)
 {
+	ASSERT(buffer != nullptr);
+
 	unsigned char* ptr = (unsigned char*)buffer + currentOffset;
 	c = *ptr;
 	currentOffset += 1;
@@ -60,6 +68,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(unsigned char& c)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(int16_t& i)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	int16_t* ptr = (int16_t*)address;
 	i = *ptr;
@@ -75,6 +85,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(int16_t& i)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(uint16_t& i)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	uint16_t* ptr = (uint16_t*)address;
 	i = *ptr;
@@ -90,6 +102,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(uint16_t& i)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(int32_t& i)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	i = *((int32_t*)address);
 	currentOffset += 4;
@@ -104,6 +118,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(int32_t& i)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(uint32_t& i)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	i = *((uint32_t*)address);
 	currentOffset += 4;
@@ -118,6 +134,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(uint32_t& i)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(int64_t& i)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	i = *((int64_t*)address);
 	currentOffset += 8;
@@ -126,6 +144,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(int64_t& i)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(uint64_t& i)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	i = *((int64_t*)address);
 	currentOffset += 8;
@@ -134,6 +154,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(uint64_t& i)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(float& f)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	f = *((float*)address);
 	currentOffset += 4;
@@ -142,6 +164,8 @@ BinaryBufferStream& BinaryBufferStream::operator>>(float& f)
 
 BinaryBufferStream& BinaryBufferStream::operator>>(double& d)
 {
+	ASSERT(buffer != nullptr);
+
 	char* address = (char*)buffer + currentOffset;
 	d = *((double*)address);
 	currentOffset += 8;

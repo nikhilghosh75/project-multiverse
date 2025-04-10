@@ -7,6 +7,9 @@ class FixedPoint
 {
 	T rawValue;
 
+	static_assert(DecimalBytes > 0); // There must be a non-zero amount of decimal bytes, otherwise it's an integer
+	static_assert(DecimalBytes < sizeof(T) * 8); // The amount of decimal bytes must be less than the overall amount of bytes
+
 public:
 	FixedPoint()
 		: rawValue(0)

@@ -27,8 +27,18 @@ void ErrorManager::ReportError(ErrorSeverity severity, std::string functionName,
 
 	switch (severity)
 	{
+	case ErrorSeverity::Minimal:
+		std::cout << "(code" << errorCode << "): " << moduleName << " - " << functionName << ": " << message << std::endl;
+		break;
+	case ErrorSeverity::Warning:
+		std::cout << "WARNING (code" << errorCode << "): " << moduleName << " - " << functionName << ": " << message << std::endl;
+		break;
 	case ErrorSeverity::Error:
 		std::cout << "ERROR (code " << errorCode << "): " << moduleName << " - " << functionName << ": " << message << std::endl;
+		break;
+	case ErrorSeverity::Severe:
+		std::cout << "SEVERE ERROR (code " << errorCode << "): " << moduleName << " - " << functionName << ": " << message << std::endl;
+		exit(1);
 		break;
 	default:
 		break;

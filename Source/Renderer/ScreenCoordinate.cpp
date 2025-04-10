@@ -1,5 +1,8 @@
 #include "ScreenCoordinate.h"
+
 #include "Window.h"
+
+#include "AssertUtils.h"
 
 ScreenCoordinate::ScreenCoordinate(glm::vec2 absolutePosition)
 	: relativePosition(absolutePosition), anchor(glm::vec2(0, 0))
@@ -41,6 +44,9 @@ glm::vec2 ScreenCoordinate::GetScreenPosition() const
 
 Rect ScreenCoordinate::CreateRect(ScreenCoordinate position, glm::vec2 dimensions, glm::vec2 pivot)
 {
+	ASSERT(pivot.x > 0);
+	ASSERT(pivot.y > 0);
+
 	int width, height;
 	Window::GetWindowSize(&width, &height);
 
