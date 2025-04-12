@@ -15,6 +15,9 @@ public:
 	float Width() const;
 	float Height() const;
 
+	float CenterX() const;
+	float CenterY() const;
+
 	void ResizeFromCenter(float newWidth, float newHeight);
 
 	bool IsPointInside(float x, float y);

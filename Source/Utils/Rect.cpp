@@ -24,6 +24,16 @@ float Rect::Height() const
 	return  bottom - top;
 }
 
+float Rect::CenterX() const
+{
+	return (right + left) / 2;
+}
+
+float Rect::CenterY() const
+{
+	return (top + bottom) / 2;
+}
+
 void Rect::ResizeFromCenter(float newWidth, float newHeight)
 {
 	float centerX = (right + left) / 2;
