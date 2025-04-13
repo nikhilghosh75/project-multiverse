@@ -64,7 +64,7 @@ public:
 	static FontRenderer* Get();
 
 	// position is relative to the screen, and is the top left of the rect
-	void AddText(std::string text, glm::vec2 position, int fontSize = 16);
+	void AddText(std::string text, glm::vec2 position, float renderingOrder, int fontSize = 16);
 
 	void RenderFontRequest(FontRenderRequest* request);
 private:

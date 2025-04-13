@@ -54,7 +54,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		if (hovered)
 		{
 			glm::vec2 textPosition = ScreenCoordinate::ConvertPointBetweenSpace(position + glm::vec2(0, 0.15), ScreenSpace::Screen, ScreenSpace::Rendering);
-			FontRenderer::Get()->AddText(actions[i]->GetDisplayName(), textPosition, 48);
+			FontRenderer::Get()->AddText(actions[i]->GetDisplayName(), textPosition, ACTION_TEXT_ORDER, 48);
 		}
 
 		position += glm::vec2(0.1, 0);
@@ -70,7 +70,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		bottomRight = bottomRight * 2.f - glm::vec2(1, 1);
-		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.014, 0.034), 72);
+		FontRenderer::Get()->AddText(std::to_string(actions[i]->GetCost()), bottomRight + glm::vec2(-0.014, 0.034), ACTION_TEXT_ORDER, 72);
 
 		Rect screenRect = ScreenCoordinate::ConvertRectBetweenSpaces(rect, ScreenSpace::Screen, ScreenSpace::Rendering);
 		// DebugRenderer::Get()->AddBox(screenRect);
