@@ -8,14 +8,14 @@
 
 std::array<SimpleVectorRenderRequest, SimpleVectorRenderRequest::MAX_VECTOR_REQUESTS> SimpleVectorRenderRequest::requests;
 
-VectorPainter::VectorPainter()
-	: state(State::WaitingToBegin), screenSpace(ScreenSpace::Screen)
+VectorPainter::VectorPainter(float renderOrder)
+	: renderOrder(renderOrder), state(State::WaitingToBegin), screenSpace(ScreenSpace::Screen)
 {
 
 }
 
-VectorPainter::VectorPainter(ScreenSpace space)
-	: state(State::WaitingToBegin), screenSpace(space)
+VectorPainter::VectorPainter(float renderOrder, ScreenSpace space)
+	: renderOrder(renderOrder), state(State::WaitingToBegin), screenSpace(space)
 {
 }
 
@@ -179,6 +179,7 @@ void VectorRenderer::SubmitPainter(const VectorPainter& painter)
 {
 	SimpleVectorRenderRequest* request = SimpleVectorRenderRequest::CreateRequest();
 	request->space = painter.screenSpace;
+	request->renderingOrder = painter.renderOrder;
 
 	for (int i = 0; i < painter.paths.size(); i++)
 	{

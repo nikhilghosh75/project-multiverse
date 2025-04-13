@@ -25,7 +25,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
 
-	VectorPainter painter;
+	VectorPainter painter(ACTION_SHAPE_ORDER);
 	painter.SetFillColor(Color(1.0f, 0.0f, 0.0f, 1.0f));
 
 	std::vector<std::shared_ptr<Action>>& actions = stage->GetCurrentTurnCharacter()->actions;

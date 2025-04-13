@@ -138,7 +138,7 @@ void CombatHUD::RenderCurrentTurnTriangle(CombatStage* stage)
 
 void CombatHUD::RenderCharacterHUDs(CombatStage* stage)
 {
-	VectorPainter painter;
+	VectorPainter painter(HEALTHBAR_ORDER);
 
 	RenderCharacterHUD(stage, stage->GetPlayerCharacter(), &painter);
 
