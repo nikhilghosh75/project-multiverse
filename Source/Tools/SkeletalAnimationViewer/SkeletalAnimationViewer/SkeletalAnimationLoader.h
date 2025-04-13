@@ -27,7 +27,7 @@ class SkeletalAnimationLoader
 public:
 	static SkeletalAnimationLoader* Get();
 
-	void RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer);
+	void RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer, std::string path);
 	void RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<uint8_t>* layeredFile);
 
 	std::unordered_map<std::string, LayerInfo> layers;

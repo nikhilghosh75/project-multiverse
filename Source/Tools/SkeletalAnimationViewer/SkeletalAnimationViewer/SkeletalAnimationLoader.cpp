@@ -34,7 +34,7 @@ SkeletalAnimationLoader* SkeletalAnimationLoader::Get()
 	return instance;
 }
 
-void SkeletalAnimationLoader::RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer)
+void SkeletalAnimationLoader::RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer, std::string path)
 {
 	PhotoshopAPI::ImageLayer<uint8_t>* imageLayer = dynamic_cast<PhotoshopAPI::ImageLayer<uint8_t>*>(layer);
 	PhotoshopAPI::GroupLayer<uint8_t>* groupLayer = dynamic_cast<PhotoshopAPI::GroupLayer<uint8_t>*>(layer);
@@ -59,13 +59,13 @@ void SkeletalAnimationLoader::RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer)
 		layerInfo.width = imageLayer->m_Width;
 		layerInfo.height = imageLayer->m_Height;
 
-		layers.insert({ layer->m_LayerName, layerInfo });
+		layers.insert({ path + layer->m_LayerName, layerInfo });
 	}
 	else if (groupLayer != nullptr)
 	{
 		for (int i = 0; i < groupLayer->m_Layers.size(); i++)
 		{
-			RegisterLayer(groupLayer->m_Layers[i].get());
+			RegisterLayer(groupLayer->m_Layers[i].get(), path + layer->m_LayerName + "/");
 		}
 	}
 }
@@ -75,6 +75,6 @@ void SkeletalAnimationLoader::RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<ui
 	layeredFile = _layeredFile;
 	for (int i = 0; i < layeredFile->m_Layers.size(); i++)
 	{
-		RegisterLayer(layeredFile->m_Layers[i].get());
+		RegisterLayer(layeredFile->m_Layers[i].get(), "");
 	}
 }
