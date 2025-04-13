@@ -27,4 +27,5 @@ private:
 	ImageRenderer* imageRenderer;
 	VectorRenderer* vectorRenderer;
 };
+
 void RunRenderThread(RenderManager* manager);
