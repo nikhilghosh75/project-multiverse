@@ -7,7 +7,7 @@
 #include "imgui.h"
 
 #include <string>
-#include <unordered_map>
+#include <map>
 
 ImVec2 GetTextureDimensions(Texture* texture);
 
@@ -30,7 +30,7 @@ public:
 	void RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer, std::string path);
 	void RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<uint8_t>* layeredFile);
 
-	std::unordered_map<std::string, LayerInfo> layers;
+	std::map<std::string, LayerInfo> layers;
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile;
 private:
 	static SkeletalAnimationLoader* instance;
