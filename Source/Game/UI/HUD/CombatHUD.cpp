@@ -18,6 +18,12 @@ const glm::vec2 healthBarOffset = glm::vec2(0, -0.08f);
 const glm::vec2 characterNameOffset = glm::vec2(0, 0.10f);
 const float healthBarWidth = 0.08f;
 
+const float COMBAT_HUD_ORDER_START = 100.f;
+const float HEALTHBAR_ORDER = 109.f;
+const float CURRENT_TURN_TRIANGLE_ORDER = 110.f;
+const float DAMAGE_NUMBER_ORDER = 111.f;
+const float CROSSHAIR_ORDER = 112.f;
+
 void CombatHUD::Initialize()
 {
 	currentState = new MainCombatHUDState();
@@ -106,7 +112,7 @@ void CombatHUD::RenderCrosshair(glm::vec2 position)
 	Rect crosshairRect = ScreenCoordinate::CreateRect(crosshairCoordinate, glm::vec2(crosshairSize, crosshairSize), glm::vec2(0.5f, 0.5f));
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
-	ImageRenderer::Get()->AddImage(crosshairTexture, crosshairRect, options);
+	ImageRenderer::Get()->AddImage(crosshairTexture, crosshairRect, CROSSHAIR_ORDER, options);
 }
 
 void CombatHUD::RenderDamageNumbers(CombatStage* stage)
@@ -133,7 +139,8 @@ void CombatHUD::RenderCurrentTurnTriangle(CombatStage* stage)
 {
 	Character* character = stage->GetCurrentTurnCharacter();
 	ScreenCoordinate coordinate = ScreenCoordinate(glm::vec2(0, -65), character->baseScreenPosition);
-	ImageRenderer::Get()->AddImage(triangleTexture, ScreenCoordinate::CreateRect(coordinate, glm::vec2(15, 15), glm::vec2(0.5, 0.5)));
+	Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(15, 15), glm::vec2(0.5, 0.5));
+	ImageRenderer::Get()->AddImage(triangleTexture, rect, CURRENT_TURN_TRIANGLE_ORDER);
 }
 
 void CombatHUD::RenderCharacterHUDs(CombatStage* stage)

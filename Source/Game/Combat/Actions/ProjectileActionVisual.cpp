@@ -5,6 +5,8 @@
 #include "ScreenCoordinate.h"
 #include "MathUtils.h"
 
+const float PROJECTILE_ORDER = 50.f;
+
 ProjectileActionVisual::ProjectileActionVisual(const std::string& texturePath, glm::vec2 _textureSize, float time)
 	: textureSize(_textureSize), visualTime(time)
 {
@@ -43,7 +45,7 @@ void ProjectileActionVisual::Update(Action* action, Character* executor, Charact
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
 
-	ImageRenderer::Get()->AddImage(projectileTexture, rect, options);
+	ImageRenderer::Get()->AddImage(projectileTexture, rect, PROJECTILE_ORDER, options);
 
 	currentTime += Time::GetDeltaTime();
 }

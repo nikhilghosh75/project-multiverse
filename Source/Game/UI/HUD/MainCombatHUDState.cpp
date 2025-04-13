@@ -13,6 +13,10 @@
 
 const glm::vec2 startPosition = glm::vec2(0.15, 0.75);
 
+const float ACTION_TEXT_ORDER = 120.f;
+const float ACTION_SHAPE_ORDER = 119.f;
+const float ACTION_ICON_ORDER = 118.f;
+
 MainCombatHUDState::MainCombatHUDState()
 {
 	noIconTexture = new Texture("Data/Sprites/UI/Icons/Icon Null.png");
@@ -35,7 +39,7 @@ void MainCombatHUDState::Render(CombatStage* stage)
 		Rect rect = ScreenCoordinate::CreateRect(coordinate, glm::vec2(50, 83.3), glm::vec2(0.5, 0.5));
 		Texture* texture = actions[i]->GetTexture() == nullptr ? noIconTexture : actions[i]->GetTexture();
 
-		ImageRenderingResult result = ImageRenderer::Get()->AddImage(texture, rect, options);
+		ImageRenderingResult result = ImageRenderer::Get()->AddImage(texture, rect, ACTION_ICON_ORDER, options);
 
 		glm::vec2 bottomRight = glm::vec2(rect.right, rect.bottom);
 		painter.DrawRegularPolygon(bottomRight, 6, 0.026f);

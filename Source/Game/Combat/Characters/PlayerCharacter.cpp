@@ -49,7 +49,7 @@ void PlayerCharacter::Render()
 
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
-	ImageRenderer::Get()->AddImage(texture, rect, options);
+	ImageRenderer::Get()->AddImage(texture, rect, CHARACTER_ORDER, options);
 }
 
 void PlayerCharacter::EndAction(CombatStage* stage)

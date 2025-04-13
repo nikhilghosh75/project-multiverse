@@ -40,6 +40,7 @@ void ImageRenderRequest::Render()
 void ImageRenderRequest::Clean()
 {
     texture = nullptr;
+    rect = Rect();
 }
 
 ImageRenderRequest* ImageRenderRequest::CreateRequest()
@@ -95,7 +96,7 @@ ImageRenderer* ImageRenderer::Get()
     return instance;
 }
 
-ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageRenderingOptions options)
+ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, float renderingOrder, ImageRenderingOptions options)
 {
     if (options.keepAspectRatio)
         rect = FitRectToTexture(rect, texture);
@@ -103,6 +104,7 @@ ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageR
     ImageRenderRequest* request = ImageRenderRequest::CreateRequest();
     request->texture = texture;
     request->rect = rect;
+    request->renderingOrder = renderingOrder;
 
     ImageRenderingResult result;
     result.finalRect = rect;

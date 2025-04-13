@@ -52,7 +52,7 @@ void EnemyCharacter::Render()
 
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
-	ImageRenderer::Get()->AddImage(texture, rect, options);
+	ImageRenderer::Get()->AddImage(texture, rect, CHARACTER_ORDER, options);
 }
 
 void EnemyCharacter::OnTurnStart(CombatStage* stage)
