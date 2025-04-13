@@ -6,6 +6,8 @@
 
 #include "ImageRenderer.h"
 
+#include <algorithm>
+
 MainView::MainView()
 	: SkeletalAnimationTab("Main View", false)
 {
@@ -167,20 +169,28 @@ void MainView::Render()
 	Device::Get()->SetOverrideRenderPass(renderPass);
 
 	// Render all of the images in the file one at a time
+	int index = 0;
 	for (auto& layer : SkeletalAnimationLoader::Get()->layers)
 	{
-		Rect rect(halfHeight + layer.second.centerY, halfHeight + layer.second.centerY + layer.second.height,
-			halfWidth + layer.second.centerX, halfWidth + layer.second.centerX + layer.second.width);
+		float layerHalfWidth = layer.second.width * 0.5f;
+		float layerHalfHeight = layer.second.height * 0.5f;
+
+		Rect rect(halfHeight + layer.second.centerY - layerHalfHeight, halfHeight + layer.second.centerY + layerHalfHeight,
+			halfWidth + layer.second.centerX - layerHalfWidth, halfWidth + layer.second.centerX + layerHalfWidth);
 
 		rect.top /= height;
 		rect.bottom /= height;
 		rect.left /= width;
 		rect.right /= width;
 
-		ImageRenderer::Get()->AddImage(layer.second.texture, rect);
+		ImageRenderer::Get()->AddImage(layer.second.texture, rect, index);
+		
+		index--;
 	}
 
 	std::vector<RenderRequest*> imageRenderRequests = ImageRenderRequest::GetRequestsThisFrame();
+	std::sort(imageRenderRequests.begin(), imageRenderRequests.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
+
 	for (int i = 0; i < imageRenderRequests.size(); i++)
 	{
 		imageRenderRequests[i]->Render();
