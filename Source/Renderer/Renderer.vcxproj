@@ -152,6 +152,7 @@
     <ClCompile Include="RenderPipeline.cpp" />
     <ClCompile Include="ScreenCoordinate.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SkeletalSpriteRenderer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TTFRasterizer.cpp" />
     <ClCompile Include="VectorRenderer.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="RenderRequest.h" />
     <ClInclude Include="ScreenCoordinate.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SkeletalSpriteRenderer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TTFRasterizer.h" />
     <ClInclude Include="VectorRenderer.h" />
