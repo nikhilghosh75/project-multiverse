@@ -8,6 +8,8 @@
 
 #include "RenderManager.h"
 
+#include "Symbol Search/SymbolSearch.h"
+
 int main()
 {
 	BuildUI buildUI;

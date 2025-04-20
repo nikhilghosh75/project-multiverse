@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeFileDialog", "Vendor\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tracy", "Vendor\tracy\Tracy.vcxproj", "{CDD12FC5-E87A-436A-9ABA-C67988FD325C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildUtils", "Source\BuildUtils\BuildUtils.vcxproj", "{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -117,6 +119,14 @@ Global
 		{CDD12FC5-E87A-436A-9ABA-C67988FD325C}.Release|x64.Build.0 = Release|x64
 		{CDD12FC5-E87A-436A-9ABA-C67988FD325C}.Release|x86.ActiveCfg = Release|Win32
 		{CDD12FC5-E87A-436A-9ABA-C67988FD325C}.Release|x86.Build.0 = Release|Win32
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Debug|x64.ActiveCfg = Debug|x64
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Debug|x64.Build.0 = Debug|x64
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Debug|x86.ActiveCfg = Debug|Win32
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Debug|x86.Build.0 = Debug|Win32
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Release|x64.ActiveCfg = Release|x64
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Release|x64.Build.0 = Release|x64
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Release|x86.ActiveCfg = Release|Win32
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -128,6 +138,7 @@ Global
 		{650844D4-1A08-49EE-AD0B-31466FA61475} = {D3B5CE18-B59B-4F09-A4DA-0A11B5E17BD7}
 		{A2C2ABC2-DD47-4048-8C8F-EF97203857E7} = {976A133F-D61E-4274-BE0E-1EB1D6788D50}
 		{CDD12FC5-E87A-436A-9ABA-C67988FD325C} = {976A133F-D61E-4274-BE0E-1EB1D6788D50}
+		{C3ACD3C1-EA34-4FB9-B4D2-CFC7C4DBB5F3} = {D3B5CE18-B59B-4F09-A4DA-0A11B5E17BD7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44AEB2BB-90A4-46AE-8CBA-6B79FAA82840}
