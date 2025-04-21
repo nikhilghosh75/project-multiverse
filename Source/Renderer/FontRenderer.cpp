@@ -168,6 +168,7 @@ void FontRenderer::RenderFontRequest(FontRenderRequest* request)
 
 void FontRenderer::PopulateBufferWithTextRequest(FontRenderRequest::TextRequest& request)
 {
+	ZoneScoped;
 	int width, height;
 	Window::GetWindowSize(&width, &height);
 	float normalizedFontSize = (static_cast<float>(request.fontSize) * 6.333f) / width;
@@ -298,6 +299,7 @@ void FontRenderer::CreateCommandBuffers()
 
 void FontRenderer::UpdateDescriptorSets()
 {
+	ZoneScoped;
 	std::array<VkWriteDescriptorSet, 1> setWrites;
 
 	VkDescriptorImageInfo samplerInfo = {};
@@ -319,12 +321,14 @@ void FontRenderer::UpdateDescriptorSets()
 
 void FontRenderer::PopulateBuffers()
 {
+	ZoneScoped;
 	Device::Get()->PopulateBufferFromVector(vertices, fontVertexBuffers[currentIndex], fontIndexBufferMemories[currentIndex]);
 	Device::Get()->PopulateBufferFromVector(indices, fontIndexBuffers[currentIndex], fontIndexBufferMemories[currentIndex]);
 }
 
 void FontRenderer::DispatchCommands()
 {
+	ZoneScoped;
 	VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
 
 	VkCommandBufferBeginInfo beginInfo{};
