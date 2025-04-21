@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "tracy/Tracy.hpp"
+
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
@@ -342,6 +344,7 @@ void Device::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 /// </summary>
 void Device::CopyBuffer(VkBuffer sourceBuffer, VkBuffer destBuffer, VkDeviceSize size)
 {
+    ZoneScoped;
     VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
     VkBufferCopy copyRegion{};
