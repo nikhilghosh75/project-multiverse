@@ -140,7 +140,9 @@
     <ClCompile Include="ErrorManager.cpp" />
     <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="MathUtils.cpp" />
+    <ClCompile Include="MatrixUtils.cpp" />
     <ClCompile Include="Rect.cpp" />
+    <ClCompile Include="YAMLParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssertUtils.h" />
@@ -154,7 +156,9 @@
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="FixedPoint.h" />
     <ClInclude Include="MathUtils.h" />
+    <ClInclude Include="MatrixUtils.h" />
     <ClInclude Include="Rect.h" />
+    <ClInclude Include="YAMLParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
