@@ -39,6 +39,9 @@
     <ClCompile Include="Views\MainView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Importer\UnitySkeletonImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SkeletalAnimationLoader.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Views\MainView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Importer\UnitySkeletonImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

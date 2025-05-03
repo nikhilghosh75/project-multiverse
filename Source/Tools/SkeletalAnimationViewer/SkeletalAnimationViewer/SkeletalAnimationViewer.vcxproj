@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source/ApplicationCore; $(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/imgui; $(SolutionDir)Vendor/glm; $(SolutionDir)Source/Utils; C:\VulkanSDK\1.3.280.0\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/imgui;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Vendor</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source/ApplicationCore; $(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/imgui; $(SolutionDir)Vendor/glm; $(SolutionDir)Source/Utils; C:\VulkanSDK\1.3.280.0\Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source/ApplicationCore;$(SolutionDir)Source/Renderer;$(SolutionDir)Vendor/imgui;$(SolutionDir)Vendor/glm;$(SolutionDir)Source/Utils;C:\VulkanSDK\1.3.280.0\Include;$(SolutionDir)/Vendor</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Importer\UnitySkeletonImporter.cpp" />
     <ClCompile Include="PhotoshopAPI\LibDeflate.cpp" />
     <ClCompile Include="PhotoshopAPI\PhotoshopAPI.cpp" />
     <ClCompile Include="SkeletalAnimationLoader.cpp" />
@@ -162,6 +163,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Importer\UnitySkeletonImporter.h" />
     <ClInclude Include="SkeletalAnimationLoader.h" />
     <ClInclude Include="SkeletalAnimationTab.h" />
     <ClInclude Include="Views\LayerHierarchyView.h" />
