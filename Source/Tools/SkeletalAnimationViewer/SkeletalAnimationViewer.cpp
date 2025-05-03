@@ -1,5 +1,6 @@
 #include "SkeletalAnimationLoader.h"
 #include "SkeletalAnimationTab.h"
+#include "Importer/UnitySkeletonImporter.h"
 #include "Views/LayerHierarchyView.h"
 #include "Views/MainView.h"
 
@@ -26,6 +27,8 @@ int main()
 	std::unique_ptr<PhotoshopAPI::PhotoshopFile> file = std::make_unique<PhotoshopAPI::PhotoshopFile>();
 	PhotoshopAPI::ProgressCallback callback;
 	file->read(inputFile, callback);
+
+	Skeleton skeleton = UnitySkeletonImporter::Import("C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta");
 
 	Window window;
 
