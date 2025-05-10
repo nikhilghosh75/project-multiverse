@@ -15,6 +15,9 @@ public:
 	float length;
 
 	glm::mat4 GetLocalTransform() const;
+
+	glm::vec2 GetAbsolutePosition() const;
+	float GetAbsoluteRotation() const;
 };
 
 struct BoneWeight
