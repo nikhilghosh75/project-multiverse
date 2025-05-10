@@ -5,8 +5,11 @@
 #include "Rect.h"
 
 #include "ImageRenderer.h"
+#include "VectorRenderer.h"
 
 #include <algorithm>
+
+const int BONE_RENDER_ORDER = 40;
 
 MainView::MainView()
 	: SkeletalAnimationTab("Main View", false)
@@ -168,6 +171,22 @@ void MainView::Render()
 
 	Device::Get()->SetOverrideRenderPass(renderPass);
 
+	RenderSprites(width, height);
+	RenderBones(width, height);
+
+	Device::Get()->ClearOverrideRenderPass();
+
+	Device::Get()->TransitionImageLayout(offscreenImages[currentImageIndex], VK_FORMAT_R8G8B8A8_UNORM,
+		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	ImGui::Image(offscreenImguiTextures[currentImageIndex], ImVec2(400, 400));
+}
+
+void MainView::RenderSprites(int width, int height)
+{
+	int halfWidth = width / 2;
+	int halfHeight = height / 2;
+
 	// Render all of the images in the file one at a time
 	int index = 0;
 	for (auto& layer : SkeletalAnimationLoader::Get()->layers)
@@ -184,12 +203,20 @@ void MainView::Render()
 		rect.right /= width;
 
 		ImageRenderer::Get()->AddImage(layer.second.texture, rect, index);
-		
+
 		index--;
 	}
 
 	std::vector<RenderRequest*> imageRenderRequests = ImageRenderRequest::GetRequestsThisFrame();
 	std::sort(imageRenderRequests.begin(), imageRenderRequests.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
+
+	std::vector<Rect> rects;
+	for (int i = 0; i < imageRenderRequests.size(); i++)
+	{
+		rects.push_back(dynamic_cast<ImageRenderRequest*>(imageRenderRequests[i])->rect);
+	}
+
+	Rect boundingRect = Rect::GetBoundingRect(rects);
 
 	for (int i = 0; i < imageRenderRequests.size(); i++)
 	{
@@ -198,11 +225,41 @@ void MainView::Render()
 		imageRenderRequests[i]->isProcessing = false;
 		imageRenderRequests[i]->Clean();
 	}
+}
 
-	Device::Get()->ClearOverrideRenderPass();
+void MainView::RenderBones(int width, int height)
+{
+	int halfWidth = width / 2;
+	int halfHeight = height / 2;
 
-	Device::Get()->TransitionImageLayout(offscreenImages[currentImageIndex], VK_FORMAT_R8G8B8A8_UNORM,
-		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	VectorPainter painter(BONE_RENDER_ORDER);
 
-	ImGui::Image(offscreenImguiTextures[currentImageIndex], ImVec2(400, 400));
+	painter.SetFillColor(Color(0.0f, 1.0f, 0.0f, 1.0f));
+
+	std::vector<Bone>& bones = SkeletalAnimationLoader::Get()->skeleton.bones;
+	for (int i = 0; i < bones.size(); i++)
+	{
+		glm::vec2 bonePosition = bones[i].GetAbsolutePosition();
+		glm::vec2 boneScreenPosition = glm::vec2(halfWidth + bonePosition.x, halfHeight - bonePosition.y);
+		boneScreenPosition.x /= width;
+		boneScreenPosition.y /= height;
+
+		painter.DrawRegularPolygon(boneScreenPosition, 6, 0.02f);
+	}
+
+	painter.SetFillColor(Color(1.0f, 0.0f, 0.0f, 1.0f));
+	painter.DrawRegularPolygon(glm::vec2(0.47, 0.5), 6, 0.01f);
+
+	VectorRenderer::Get()->SubmitPainter(painter);
+
+	std::vector<RenderRequest*> vectorRenderRequests = SimpleVectorRenderRequest::GetRequestsThisFrame();
+	std::sort(vectorRenderRequests.begin(), vectorRenderRequests.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
+
+	for (int i = 0; i < vectorRenderRequests.size(); i++)
+	{
+		vectorRenderRequests[i]->Render();
+		vectorRenderRequests[i]->isActive = false;
+		vectorRenderRequests[i]->isProcessing = false;
+		vectorRenderRequests[i]->Clean();
+	}
 }

@@ -2,6 +2,7 @@
 
 #include "AssertUtils.h"
 #include "ErrorManager.h"
+#include "Quat.h"
 #include "YAMLParser.h"
 
 #include <filesystem>
@@ -26,6 +27,21 @@ Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 		ASSERT(yaml.HasRootNode("ScriptedImporter"));
 		YAML::Node& importer = yaml["ScriptedImporter"];
 
+		// Get Texture Pivot Point
+		YAML::Node* textureSettings = yaml.GetChild(&importer, "textureImporterSettings");
+
+		YAML::Node* spritePivotNode = yaml.GetChild(textureSettings, "spritePivot");
+		glm::vec2 spritePivot = ParsePosition(spritePivotNode->GetString());
+
+		// Get Document Pivot Point (which is a separate value)
+		YAML::Node* documentPivotNode = yaml.GetChild(textureSettings, "documentPivot");
+		glm::vec2 documentPivot = ParsePosition(documentPivotNode->GetString());
+
+		// Get Document Size
+		YAML::Node* documentSizeNode = yaml.GetChild(&importer, "documentSize");
+		glm::vec2 documentSize = ParsePosition(documentSizeNode->GetString());
+
+		// Get Bones
 		ASSERT(yaml.HasChild(&importer, "characterData"));
 		YAML::Node* characterData = yaml.GetChild(&importer, "characterData");
 
@@ -62,8 +78,22 @@ Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 			ASSERT((*child).GetType() == YAML::ValueType::Int);
 			int boneParentIndex = (*child).GetInt();
 
+			// Since we store all positions as pixel positions relative to the center
+			// we need to transform it when we parse
+			glm::vec2 localPosition;
+
+			if (boneParentIndex == -1)
+			{
+				glm::vec2 pivotedLocalPosition = ParsePosition(bonePosition);
+				localPosition = pivotedLocalPosition - glm::vec2((0.5 - documentPivot.x) * documentSize.x, (0.5 - documentPivot.y) * documentSize.y);
+			}
+			else
+			{
+				localPosition = ParsePosition(bonePosition);
+			}
+
 			Bone bone;
-			bone.localPosition = ParsePosition(bonePosition);
+			bone.localPosition = localPosition;
 			bone.localRotation = ParseRotation(boneRotation);
 			bone.length = boneLength;
 
@@ -106,12 +136,14 @@ glm::vec2 UnitySkeletonImporter::ParsePosition(const std::string_view& positionS
 
 float UnitySkeletonImporter::ParseRotation(const std::string_view& rotationString)
 {
-	std::regex regex(R"(z:\s*([-+]?[0-9]*\.?[0-9]+),)");
+	std::regex regex(R"(x:\s*([-+]?[0-9]*\.?[0-9]+),\s*y:\s*([-+]?[0-9]*\.?[0-9]+),\s*z:\s*([-+]?[0-9]*\.?[0-9]+),\s*w:\s*([-+]?[0-9]*\.?[0-9]+))");
 	std::smatch match;
 
 	std::string position = std::string(rotationString);
-	if (std::regex_search(position, match, regex) && match.size() == 2) {
-		return std::stof(match[1].str());
+	if (std::regex_search(position, match, regex) && match.size() == 5) {
+		Quat quat(atof(match[1].str().c_str()), atof(match[2].str().c_str()), atof(match[3].str().c_str()), atof(match[4].str().c_str()));
+
+		return quat.ToEulerAngles().z;
 	}
 
 	return 0.0f;

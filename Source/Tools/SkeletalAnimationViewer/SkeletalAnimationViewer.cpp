@@ -28,7 +28,7 @@ int main()
 	PhotoshopAPI::ProgressCallback callback;
 	file->read(inputFile, callback);
 
-	Skeleton skeleton = UnitySkeletonImporter::Import("C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta");
+	SkeletalAnimationLoader::Get()->skeleton = UnitySkeletonImporter::Import("C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta");
 
 	Window window;
 
@@ -40,7 +40,6 @@ int main()
 
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile = new PhotoshopAPI::LayeredFile<uint8_t>(file);
 	SkeletalAnimationLoader::Get()->RegisterPhotoshopFile(layeredFile);
-
 
 	SkeletalAnimationTabSystem::Get()->AddTab(new MainView());
 	SkeletalAnimationTabSystem::Get()->AddTab(new LayerHierarchyView());

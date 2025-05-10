@@ -161,6 +161,15 @@
     <ProjectReference Include="..\..\..\Renderer\Renderer.vcxproj">
       <Project>{295aaa3e-57ec-468b-9023-54f2fc6f169e}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\ApplicationCore\ApplicationCore.vcxproj">
+      <Project>{fe5eb2b7-5950-4e09-aca3-e6462eea1b15}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Renderer\Renderer.vcxproj">
+      <Project>{295aaa3e-57ec-468b-9023-54f2fc6f169e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utils\Utils.vcxproj">
+      <Project>{0a28b938-6721-4a24-bfef-602c69eed630}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Importer\UnitySkeletonImporter.h" />

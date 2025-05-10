@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SkeletalSpriteRenderer.h"
 #include "Texture.h"
 
 #include "PhotoshopAPI/include/PhotoshopAPI.h"
@@ -32,6 +33,8 @@ public:
 
 	std::map<std::string, LayerInfo> layers;
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile;
+
+	Skeleton skeleton;
 private:
 	static SkeletalAnimationLoader* instance;
 };
