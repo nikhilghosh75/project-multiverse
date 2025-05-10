@@ -49,3 +49,34 @@ bool Rect::IsPointInside(float x, float y)
 {
 	return left < x && right > x && bottom > y && top < y;
 }
+
+Rect Rect::GetBoundingRect(const std::vector<Rect>& rects)
+{
+	ASSERT(rects.size() > 0);
+	Rect rect = rects[0];
+
+	for (int i = 1; i < rects.size(); i++)
+	{
+		if (rects[i].bottom > rect.bottom)
+		{
+			rect.bottom = rects[i].bottom;
+		}
+
+		if (rects[i].top < rect.top)
+		{
+			rect.top = rects[i].top;
+		}
+
+		if (rects[i].right > rect.right)
+		{
+			rect.right = rects[i].right;
+		}
+
+		if (rects[i].left > rect.left)
+		{
+			rect.left = rects[i].left;
+		}
+	}
+
+	return rect;
+}

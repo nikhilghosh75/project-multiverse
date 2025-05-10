@@ -6,6 +6,15 @@ float Math::Clamp(float value, float lower, float upper)
 	return Max(lower, Min(value, upper));
 }
 
+float Math::CopySign(float x, float y)
+{
+	if (y > 0.0f)
+	{
+		return abs(x);
+	}
+	return -1.f * abs(x);
+}
+
 float Math::Lerp(float a, float b, float t)
 {
 	return ((b - a) * t) + a;;
