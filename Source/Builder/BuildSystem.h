@@ -25,6 +25,10 @@ public:
 
 	void UpdateBuild();
 
+	void CancelBuild();
+
+	bool IsBuildInProgress() const;
+
 	std::optional<std::string> buildFolderPath;
 
 	std::vector<BuildInfo> previousBuilds;

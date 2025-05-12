@@ -22,8 +22,6 @@ VSProjectGraphNode::~VSProjectGraphNode()
 
 void VSProjectGraphNode::Start()
 {
-	BuildGraphNode::Start();
-
 	std::string solutionDirectory = std::filesystem::current_path().string();
 	File::EnforceForwardSlash(solutionDirectory);
 
@@ -35,21 +33,22 @@ void VSProjectGraphNode::Start()
 		delete process;
 	}
 	process = new BuildProcess(command, std::bind(&VSProjectGraphNode::OnProjectBuildFinished, this, std::placeholders::_1, std::placeholders::_2));
+
 	projectBuildState = FileBuildState::InProgress;
+	state = NodeState::InProgress;
 }
 
 void VSProjectGraphNode::Update()
 {
+	process->Update();
 }
 
-bool VSProjectGraphNode::IsDone()
+void VSProjectGraphNode::Cancel()
 {
-	if (process == nullptr)
+	if (process != nullptr)
 	{
-		return false;
+		process->Terminate();
 	}
-
-	return !process->StillRunning();
 }
 
 std::map<std::string, FileBuildState> VSProjectGraphNode::GetFileStates()
@@ -62,9 +61,11 @@ void VSProjectGraphNode::OnProjectBuildFinished(BuildProcess& buildProcess, uint
 	if (exitCode == 0)
 	{
 		projectBuildState = FileBuildState::Succeeded;
+		state = NodeState::Succeeded;
 	}
 	else
 	{
 		projectBuildState = FileBuildState::Failed;
+		state = NodeState::Failed;
 	}
 }

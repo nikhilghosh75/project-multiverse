@@ -12,7 +12,7 @@ public:
 
 	void Start() override;
 	void Update() override;
-	bool IsDone() override;
+	void Cancel() override;
 
 	std::map<std::string, FileBuildState> GetFileStates() override;
 
