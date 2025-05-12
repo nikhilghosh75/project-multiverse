@@ -9,7 +9,8 @@ enum class BuildState
 {
 	NotStarted,
 	InProgress,
-	Complete
+	Complete,
+	Failed
 };
 
 class BuildConfig
@@ -72,6 +73,8 @@ public:
 
 	void UpdateBuild();
 
+	void CancelBuild();
+
 	BuildState GetCurrentState();
 
 	std::map<std::string, FileBuildState> GetFileStates();
@@ -85,6 +88,7 @@ private:
 
 	void AddNodeToBuild();
 	bool IsBuildComplete();
+	bool DidBuildFail();
 
 	BuildState currentState;
 };

@@ -48,6 +48,14 @@ void BuildUI::Render()
 		BuildSystem::Get()->StartBuild();
 	}
 
+	if (BuildSystem::Get()->IsBuildInProgress())
+	{
+		if (ImGui::Button("Cancel"))
+		{
+			BuildSystem::Get()->CancelBuild();
+		}
+	}
+
 	ImGui::End();
 
 	ImGui::Begin("File Statuses");
