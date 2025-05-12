@@ -16,18 +16,25 @@ public:
 
 	std::string GetOutput() const;
 
+	void Terminate();
+
 	void Update();
 
 	bool StillRunning();
+	bool WasStartupSuccessful();
 
 private:
 	std::stringstream outputStream;
+
+	bool startupSucceeded = true;
 
 	PROCESS_INFORMATION pi;
 	uint32_t exitValue;
 
 	HANDLE hReadPipe = nullptr;
 	HANDLE hWritePipe = nullptr;
+	HANDLE hReadErrorPipe = nullptr;
+	HANDLE hWriteErrorPipe = nullptr;
 
 	std::optional<std::function<void(BuildProcess&, uint32_t)>> endOfProcessCallback;
 };
