@@ -78,3 +78,17 @@ void SkeletalAnimationLoader::RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<ui
 		RegisterLayer(layeredFile->m_Layers[i].get(), "");
 	}
 }
+
+std::optional<std::string> SkeletalAnimationLoader::FindFullNameOfLayer(const std::string& name)
+{
+	for (auto it : layers)
+	{
+		if (it.first.find(name) != std::string::npos)
+		{
+			return it.first;
+		}
+	}
+
+	return std::nullopt;
+}
+

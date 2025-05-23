@@ -10,6 +10,7 @@
 #include <algorithm>
 
 const int BONE_RENDER_ORDER = 40;
+const int VERTEX_RENDER_ORDER = 50;
 
 MainView::MainView()
 	: SkeletalAnimationTab("Main View", false)
@@ -173,6 +174,9 @@ void MainView::Render()
 
 	RenderSprites(width, height);
 	RenderBones(width, height);
+	RenderVertices(width, height);
+
+	SubmitRenderRequests();
 
 	Device::Get()->ClearOverrideRenderPass();
 
@@ -206,25 +210,6 @@ void MainView::RenderSprites(int width, int height)
 
 		index--;
 	}
-
-	std::vector<RenderRequest*> imageRenderRequests = ImageRenderRequest::GetRequestsThisFrame();
-	std::sort(imageRenderRequests.begin(), imageRenderRequests.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
-
-	std::vector<Rect> rects;
-	for (int i = 0; i < imageRenderRequests.size(); i++)
-	{
-		rects.push_back(dynamic_cast<ImageRenderRequest*>(imageRenderRequests[i])->rect);
-	}
-
-	Rect boundingRect = Rect::GetBoundingRect(rects);
-
-	for (int i = 0; i < imageRenderRequests.size(); i++)
-	{
-		imageRenderRequests[i]->Render();
-		imageRenderRequests[i]->isActive = false;
-		imageRenderRequests[i]->isProcessing = false;
-		imageRenderRequests[i]->Clean();
-	}
 }
 
 void MainView::RenderBones(int width, int height)
@@ -248,9 +233,54 @@ void MainView::RenderBones(int width, int height)
 	}
 
 	painter.SetFillColor(Color(1.0f, 0.0f, 0.0f, 1.0f));
-	painter.DrawRegularPolygon(glm::vec2(0.47, 0.5), 6, 0.01f);
 
 	VectorRenderer::Get()->SubmitPainter(painter);
+}
+
+void MainView::RenderVertices(int width, int height)
+{
+	int halfWidth = width / 2;
+	int halfHeight = height / 2;
+
+	// TODO: Switch to rendering the current image's vertices
+	LayerInfo& currentLayer = SkeletalAnimationLoader::Get()->layers["Staff/Staff"];
+
+	VectorPainter painter(VERTEX_RENDER_ORDER);
+
+	painter.SetFillColor(Color(0.5f, 1.0f, 0.0f, 1.f));
+
+	// painter.BeginPath();
+
+	for (int i = 0; i < currentLayer.spriteVertices.size(); i++)
+	{
+		glm::vec2 vertexPosition = currentLayer.spriteVertices[i].position;
+
+		glm::vec2 vertexScreenPosition = glm::vec2(halfWidth + vertexPosition.x, halfHeight - vertexPosition.y);
+		vertexScreenPosition.x /= width;
+		vertexScreenPosition.y /= height;
+
+		std::cout << "(" << vertexScreenPosition.x << ", " << vertexScreenPosition.y << ")" << std::endl;
+
+		painter.DrawRegularPolygon(vertexScreenPosition, 4, 0.0025);
+	}
+
+	// painter.ClosePath();
+
+	VectorRenderer::Get()->SubmitPainter(painter);
+}
+
+void MainView::SubmitRenderRequests()
+{
+	std::vector<RenderRequest*> imageRenderRequests = ImageRenderRequest::GetRequestsThisFrame();
+	std::sort(imageRenderRequests.begin(), imageRenderRequests.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
+
+	for (int i = 0; i < imageRenderRequests.size(); i++)
+	{
+		imageRenderRequests[i]->Render();
+		imageRenderRequests[i]->isActive = false;
+		imageRenderRequests[i]->isProcessing = false;
+		imageRenderRequests[i]->Clean();
+	}
 
 	std::vector<RenderRequest*> vectorRenderRequests = SimpleVectorRenderRequest::GetRequestsThisFrame();
 	std::sort(vectorRenderRequests.begin(), vectorRenderRequests.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });

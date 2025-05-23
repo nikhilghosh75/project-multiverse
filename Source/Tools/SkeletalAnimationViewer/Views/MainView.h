@@ -20,6 +20,9 @@ public:
 private:
 	void RenderSprites(int width, int height);
 	void RenderBones(int width, int height);
+	void RenderVertices(int width, int height);
+
+	void SubmitRenderRequests();
 
 	std::array<VkImage, MAX_FRAMES_IN_FLIGHT> offscreenImages;
 	std::array<VkImageView, MAX_FRAMES_IN_FLIGHT> offscreenImageViews;

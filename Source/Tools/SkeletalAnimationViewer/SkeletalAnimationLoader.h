@@ -7,8 +7,9 @@
 
 #include "imgui.h"
 
-#include <string>
 #include <map>
+#include <optional>
+#include <string>
 
 ImVec2 GetTextureDimensions(Texture* texture);
 
@@ -32,6 +33,8 @@ public:
 
 	void RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer, std::string path);
 	void RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<uint8_t>* layeredFile);
+
+	std::optional<std::string> FindFullNameOfLayer(const std::string& name);
 
 	std::map<std::string, LayerInfo> layers;
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile;
