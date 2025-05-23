@@ -39,6 +39,11 @@ int YAML::Node::GetInt() const
 
 float YAML::Node::GetFloat() const
 {
+	if (valueType == ValueType::Int)
+	{
+		return (float)intValue;
+	}
+
 	return floatValue;
 }
 
