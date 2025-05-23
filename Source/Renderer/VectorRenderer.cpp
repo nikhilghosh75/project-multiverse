@@ -177,6 +177,11 @@ VectorRenderer* VectorRenderer::Get()
 
 void VectorRenderer::SubmitPainter(const VectorPainter& painter)
 {
+	if (painter.paths.size() == 0)
+	{
+		return;
+	}
+
 	SimpleVectorRenderRequest* request = SimpleVectorRenderRequest::CreateRequest();
 	request->space = painter.screenSpace;
 	request->renderingOrder = painter.renderOrder;
@@ -248,6 +253,8 @@ void VectorRenderer::CreatePipeline()
 
 	pipeline.SetShader(vertexShader, ShaderType::Vertex);
 	pipeline.SetShader(fragmentShader, ShaderType::Fragment);
+
+	pipeline.SetColorBlendingEnabled(true);
 
 	pipeline.SetDescriptorSet(descriptorSetLayout);
 
