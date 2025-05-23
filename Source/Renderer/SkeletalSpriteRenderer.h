@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Texture.h"
+
 #include "glm/mat4x4.hpp"
 
 #include <array>
@@ -26,10 +28,29 @@ struct BoneWeight
 	float boneWeight;
 };
 
+struct SpriteVertex
+{
+	glm::vec2 position;
+	glm::vec2 uv;
+	std::array<BoneWeight, 4> weights;
+};
+
 class Skeleton
 {
 public:
 	Skeleton();
 
 	std::vector<Bone> bones;
+	std::vector<SpriteVertex> vertices;
+};
+
+class SkeletalSprite
+{
+public:
+	struct Layer
+	{
+		std::string name;
+		Texture* texture;
+		std::vector<SpriteVertex> vertices;
+	};
 };

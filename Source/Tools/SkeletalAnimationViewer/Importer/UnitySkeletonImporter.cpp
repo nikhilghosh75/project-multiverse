@@ -1,5 +1,7 @@
 #include "UnitySkeletonImporter.h"
 
+#include "../SkeletalAnimationLoader.h"
+
 #include "AssertUtils.h"
 #include "ErrorManager.h"
 #include "Quat.h"
@@ -8,6 +10,181 @@
 #include <filesystem>
 #include <fstream>
 #include <regex>
+
+glm::vec2 ParsePosition(const std::string_view& positionString);
+float ParseRotation(const std::string_view& rotationString);
+
+void ParseBones(YAML& yaml, Skeleton& skeleton, glm::vec2 documentSize)
+{
+	YAML::Node& importer = yaml["ScriptedImporter"];
+
+	// Get Document Pivot Point (which is a separate value)
+	YAML::Node* textureSettings = yaml.GetChild(&importer, "textureImporterSettings");
+	YAML::Node* documentPivotNode = yaml.GetChild(textureSettings, "documentPivot");
+	glm::vec2 documentPivot = ParsePosition(documentPivotNode->GetString());
+
+	ASSERT(yaml.HasChild(&importer, "characterData"));
+	YAML::Node* characterData = yaml.GetChild(&importer, "characterData");
+
+	ASSERT(yaml.HasChild(characterData, "bones"));
+	YAML::Node* bones = yaml.GetChild(characterData, "bones");
+
+	std::unordered_map<int, int> bonesToParentIndices;
+
+	for (auto child = yaml.NodeChildren(bones).begin(); child != yaml.NodeChildren(bones).end(); ++child)
+	{
+		// Each bone element has 5 children underneath the "bones" object
+
+		ASSERT((*child).GetName() == "name");
+		ASSERT((*child).GetType() == YAML::ValueType::String);
+		std::string_view boneName = (*child).GetString();
+		++child;
+
+		ASSERT((*child).GetName() == "position");
+		ASSERT((*child).GetType() == YAML::ValueType::String);
+		std::string_view bonePosition = (*child).GetString();
+		++child;
+
+		ASSERT((*child).GetName() == "rotation");
+		ASSERT((*child).GetType() == YAML::ValueType::String);
+		std::string_view boneRotation = (*child).GetString();
+		++child;
+
+		ASSERT((*child).GetName() == "length");
+		ASSERT((*child).GetType() == YAML::ValueType::Float);
+		float boneLength = (*child).GetFloat();
+		++child;
+
+		ASSERT((*child).GetName() == "parentId");
+		ASSERT((*child).GetType() == YAML::ValueType::Int);
+		int boneParentIndex = (*child).GetInt();
+
+		// Since we store all positions as pixel positions relative to the center
+		// we need to transform it when we parse
+		glm::vec2 localPosition;
+
+		if (boneParentIndex == -1)
+		{
+			glm::vec2 pivotedLocalPosition = ParsePosition(bonePosition);
+			localPosition = pivotedLocalPosition - glm::vec2((0.5 - documentPivot.x) * documentSize.x, (0.5 - documentPivot.y) * documentSize.y);
+		}
+		else
+		{
+			localPosition = ParsePosition(bonePosition);
+		}
+
+		Bone bone;
+		bone.localPosition = localPosition;
+		bone.localRotation = ParseRotation(boneRotation);
+		bone.length = boneLength;
+
+		skeleton.bones.push_back(bone);
+
+		if (boneParentIndex != -1)
+		{
+			bonesToParentIndices.insert({ skeleton.bones.size() - 1, boneParentIndex });
+		}
+	}
+
+	for (auto it : bonesToParentIndices)
+	{
+		skeleton.bones[it.first].parent = &skeleton.bones[it.second];
+		skeleton.bones[it.second].children.push_back(&skeleton.bones[it.first]);
+	}
+}
+
+std::vector<SpriteVertex> ParseSpriteVertices(YAML yaml, YAML::Node* parent)
+{
+	std::vector<SpriteVertex> spriteVertices;
+
+	for (auto child = yaml.NodeChildren(parent).begin(); child != yaml.NodeChildren(parent).end(); ++child)
+	{
+		SpriteVertex vertex;
+
+		vertex.position = ParsePosition((*child).GetString());
+		++child;
+
+		YAML::ChildrenIterator boneIterator = yaml.NodeChildren(&(*child)).begin();
+
+		vertex.weights[0].boneWeight = (*boneIterator).GetFloat();
+		++boneIterator;
+
+		vertex.weights[1].boneWeight = (*boneIterator).GetFloat();
+		++boneIterator;
+
+		vertex.weights[2].boneWeight = (*boneIterator).GetFloat();
+		++boneIterator;
+
+		vertex.weights[3].boneWeight = (*boneIterator).GetFloat();
+		++boneIterator;
+
+		vertex.weights[0].boneIndex = (*boneIterator).GetInt();
+		++boneIterator;
+
+		vertex.weights[1].boneIndex = (*boneIterator).GetInt();
+		++boneIterator;
+
+		vertex.weights[2].boneIndex = (*boneIterator).GetInt();
+		++boneIterator;
+
+		vertex.weights[3].boneIndex = (*boneIterator).GetInt();
+		++boneIterator;
+
+		spriteVertices.push_back(vertex);
+	}
+
+	return spriteVertices;
+}
+
+void ParseRig(YAML& yaml, Skeleton& skeleton)
+{
+	YAML::Node& importer = yaml["ScriptedImporter"];
+
+	// Get Rig Data
+	YAML::Node* spriteSettings = yaml.GetChild(&importer, "spriteImportData");
+	YAML::Node* rigSpriteSettings = yaml.GetChild(&importer, "rigSpriteImportData");
+
+	LayerInfo* layerInfo = nullptr;
+
+	int i = 0;
+
+	// Iterate over all the sprites
+	for (auto child = yaml.NodeChildren(rigSpriteSettings).begin(); child != yaml.NodeChildren(rigSpriteSettings).end(); ++child)
+	{
+		std::string_view name = (*child).GetName();
+		if (name == "name")
+		{
+			std::string layerName = (std::string)(*child).GetString();
+			std::optional<std::string> fullLayerName = SkeletalAnimationLoader::Get()->FindFullNameOfLayer(layerName);
+			if (fullLayerName)
+			{
+				layerInfo = &(SkeletalAnimationLoader::Get()->layers[*fullLayerName]);
+			}
+			else
+			{
+				ErrorManager::Get()->ReportError(ErrorSeverity::Error, "UnitySkeletalAnimation::ParseRig", "SkeletalAnimationViewer", 0, "LayerInfo cannot be found");
+			}
+		}
+		else if (name == "vertices")
+		{
+			if (layerInfo != nullptr)
+			{
+				layerInfo->spriteVertices = ParseSpriteVertices(yaml, &(*child));
+			}
+		}
+		else if (name == "uvTransform")
+		{
+			if (layerInfo != nullptr)
+			{
+				glm::vec2 transform = ParsePosition((*child).GetString());
+				for (int j = 0; j < layerInfo->spriteVertices.size(); j++)
+				{
+					// layerInfo->spriteVertices[j].position += transform;
+				}
+			}
+		}
+	}
+}
 
 Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 {
@@ -33,83 +210,12 @@ Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 		YAML::Node* spritePivotNode = yaml.GetChild(textureSettings, "spritePivot");
 		glm::vec2 spritePivot = ParsePosition(spritePivotNode->GetString());
 
-		// Get Document Pivot Point (which is a separate value)
-		YAML::Node* documentPivotNode = yaml.GetChild(textureSettings, "documentPivot");
-		glm::vec2 documentPivot = ParsePosition(documentPivotNode->GetString());
-
 		// Get Document Size
 		YAML::Node* documentSizeNode = yaml.GetChild(&importer, "documentSize");
 		glm::vec2 documentSize = ParsePosition(documentSizeNode->GetString());
 
-		// Get Bones
-		ASSERT(yaml.HasChild(&importer, "characterData"));
-		YAML::Node* characterData = yaml.GetChild(&importer, "characterData");
-
-		ASSERT(yaml.HasChild(characterData, "bones"));
-		YAML::Node* bones = yaml.GetChild(characterData, "bones");
-
-		std::unordered_map<int, int> bonesToParentIndices;
-
-		for (auto child = yaml.NodeChildren(bones).begin(); child != yaml.NodeChildren(bones).end(); ++child)
-		{
-			// Each bone element has 5 children underneath the "bones" object
-
-			ASSERT((*child).GetName() == "name");
-			ASSERT((*child).GetType() == YAML::ValueType::String);
-			std::string_view boneName = (*child).GetString();
-			++child;
-
-			ASSERT((*child).GetName() == "position");
-			ASSERT((*child).GetType() == YAML::ValueType::String);
-			std::string_view bonePosition = (*child).GetString();
-			++child;
-
-			ASSERT((*child).GetName() == "rotation");
-			ASSERT((*child).GetType() == YAML::ValueType::String);
-			std::string_view boneRotation = (*child).GetString();
-			++child;
-
-			ASSERT((*child).GetName() == "length");
-			ASSERT((*child).GetType() == YAML::ValueType::Float);
-			float boneLength = (*child).GetFloat();
-			++child;
-
-			ASSERT((*child).GetName() == "parentId");
-			ASSERT((*child).GetType() == YAML::ValueType::Int);
-			int boneParentIndex = (*child).GetInt();
-
-			// Since we store all positions as pixel positions relative to the center
-			// we need to transform it when we parse
-			glm::vec2 localPosition;
-
-			if (boneParentIndex == -1)
-			{
-				glm::vec2 pivotedLocalPosition = ParsePosition(bonePosition);
-				localPosition = pivotedLocalPosition - glm::vec2((0.5 - documentPivot.x) * documentSize.x, (0.5 - documentPivot.y) * documentSize.y);
-			}
-			else
-			{
-				localPosition = ParsePosition(bonePosition);
-			}
-
-			Bone bone;
-			bone.localPosition = localPosition;
-			bone.localRotation = ParseRotation(boneRotation);
-			bone.length = boneLength;
-
-			skeleton.bones.push_back(bone);
-
-			if (boneParentIndex != -1)
-			{
-				bonesToParentIndices.insert({ skeleton.bones.size() - 1, boneParentIndex});
-			}
-		}
-
-		for (auto it : bonesToParentIndices)
-		{
-			skeleton.bones[it.first].parent = &skeleton.bones[it.second];
-			skeleton.bones[it.second].children.push_back(&skeleton.bones[it.first]);
-		}
+		ParseBones(yaml, skeleton, documentSize);
+		ParseRig(yaml, skeleton);
 	}
 	else
 	{
@@ -119,7 +225,7 @@ Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 	return skeleton;
 }
 
-glm::vec2 UnitySkeletonImporter::ParsePosition(const std::string_view& positionString)
+glm::vec2 ParsePosition(const std::string_view& positionString)
 {
 	std::regex regex(R"(x:\s*([-+]?[0-9]*\.?[0-9]+),\s*y:\s*([-+]?[0-9]*\.?[0-9]+))");
 	std::smatch match;
@@ -134,7 +240,7 @@ glm::vec2 UnitySkeletonImporter::ParsePosition(const std::string_view& positionS
 	return glm::vec2(0.0f);
 }
 
-float UnitySkeletonImporter::ParseRotation(const std::string_view& rotationString)
+float ParseRotation(const std::string_view& rotationString)
 {
 	std::regex regex(R"(x:\s*([-+]?[0-9]*\.?[0-9]+),\s*y:\s*([-+]?[0-9]*\.?[0-9]+),\s*z:\s*([-+]?[0-9]*\.?[0-9]+),\s*w:\s*([-+]?[0-9]*\.?[0-9]+))");
 	std::smatch match;

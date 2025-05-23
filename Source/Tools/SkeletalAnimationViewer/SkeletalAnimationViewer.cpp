@@ -28,8 +28,6 @@ int main()
 	PhotoshopAPI::ProgressCallback callback;
 	file->read(inputFile, callback);
 
-	SkeletalAnimationLoader::Get()->skeleton = UnitySkeletonImporter::Import("C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta");
-
 	Window window;
 
 	ImGuiDevice device;
@@ -40,6 +38,8 @@ int main()
 
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile = new PhotoshopAPI::LayeredFile<uint8_t>(file);
 	SkeletalAnimationLoader::Get()->RegisterPhotoshopFile(layeredFile);
+
+	SkeletalAnimationLoader::Get()->skeleton = UnitySkeletonImporter::Import("C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta");
 
 	SkeletalAnimationTabSystem::Get()->AddTab(new MainView());
 	SkeletalAnimationTabSystem::Get()->AddTab(new LayerHierarchyView());

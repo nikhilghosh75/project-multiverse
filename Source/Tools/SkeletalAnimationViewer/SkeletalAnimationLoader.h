@@ -21,6 +21,8 @@ public:
 	float centerY;
 	float width;
 	float height;
+
+	std::vector<SpriteVertex> spriteVertices;
 };
 
 class SkeletalAnimationLoader

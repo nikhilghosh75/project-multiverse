@@ -10,7 +10,4 @@ class UnitySkeletonImporter
 public:
 	static Skeleton Import(const std::string& filepath);
 
-private:
-	static glm::vec2 ParsePosition(const std::string_view& positionString);
-	static float ParseRotation(const std::string_view& rotationString);
 };
