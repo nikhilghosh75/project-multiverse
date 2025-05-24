@@ -29,10 +29,10 @@ void DebugRenderRequest::CombineWith(RenderRequest* other)
 	}
 }
 
-void DebugRenderRequest::Render()
+void DebugRenderRequest::Render(VkCommandBuffer buffer)
 {
 	ZoneScopedN("DebugRenderRequest::Render");
-	DebugRenderer::Get()->RenderDebugRequest(this);
+	DebugRenderer::Get()->RenderDebugRequest(this, buffer);
 }
 
 void DebugRenderRequest::Clean()
@@ -120,7 +120,7 @@ void DebugRenderer::AddBox(Rect rect)
 	request->rects.push_back(rect);
 }
 
-void DebugRenderer::RenderDebugRequest(DebugRenderRequest* request)
+void DebugRenderer::RenderDebugRequest(DebugRenderRequest* request, VkCommandBuffer commandBuffer)
 {
 	for (int i = 0; i < request->rects.size(); i++)
 	{
@@ -129,7 +129,7 @@ void DebugRenderer::RenderDebugRequest(DebugRenderRequest* request)
 
 	UpdateDescriptorSets();
 	PopulateBuffers();
-	DispatchCommands();
+	DispatchCommands(commandBuffer);
 
 	vertices.clear();
 	indices.clear();
@@ -230,35 +230,8 @@ void DebugRenderer::PopulateBuffers()
 	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
 }
 
-void DebugRenderer::DispatchCommands()
+void DebugRenderer::DispatchCommands(VkCommandBuffer commandBuffer)
 {
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = Device::Get()->GetCommandPool();
-	allocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, &commandBuffer);
-
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-	VULKAN_CALL(vkBeginCommandBuffer(commandBuffer, &beginInfo));
-
-	VkRenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = Device::Get()->GetRenderPass();
-	renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
-	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
-
-	VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
-
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
 	VkViewport viewport{};
@@ -281,22 +254,9 @@ void DebugRenderer::DispatchCommands()
 
 	vkCmdBindIndexBuffer(commandBuffer, indexBuffers[currentIndex], 0, VK_INDEX_TYPE_UINT16);
 
-	// VkDescriptorSet& descriptorSet = descriptorSets[Device::GetFrameNumber() % MAX_FRAMES_IN_FLIGHT];
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
-
-	vkCmdEndRenderPass(commandBuffer);
-
-	VULKAN_CALL_MSG(vkEndCommandBuffer(commandBuffer), "Failed to end command buffer");
-
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-
-	vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
 }
 
 DebugRenderer::DebugVertex::DebugVertex(glm::vec2 position)

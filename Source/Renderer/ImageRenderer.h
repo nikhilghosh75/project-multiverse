@@ -28,7 +28,7 @@ public:
 
 	void CombineWith(RenderRequest* other) override;
 
-	void Render() override;
+	void Render(VkCommandBuffer commandBuffer) override;
 	void Clean() override;
 
 	static ImageRenderRequest* CreateRequest();
@@ -57,7 +57,7 @@ public:
 
 	ImageRenderingResult AddImage(Texture* texture, Rect rect, ImageRenderingOptions options = defaultOptions);
 
-	void RenderImageRequest(ImageRenderRequest* request);
+	void RenderImageRequest(ImageRenderRequest* request, VkCommandBuffer commandBuffer);
 
 private:
 	class Vertex
@@ -85,7 +85,7 @@ private:
 
 	void UpdateDescriptorSets();
 	void PopulateBuffers();
-	void DispatchCommands();
+	void DispatchCommands(VkCommandBuffer commandBuffer);
 
 	static inline ImageRenderer* instance;
 

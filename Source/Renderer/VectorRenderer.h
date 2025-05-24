@@ -60,7 +60,7 @@ public:
 
 	void CombineWith(RenderRequest* other) override;
 
-	void Render() override;
+	void Render(VkCommandBuffer commandBuffer) override;
 	void Clean() override;
 
 	static SimpleVectorRenderRequest* CreateRequest();
@@ -87,7 +87,7 @@ public:
 
 	void SubmitPainter(const VectorPainter& painter);
 
-	void RenderSimpleVectorRequest(SimpleVectorRenderRequest* request);
+	void RenderSimpleVectorRequest(SimpleVectorRenderRequest* request, VkCommandBuffer commandBuffer);
 private:
 	class Vertex
 	{
@@ -110,9 +110,7 @@ private:
 
 	void UpdateDescriptorSets();
 	void PopulateBuffers();
-	void DispatchCommands();
-
-	void Render();
+	void DispatchCommands(VkCommandBuffer commandBuffer);
 
 	bool IsValidPath(const VectorPainter::Path& path);
 
