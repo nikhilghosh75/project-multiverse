@@ -128,7 +128,6 @@ void DebugRenderer::RenderDebugRequest(DebugRenderRequest* request)
 	}
 
 	UpdateDescriptorSets();
-	PopulateBuffers();
 	DispatchCommands();
 
 	vertices.clear();
@@ -224,12 +223,6 @@ void DebugRenderer::UpdateDescriptorSets()
 
 }
 
-void DebugRenderer::PopulateBuffers()
-{
-	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex]);
-	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
-}
-
 void DebugRenderer::DispatchCommands()
 {
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -257,8 +250,10 @@ void DebugRenderer::DispatchCommands()
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex], commandBuffer);
+	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex], commandBuffer);
 
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
 	VkViewport viewport{};

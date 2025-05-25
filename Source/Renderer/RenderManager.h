@@ -10,8 +10,6 @@ public:
 	RenderManager();
 	~RenderManager();
 
-	void Setup();
-
 	void StartFrame();
 	void EndFrame();
 

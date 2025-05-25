@@ -20,7 +20,6 @@ int main()
 	device.Setup(Window::GetWindowHandle(), Device::Get());
 
 	RenderManager renderingManager;
-	renderingManager.Setup();
 
 	BuildSystem::Get()->Init();
 
