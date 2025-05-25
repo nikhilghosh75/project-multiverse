@@ -16,7 +16,7 @@ public:
 
 	void CombineWith(RenderRequest* other) override;
 
-	void Render(VkCommandBuffer buffer) override;
+	void Render() override;
 	void Clean() override;
 
 	static DebugRenderRequest* CreateRequest();
@@ -48,7 +48,7 @@ public:
 	// In Rendering Space
 	void AddBox(Rect rect);
 
-	void RenderDebugRequest(DebugRenderRequest* request, VkCommandBuffer commandBuffer);
+	void RenderDebugRequest(DebugRenderRequest* request);
 private:
 	static inline DebugRenderer* instance;
 
@@ -62,7 +62,7 @@ private:
 
 	void UpdateDescriptorSets();
 	void PopulateBuffers();
-	void DispatchCommands(VkCommandBuffer commandBuffer);
+	void DispatchCommands();
 
 	RenderPipeline pipeline;
 

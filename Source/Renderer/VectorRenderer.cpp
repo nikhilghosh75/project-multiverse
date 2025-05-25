@@ -112,10 +112,10 @@ void SimpleVectorRenderRequest::CombineWith(RenderRequest* other)
 	}
 }
 
-void SimpleVectorRenderRequest::Render(VkCommandBuffer commandBuffer)
+void SimpleVectorRenderRequest::Render()
 {
 	ZoneScopedN("VectorRenderRequest::Render");
-	VectorRenderer::Get()->RenderSimpleVectorRequest(this, commandBuffer);
+	VectorRenderer::Get()->RenderSimpleVectorRequest(this);
 }
 
 void SimpleVectorRenderRequest::Clean()
@@ -189,7 +189,7 @@ void VectorRenderer::SubmitPainter(const VectorPainter& painter)
 	}
 }
 
-void VectorRenderer::RenderSimpleVectorRequest(SimpleVectorRenderRequest* request, VkCommandBuffer commandBuffer)
+void VectorRenderer::RenderSimpleVectorRequest(SimpleVectorRenderRequest* request)
 {
 	maxLayers = request->paths.size() + 1;
 
@@ -203,7 +203,7 @@ void VectorRenderer::RenderSimpleVectorRequest(SimpleVectorRenderRequest* reques
 
 	UpdateDescriptorSets();
 	PopulateBuffers();
-	DispatchCommands(commandBuffer);
+	DispatchCommands();
 
 	vertices.clear();
 	indices.clear();
@@ -304,8 +304,28 @@ void VectorRenderer::PopulateBuffers()
 	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
 }
 
-void VectorRenderer::DispatchCommands(VkCommandBuffer commandBuffer)
+void VectorRenderer::DispatchCommands()
 {
+	VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+	VULKAN_CALL(vkBeginCommandBuffer(commandBuffer, &beginInfo));
+
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = Device::Get()->GetRenderPass();
+	renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
+	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
+
+	VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearColor;
+
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
 	VkViewport viewport{};
@@ -332,6 +352,18 @@ void VectorRenderer::DispatchCommands(VkCommandBuffer commandBuffer)
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
+	vkCmdEndRenderPass(commandBuffer);
+
+	VULKAN_CALL_MSG(vkEndCommandBuffer(commandBuffer), "Failed to end command buffer");
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
 }
 
 bool VectorRenderer::IsValidPath(const VectorPainter::Path& path)

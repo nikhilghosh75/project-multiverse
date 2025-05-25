@@ -3,7 +3,6 @@
 #include "Device.h"
 
 #include "DateTime.h"
-#include "VulkanUtils.h"
 
 #include <chrono>
 #include <iostream>
@@ -14,8 +13,6 @@
 void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame);
 void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
 void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
-void BeginRenderCommandBuffer(VkCommandBuffer buffer);
-void EndRenderCommandBuffer(VkCommandBuffer buffer);
 
 void RunRenderThread(RenderManager* manager)
 {
@@ -45,15 +42,11 @@ void RunRenderThread(RenderManager* manager)
 
 			std::cout << requestsBeforeCombining << " before, " << requestsAfterCombining << " after" << std::endl;
 
-			VkCommandBuffer commandBuffer = manager->GetCurrentCommandBuffer();
-			BeginRenderCommandBuffer(commandBuffer);
-
 			for (int i = 0; i < requestsLastFrame.size(); i++)
 			{
-				requestsLastFrame[i]->Render(commandBuffer);
+				requestsLastFrame[i]->Render();
 			}
 
-			EndRenderCommandBuffer(commandBuffer);
 			FreeRenderRequests(requestsLastFrame);
 		}
 
@@ -99,42 +92,6 @@ void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 	}
 }
 
-void BeginRenderCommandBuffer(VkCommandBuffer buffer)
-{
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-	VULKAN_CALL(vkBeginCommandBuffer(buffer, &beginInfo));
-
-	VkRenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = Device::Get()->GetRenderPass();
-	renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
-	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
-
-	VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
-
-	vkCmdBeginRenderPass(buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-}
-
-void EndRenderCommandBuffer(VkCommandBuffer commandBuffer)
-{
-	vkCmdEndRenderPass(commandBuffer);
-
-	VULKAN_CALL_MSG(vkEndCommandBuffer(commandBuffer), "Failed to end command buffer");
-
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-
-	vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
-}
-
 void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame)
 {
 	ZoneScoped;
@@ -150,15 +107,6 @@ RenderManager::RenderManager()
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
 	vectorRenderer = new VectorRenderer();
-
-	// Create Commander Buffer
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = Device::Get()->GetCommandPool();
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-	VULKAN_CALL(vkAllocateCommandBuffers(Device::Get()->GetVulkanDevice(), &allocInfo, commandBuffers.data()));
 }
 
 RenderManager::~RenderManager()
@@ -196,8 +144,6 @@ void RenderManager::StartFrame()
 		Device::Get()->GetCurrentSwapChainImage(),
 		Device::Get()->GetSwapChainFormat(),
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-
-	currentIndex = (currentIndex + 1) % MAX_REQUESTS_IN_FLIGHT;
 }
 
 void RenderManager::EndFrame()
@@ -237,10 +183,5 @@ std::vector<RenderRequest*> RenderManager::GetRenderRequests()
 	}
 
 	return requests;
-}
-
-VkCommandBuffer RenderManager::GetCurrentCommandBuffer()
-{
-	return commandBuffers[currentIndex];
 }
 

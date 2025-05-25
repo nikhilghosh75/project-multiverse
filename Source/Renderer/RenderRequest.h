@@ -1,7 +1,5 @@
 #pragma once
 
-#include "vulkan/vulkan.h"
-
 class RenderRequest
 {
 public:
@@ -9,7 +7,7 @@ public:
 
 	virtual void CombineWith(RenderRequest* other) = 0;
 
-	virtual void Render(VkCommandBuffer buffer) = 0;
+	virtual void Render() = 0;
 	virtual void Clean() = 0;
 
 	bool isActive = false; // Does the request have data that is actively used

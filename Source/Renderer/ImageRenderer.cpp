@@ -31,10 +31,10 @@ void ImageRenderRequest::CombineWith(RenderRequest* other)
 {
 }
 
-void ImageRenderRequest::Render(VkCommandBuffer commandBuffer)
+void ImageRenderRequest::Render()
 {
     ZoneScopedN("ImageRenderRequest::Render");
-    ImageRenderer::Get()->RenderImageRequest(this, commandBuffer);
+    ImageRenderer::Get()->RenderImageRequest(this);
 }
 
 void ImageRenderRequest::Clean()
@@ -111,14 +111,14 @@ ImageRenderingResult ImageRenderer::AddImage(Texture* texture, Rect rect, ImageR
     return result;
 }
 
-void ImageRenderer::RenderImageRequest(ImageRenderRequest* request, VkCommandBuffer commandBuffer)
+void ImageRenderer::RenderImageRequest(ImageRenderRequest* request)
 {
     SetTexture(request->texture);
     PopulateWithRect(request->rect);
 
     UpdateDescriptorSets();
     PopulateBuffers();
-    DispatchCommands(commandBuffer);
+    DispatchCommands();
 
     vertices.clear();
 
@@ -299,9 +299,28 @@ void ImageRenderer::PopulateBuffers()
     Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
 }
 
-void ImageRenderer::DispatchCommands(VkCommandBuffer commandBuffer)
+void ImageRenderer::DispatchCommands()
 {
     ZoneScoped;
+    VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    VULKAN_CALL(vkBeginCommandBuffer(commandBuffer, &beginInfo));
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = Device::Get()->GetRenderPass();
+    renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
+
+    VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
@@ -328,6 +347,18 @@ void ImageRenderer::DispatchCommands(VkCommandBuffer commandBuffer)
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
+    vkCmdEndRenderPass(commandBuffer);
+
+    VULKAN_CALL(vkEndCommandBuffer(commandBuffer));
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(Device::Get()->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(Device::Get()->GetGraphicsQueue());
 }
 
 ImageRenderer::Vertex::Vertex(glm::vec2 _position, glm::vec2 _uv)
