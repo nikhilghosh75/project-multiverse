@@ -117,7 +117,6 @@ void ImageRenderer::RenderImageRequest(ImageRenderRequest* request)
     PopulateWithRect(request->rect);
 
     UpdateDescriptorSets();
-    PopulateBuffers();
     DispatchCommands();
 
     vertices.clear();
@@ -292,13 +291,6 @@ void ImageRenderer::UpdateDescriptorSets()
     currentTexture->TransitionLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-void ImageRenderer::PopulateBuffers()
-{
-    ZoneScoped;
-    Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex]);
-    Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
-}
-
 void ImageRenderer::DispatchCommands()
 {
     ZoneScoped;
@@ -320,8 +312,10 @@ void ImageRenderer::DispatchCommands()
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
-    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex], commandBuffer);
+    Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex], commandBuffer);
 
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
     VkViewport viewport{};

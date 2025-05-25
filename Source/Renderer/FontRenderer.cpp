@@ -156,7 +156,6 @@ void FontRenderer::RenderFontRequest(FontRenderRequest* request)
 		PopulateBufferWithTextRequest(textRequest);
 	}
 
-	PopulateBuffers();
 	UpdateDescriptorSets();
 	DispatchCommands();
 
@@ -319,13 +318,6 @@ void FontRenderer::UpdateDescriptorSets()
 	vkUpdateDescriptorSets(Device::Get()->GetVulkanDevice(), 1, &setWrites[0], 0, nullptr);
 }
 
-void FontRenderer::PopulateBuffers()
-{
-	ZoneScoped;
-	Device::Get()->PopulateBufferFromVector(vertices, fontVertexBuffers[currentIndex], fontIndexBufferMemories[currentIndex]);
-	Device::Get()->PopulateBufferFromVector(indices, fontIndexBuffers[currentIndex], fontIndexBufferMemories[currentIndex]);
-}
-
 void FontRenderer::DispatchCommands()
 {
 	ZoneScoped;
@@ -347,8 +339,10 @@ void FontRenderer::DispatchCommands()
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	Device::Get()->PopulateBufferFromVector(vertices, fontVertexBuffers[currentIndex], fontIndexBufferMemories[currentIndex], commandBuffer);
+	Device::Get()->PopulateBufferFromVector(indices, fontIndexBuffers[currentIndex], fontIndexBufferMemories[currentIndex], commandBuffer);
 
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
 	VkViewport viewport{};
