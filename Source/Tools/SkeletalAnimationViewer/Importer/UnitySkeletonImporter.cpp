@@ -14,7 +14,7 @@
 glm::vec2 ParsePosition(const std::string_view& positionString);
 float ParseRotation(const std::string_view& rotationString);
 
-void ParseBones(YAML& yaml, Skeleton& skeleton, glm::vec2 documentSize)
+void ParseBones(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo, glm::vec2 documentSize)
 {
 	YAML::Node& importer = yaml["ScriptedImporter"];
 
@@ -78,6 +78,7 @@ void ParseBones(YAML& yaml, Skeleton& skeleton, glm::vec2 documentSize)
 		bone.localRotation = ParseRotation(boneRotation);
 		bone.length = boneLength;
 
+		debugInfo.boneNameToIndex.insert({ (std::string)boneName, skeleton.bones.size() });
 		skeleton.bones.push_back(bone);
 
 		if (boneParentIndex != -1)
@@ -186,9 +187,10 @@ void ParseRig(YAML& yaml, Skeleton& skeleton)
 	}
 }
 
-Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
+std::pair<Skeleton, SkeletonDebugInfo> UnitySkeletonImporter::Import(const std::string& filepath)
 {
 	Skeleton skeleton;
+	SkeletonDebugInfo debugInfo;
 
 	std::filesystem::path path(filepath);
 	std::size_t size = std::filesystem::file_size(path);
@@ -214,7 +216,7 @@ Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 		YAML::Node* documentSizeNode = yaml.GetChild(&importer, "documentSize");
 		glm::vec2 documentSize = ParsePosition(documentSizeNode->GetString());
 
-		ParseBones(yaml, skeleton, documentSize);
+		ParseBones(yaml, skeleton, debugInfo, documentSize);
 		ParseRig(yaml, skeleton);
 	}
 	else
@@ -222,7 +224,7 @@ Skeleton UnitySkeletonImporter::Import(const std::string& filepath)
 		ErrorManager::Get()->ReportError(ErrorSeverity::Error, "UnitySkeletonImporter::Import", "SkeletalAnimationViewer", 0, "File could not be opened");
 	}
 
-	return skeleton;
+	return { skeleton, debugInfo };
 }
 
 glm::vec2 ParsePosition(const std::string_view& positionString)

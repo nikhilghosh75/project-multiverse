@@ -4,10 +4,13 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
+
+class SkeletonDebugInfo;
 
 class UnitySkeletonImporter
 {
 public:
-	static Skeleton Import(const std::string& filepath);
+	static std::pair<Skeleton, SkeletonDebugInfo> Import(const std::string& filepath);
 
 };

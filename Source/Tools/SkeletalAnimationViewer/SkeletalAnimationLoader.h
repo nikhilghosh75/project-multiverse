@@ -13,6 +13,12 @@
 
 ImVec2 GetTextureDimensions(Texture* texture);
 
+class SkeletonDebugInfo
+{
+public:
+	std::map<std::string, int> boneNameToIndex;
+};
+
 class LayerInfo
 {
 public:
@@ -40,6 +46,7 @@ public:
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile;
 
 	Skeleton skeleton;
+	SkeletonDebugInfo skeletonDebugInfo;
 private:
 	static SkeletalAnimationLoader* instance;
 };
