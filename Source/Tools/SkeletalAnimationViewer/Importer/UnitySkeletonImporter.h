@@ -11,6 +11,6 @@ class SkeletonDebugInfo;
 class UnitySkeletonImporter
 {
 public:
-	static std::pair<Skeleton, SkeletonDebugInfo> Import(const std::string& filepath);
+	static void Import(const std::string& filepath, Skeleton& skeleton, SkeletonDebugInfo& debugInfo);
 
 };

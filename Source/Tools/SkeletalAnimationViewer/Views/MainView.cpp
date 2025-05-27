@@ -243,7 +243,7 @@ void MainView::RenderVertices(int width, int height)
 	int halfHeight = height / 2;
 
 	// TODO: Switch to rendering the current image's vertices
-	LayerInfo& currentLayer = SkeletalAnimationLoader::Get()->layers["Staff/Staff"];
+	LayerInfo& currentLayer = SkeletalAnimationLoader::Get()->layers["Head/Face"];
 
 	VectorPainter painter(VERTEX_RENDER_ORDER);
 
@@ -253,7 +253,7 @@ void MainView::RenderVertices(int width, int height)
 
 	for (int i = 0; i < currentLayer.spriteVertices.size(); i++)
 	{
-		glm::vec2 vertexPosition = currentLayer.spriteVertices[i].position;
+		glm::vec2 vertexPosition = currentLayer.spriteVertices[i].position + glm::vec2(currentLayer.centerX - currentLayer.width * 0.5f, currentLayer.centerY + currentLayer.height * 0.5f);;
 
 		glm::vec2 vertexScreenPosition = glm::vec2(halfWidth + vertexPosition.x, halfHeight - vertexPosition.y);
 		vertexScreenPosition.x /= width;

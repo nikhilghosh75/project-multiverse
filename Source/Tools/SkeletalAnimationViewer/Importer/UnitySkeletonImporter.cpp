@@ -137,7 +137,7 @@ std::vector<SpriteVertex> ParseSpriteVertices(YAML yaml, YAML::Node* parent)
 	return spriteVertices;
 }
 
-void ParseRig(YAML& yaml, Skeleton& skeleton)
+void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 {
 	YAML::Node& importer = yaml["ScriptedImporter"];
 
@@ -146,12 +146,16 @@ void ParseRig(YAML& yaml, Skeleton& skeleton)
 	YAML::Node* rigSpriteSettings = yaml.GetChild(&importer, "rigSpriteImportData");
 
 	LayerInfo* layerInfo = nullptr;
+	
+	// Each layer has their own set of indices to refer to bones
+	std::vector<int> absoluteBoneIndicesOfLocalLayers;
 
 	int i = 0;
 
 	// Iterate over all the sprites
 	for (auto child = yaml.NodeChildren(rigSpriteSettings).begin(); child != yaml.NodeChildren(rigSpriteSettings).end(); ++child)
 	{
+		YAML::Node& node = *child;
 		std::string_view name = (*child).GetName();
 		if (name == "name")
 		{
@@ -166,32 +170,54 @@ void ParseRig(YAML& yaml, Skeleton& skeleton)
 				ErrorManager::Get()->ReportError(ErrorSeverity::Error, "UnitySkeletalAnimation::ParseRig", "SkeletalAnimationViewer", 0, "LayerInfo cannot be found");
 			}
 		}
+		else if (name == "spriteBone")
+		{
+			absoluteBoneIndicesOfLocalLayers.clear();
+
+			for (auto grandchild = yaml.NodeChildren(&(*child)).begin(); grandchild != yaml.NodeChildren(&(*child)).end(); ++grandchild)
+			{
+				std::string_view boneName = (*grandchild).GetString();
+				auto foundBoneIndex = debugInfo.boneNameToIndex.find((std::string)boneName);
+				if (foundBoneIndex != debugInfo.boneNameToIndex.end())
+				{
+					absoluteBoneIndicesOfLocalLayers.push_back((*foundBoneIndex).second);
+				}
+				else
+				{
+					absoluteBoneIndicesOfLocalLayers.push_back(-1);
+				}
+
+				++grandchild;
+				++grandchild;
+				++grandchild;
+				++grandchild;
+			}
+		}
 		else if (name == "vertices")
 		{
 			if (layerInfo != nullptr)
 			{
 				layerInfo->spriteVertices = ParseSpriteVertices(yaml, &(*child));
-			}
-		}
-		else if (name == "uvTransform")
-		{
-			if (layerInfo != nullptr)
-			{
-				glm::vec2 transform = ParsePosition((*child).GetString());
-				for (int j = 0; j < layerInfo->spriteVertices.size(); j++)
+
+				/*
+				for (SpriteVertex vertex : layerInfo->spriteVertices)
 				{
-					// layerInfo->spriteVertices[j].position += transform;
+					for (BoneWeight weight : vertex.weights)
+					{
+						if (weight.boneWeight > 0)
+						{
+							weight.boneIndex = absoluteBoneIndicesOfLocalLayers[weight.boneIndex];
+						}
+					}
 				}
+				*/
 			}
 		}
 	}
 }
 
-std::pair<Skeleton, SkeletonDebugInfo> UnitySkeletonImporter::Import(const std::string& filepath)
+void UnitySkeletonImporter::Import(const std::string& filepath, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 {
-	Skeleton skeleton;
-	SkeletonDebugInfo debugInfo;
-
 	std::filesystem::path path(filepath);
 	std::size_t size = std::filesystem::file_size(path);
 
@@ -217,14 +243,12 @@ std::pair<Skeleton, SkeletonDebugInfo> UnitySkeletonImporter::Import(const std::
 		glm::vec2 documentSize = ParsePosition(documentSizeNode->GetString());
 
 		ParseBones(yaml, skeleton, debugInfo, documentSize);
-		ParseRig(yaml, skeleton);
+		ParseRig(yaml, skeleton, debugInfo);
 	}
 	else
 	{
 		ErrorManager::Get()->ReportError(ErrorSeverity::Error, "UnitySkeletonImporter::Import", "SkeletalAnimationViewer", 0, "File could not be opened");
 	}
-
-	return { skeleton, debugInfo };
 }
 
 glm::vec2 ParsePosition(const std::string_view& positionString)
