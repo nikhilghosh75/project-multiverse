@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SkeletalSpriteRenderer.h"
+#include "SkeletalSprite.h"
 #include "Texture.h"
 
 #include "PhotoshopAPI/include/PhotoshopAPI.h"

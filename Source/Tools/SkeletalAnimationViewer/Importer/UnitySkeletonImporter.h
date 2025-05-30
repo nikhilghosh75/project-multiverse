@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SkeletalSpriteRenderer.h"
+#include "SkeletalSprite.h"
 
 #include <string>
 #include <string_view>

@@ -199,7 +199,6 @@ void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 			{
 				layerInfo->spriteVertices = ParseSpriteVertices(yaml, &(*child));
 
-				/*
 				for (SpriteVertex vertex : layerInfo->spriteVertices)
 				{
 					for (BoneWeight weight : vertex.weights)
@@ -210,7 +209,6 @@ void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 						}
 					}
 				}
-				*/
 			}
 		}
 	}
