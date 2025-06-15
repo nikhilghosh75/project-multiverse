@@ -148,6 +148,7 @@
     <ClCompile Include="Combat\Characters\CompanionCharacter.cpp" />
     <ClCompile Include="Combat\Characters\EnemyCharacter.cpp" />
     <ClCompile Include="Combat\Characters\PlayerCharacter.cpp" />
+    <ClCompile Include="Core\Localization\LocalizationSystem.cpp" />
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Map\EncounterGenerator.cpp" />
     <ClCompile Include="Temp\TempDefeatStage.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="Combat\Characters\CompanionCharacter.h" />
     <ClInclude Include="Combat\Characters\EnemyCharacter.h" />
     <ClInclude Include="Combat\Characters\PlayerCharacter.h" />
+    <ClInclude Include="Core\Localization\LocalizationSystem.h" />
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Map\EncounterGenerator.h" />
     <ClInclude Include="Temp\TempDefeatStage.h" />
