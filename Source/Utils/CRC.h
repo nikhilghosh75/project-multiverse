@@ -3,5 +3,5 @@
 
 namespace CRC
 {
-	static uint32_t Calculate(const void* data, size_t length);
+	uint32_t Calculate(const void* data, size_t length);
 };
