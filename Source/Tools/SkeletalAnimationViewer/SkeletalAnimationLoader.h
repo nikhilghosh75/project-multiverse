@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Rect.h"
+
 #include "SkeletalSprite.h"
 #include "Texture.h"
 
@@ -17,6 +19,7 @@ class SkeletonDebugInfo
 {
 public:
 	std::map<std::string, int> boneNameToIndex;
+	int indicesSize = 0;
 };
 
 class LayerInfo
@@ -28,8 +31,11 @@ public:
 	float centerY;
 	float width;
 	float height;
+	Rect uvRect;
 
 	std::vector<SpriteVertex> spriteVertices;
+	std::vector<int> indices;
+	void* originalLayer;
 };
 
 class SkeletalAnimationLoader
@@ -43,10 +49,14 @@ public:
 	std::optional<std::string> FindFullNameOfLayer(const std::string& name);
 
 	std::map<std::string, LayerInfo> layers;
+	Texture* texture;
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile;
 
 	Skeleton skeleton;
 	SkeletonDebugInfo skeletonDebugInfo;
+
 private:
+	void AddLayerToTexture(PhotoshopAPI::Layer<uint8_t>* layer, uint8_t* data, glm::vec2& currentPosition, float& currentRowHeight, float imageDimensions, Rect& uvRect);
+
 	static SkeletalAnimationLoader* instance;
 };
