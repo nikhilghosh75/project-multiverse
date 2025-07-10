@@ -139,6 +139,7 @@
     <ClCompile Include="DateTime.cpp" />
     <ClCompile Include="ErrorManager.cpp" />
     <ClCompile Include="FileUtils.cpp" />
+    <ClCompile Include="GeometryUtils.cpp" />
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="MatrixUtils.cpp" />
     <ClCompile Include="Quat.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="ErrorManager.h" />
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="FixedPoint.h" />
+    <ClInclude Include="GeometryUtils.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="MatrixUtils.h" />
     <ClInclude Include="Quat.h" />
