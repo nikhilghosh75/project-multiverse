@@ -62,6 +62,11 @@ void RenderPipeline::SetPolygonMode(VkPolygonMode mode)
     polygonMode = mode;
 }
 
+void RenderPipeline::SetFrontFace(bool _isCounterClockwise)
+{
+    isCounterClockwise = _isCounterClockwise;
+}
+
 void RenderPipeline::Create()
 {
     VkDevice vulkanDevice = Device::Get()->GetVulkanDevice();
@@ -121,7 +126,7 @@ void RenderPipeline::Create()
     rasterizer.polygonMode = polygonMode;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.frontFace = isCounterClockwise ? VK_FRONT_FACE_COUNTER_CLOCKWISE : VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
     // Setup multisampling (for antialiasing)
