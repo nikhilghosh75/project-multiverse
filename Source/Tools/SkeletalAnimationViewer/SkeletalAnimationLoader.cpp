@@ -1,6 +1,7 @@
 #include "SkeletalAnimationLoader.h"
 
 #include "MathUtils.h"
+#include "StringUtils.h"
 
 #include "backends/imgui_impl_vulkan.h"
 
@@ -45,14 +46,16 @@ void SkeletalAnimationLoader::RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer,
 
 	if (imageLayer != nullptr)
 	{
-		LayerInfo layerInfo;
-		layerInfo.centerX = imageLayer->m_CenterX;
-		layerInfo.centerY = imageLayer->m_CenterY;
-		layerInfo.width = imageLayer->m_Width;
-		layerInfo.height = imageLayer->m_Height;
-		layerInfo.originalLayer = imageLayer;
+		SkeletalSprite::Layer spriteLayer;
+		spriteLayer.name = path + layer->m_LayerName;
+		spriteLayer.center = glm::vec2(imageLayer->m_CenterX, imageLayer->m_CenterY);
+		spriteLayer.width = imageLayer->m_Width;
+		spriteLayer.height = imageLayer->m_Height;
 
-		layers.insert({ path + layer->m_LayerName, layerInfo });
+		String::FixNegativeChars(spriteLayer.name);
+		
+		sprite.layers.push_back(spriteLayer);
+		originalLayers.push_back(imageLayer);
 	}
 	else if (groupLayer != nullptr)
 	{
@@ -66,6 +69,7 @@ void SkeletalAnimationLoader::RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer,
 void SkeletalAnimationLoader::RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<uint8_t>* _layeredFile)
 {
 	layeredFile = _layeredFile;
+	sprite = SkeletalSprite();
 
 	for (int i = 0; i < layeredFile->m_Layers.size(); i++)
 	{
@@ -75,7 +79,7 @@ void SkeletalAnimationLoader::RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<ui
 	// Figure out the layers that are the largest
 	struct LayerDimensionsInfo
 	{
-		std::string layerName;
+		int layerIndex;
 		float area;
 	};
 
@@ -86,10 +90,11 @@ void SkeletalAnimationLoader::RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<ui
 
 	std::vector<LayerDimensionsInfo> dimensions;
 	float totalArea = 0;
-	for (auto it : layers)
+	for (int i = 0; i < sprite.layers.size(); i++)
 	{
-		dimensions.push_back({ it.first, it.second.width * it.second.height });
-		totalArea += it.second.width * it.second.height;
+		float area = sprite.layers[i].width * sprite.layers[i].height;
+		dimensions.push_back({ i, area});
+		totalArea += area;
 	}
 
 	int imageDimensions = ceilf(sqrtf(totalArea * 2.40f) / 128.f) * 128.f;
@@ -102,26 +107,28 @@ void SkeletalAnimationLoader::RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<ui
 
 	for (int i = 0; i < dimensions.size(); i++)
 	{
-		PhotoshopAPI::Layer<uint8_t>* layer = (PhotoshopAPI::Layer<uint8_t>*)layers[dimensions[i].layerName].originalLayer;
-		Rect& uvRect = layers[dimensions[i].layerName].uvRect;
+		PhotoshopAPI::Layer<uint8_t>* layer = (PhotoshopAPI::Layer<uint8_t>*)originalLayers[dimensions[i].layerIndex];
+		Rect& uvRect = sprite.layers[dimensions[i].layerIndex].uvRect;
 		AddLayerToTexture(layer, data, currentImagePosition, currentRowHeight, imageDimensions, uvRect);
 	}
 
-	texture = new Texture(data, imageDimensions, imageDimensions);
-	texture->TransitionLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	sprite.texture = new Texture(data, imageDimensions, imageDimensions);
+	sprite.texture->TransitionLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	
+	textureDescriptorSet = ImGui_ImplVulkan_AddTexture(sprite.texture->GetSampler(), sprite.texture->GetImageView(), sprite.texture->GetImageLayout());
 }
 
-std::optional<std::string> SkeletalAnimationLoader::FindFullNameOfLayer(const std::string& name)
+SkeletalSprite::Layer* SkeletalAnimationLoader::FindLayerOfName(std::string name)
 {
-	for (auto it : layers)
+	for (int i = 0; i < sprite.layers.size(); i++)
 	{
-		if (it.first.find(name) != std::string::npos)
+		if (sprite.layers[i].name.find(name) != std::string::npos || sprite.layers[i].name == name)
 		{
-			return it.first;
+			return &sprite.layers[i];
 		}
 	}
 
-	return std::nullopt;
+	return nullptr;
 }
 
 void SkeletalAnimationLoader::AddLayerToTexture(PhotoshopAPI::Layer<uint8_t>* layer, uint8_t* data, glm::vec2& currentPosition, float& currentRowHeight, float imageDimensions, Rect& uvRect)

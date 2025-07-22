@@ -46,14 +46,14 @@ public:
 	void RegisterLayer(PhotoshopAPI::Layer<uint8_t>* layer, std::string path);
 	void RegisterPhotoshopFile(PhotoshopAPI::LayeredFile<uint8_t>* layeredFile);
 
-	std::optional<std::string> FindFullNameOfLayer(const std::string& name);
+	SkeletalSprite::Layer* FindLayerOfName(std::string name);
 
-	std::map<std::string, LayerInfo> layers;
-	Texture* texture;
+	SkeletalSprite sprite;
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile;
 
-	Skeleton skeleton;
 	SkeletonDebugInfo skeletonDebugInfo;
+	std::vector<void*> originalLayers;
+	VkDescriptorSet textureDescriptorSet;
 
 private:
 	void AddLayerToTexture(PhotoshopAPI::Layer<uint8_t>* layer, uint8_t* data, glm::vec2& currentPosition, float& currentRowHeight, float imageDimensions, Rect& uvRect);
