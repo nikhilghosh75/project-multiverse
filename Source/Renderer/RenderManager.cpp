@@ -120,6 +120,7 @@ RenderManager::~RenderManager()
 	delete imageRenderer;
 	delete vectorRenderer;
 	delete debugRenderer;
+	delete skeletalSpriteRenderer;
 }
 
 void RenderManager::Setup()
@@ -127,6 +128,7 @@ void RenderManager::Setup()
 	debugRenderer = new DebugRenderer();
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
+	skeletalSpriteRenderer = new SkeletalSpriteRenderer();
 	vectorRenderer = new VectorRenderer();
 }
 
@@ -191,6 +193,12 @@ std::vector<RenderRequest*> RenderManager::GetRenderRequests()
 
 	std::vector<RenderRequest*> debugRequests = DebugRenderRequest::GetRequestsThisFrame();
 	for (RenderRequest* request : debugRequests)
+	{
+		requests.push_back(request);
+	}
+
+	std::vector<RenderRequest*> skeletalSpriteRequests = SkeletalSpriteRenderRequest::GetRequestsThisFrame();
+	for (RenderRequest* request : skeletalSpriteRequests)
 	{
 		requests.push_back(request);
 	}
