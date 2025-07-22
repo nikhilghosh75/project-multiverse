@@ -84,7 +84,6 @@ private:
 	void CreateDescriptorSets();
 
 	void UpdateDescriptorSets();
-	void PopulateBuffers();
 	void DispatchCommands();
 
 	static inline ImageRenderer* instance;

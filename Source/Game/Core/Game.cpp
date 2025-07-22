@@ -18,7 +18,6 @@ int main()
     Window window;
 
     RenderManager renderingManager;
-    renderingManager.Setup();
     std::thread renderingThread(RunRenderThread, &renderingManager);
 
     Time::Initialize();

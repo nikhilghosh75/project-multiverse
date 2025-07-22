@@ -9,7 +9,8 @@ enum class BuildState
 {
 	NotStarted,
 	InProgress,
-	Complete
+	Complete,
+	Failed
 };
 
 class BuildConfig
@@ -34,21 +35,30 @@ enum class FileBuildState
 	Failed
 };
 
+enum class NodeState
+{
+	NotStarted,
+	InProgress,
+	Succeeded,
+	Failed
+};
+
 class BuildGraphNode
 {
 public:
-	virtual void Start();
+	virtual void Start() = 0;
 	virtual void Update() = 0;
-	virtual bool IsDone() = 0;
+
+	virtual void Cancel() = 0;
 
 	virtual std::map<std::string, FileBuildState> GetFileStates() = 0;
 
-	bool HasStarted() { return hasStarted; }
+	NodeState GetState() inline const { return state; }
 
 	std::vector<BuildGraphNode*> children;
 
-private:
-	bool hasStarted;
+protected:
+	NodeState state = NodeState::NotStarted;
 };
 
 class BuildGraph
@@ -63,6 +73,8 @@ public:
 
 	void UpdateBuild();
 
+	void CancelBuild();
+
 	BuildState GetCurrentState();
 
 	std::map<std::string, FileBuildState> GetFileStates();
@@ -76,6 +88,7 @@ private:
 
 	void AddNodeToBuild();
 	bool IsBuildComplete();
+	bool DidBuildFail();
 
 	BuildState currentState;
 };

@@ -134,12 +134,31 @@ void BuildSystem::UpdateBuild()
 	{
 		buildGraph.UpdateBuild();
 
-		if (buildGraph.GetCurrentState() == BuildState::Complete)
+		BuildState state = buildGraph.GetCurrentState();
+		if (state == BuildState::Complete)
 		{
 			isBuildInProgress = false;
 			ReportBuild();
 		}
+		else if (state == BuildState::Failed)
+		{
+			isBuildInProgress = false;
+		}
 	}
+}
+
+void BuildSystem::CancelBuild()
+{
+	if (isBuildInProgress)
+	{
+		buildGraph.CancelBuild();
+		isBuildInProgress = false;
+	}
+}
+
+bool BuildSystem::IsBuildInProgress() const
+{
+	return isBuildInProgress;
 }
 
 std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, std::optional<std::string>& projectPath)

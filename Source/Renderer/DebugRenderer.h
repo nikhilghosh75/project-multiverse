@@ -61,7 +61,6 @@ private:
 	void CreateDescriptorSets();
 
 	void UpdateDescriptorSets();
-	void PopulateBuffers();
 	void DispatchCommands();
 
 	RenderPipeline pipeline;

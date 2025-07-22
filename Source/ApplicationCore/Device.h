@@ -94,7 +94,7 @@ public:
 	// Create a buffer from a vector (uploading the contents of the vector into the buffer's memory)
 	template<typename T> void CreateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory, VkBufferUsageFlags flags);
 
-	template<typename T> void PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory);
+	template<typename T> void PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory, VkCommandBuffer commandBuffer);
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
@@ -174,7 +174,7 @@ inline void Device::CreateBufferFromVector(const std::vector<T>& vector, VkBuffe
 }
 
 template<typename T>
-inline void Device::PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory)
+inline void Device::PopulateBufferFromVector(const std::vector<T>& vector, VkBuffer& buffer, VkDeviceMemory& memory, VkCommandBuffer commandBuffer)
 {
 	VkDeviceSize bufferSize = sizeof(vector[0]) * vector.size();
 
@@ -186,6 +186,9 @@ inline void Device::PopulateBufferFromVector(const std::vector<T>& vector, VkBuf
 	memcpy(data, vector.data(), (size_t)bufferSize);
 	vkUnmapMemory(vulkanDevice, stagingBufferMemory);
 
-	CopyBuffer(stagingBuffer, buffer, bufferSize);
+	VkBufferCopy copyRegion{};
+	copyRegion.size = bufferSize;
+	vkCmdCopyBuffer(commandBuffer, stagingBuffer, buffer, 1, &copyRegion);
 
+	currentStagingBufferIndex = (currentStagingBufferIndex + 1) % MAX_STAGING_BUFFERS;
 }

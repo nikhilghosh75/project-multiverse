@@ -12,19 +12,25 @@ CopyFolderGraphNode::CopyFolderGraphNode(const std::string& folderPath, const st
 
 void CopyFolderGraphNode::Start()
 {
-	BuildGraphNode::Start();
+	if (std::filesystem::exists(folderPath))
+	{
+		std::string resultFolderPath = buildFolderPath + "/" + folderPath;
+		std::filesystem::copy(folderPath, resultFolderPath, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
 
-	std::string resultFolderPath = buildFolderPath + "/" + folderPath;
-	std::filesystem::copy(folderPath, resultFolderPath, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+		state = NodeState::Succeeded;
+	}
+	else
+	{
+		state = NodeState::Failed;
+	}
 }
 
 void CopyFolderGraphNode::Update()
 {
 }
 
-bool CopyFolderGraphNode::IsDone()
+void CopyFolderGraphNode::Cancel()
 {
-	return HasStarted();
 }
 
 std::map<std::string, FileBuildState> CopyFolderGraphNode::GetFileStates()

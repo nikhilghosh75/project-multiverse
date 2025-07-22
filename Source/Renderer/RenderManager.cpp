@@ -111,7 +111,11 @@ void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFra
 
 RenderManager::RenderManager()
 {
-
+	debugRenderer = new DebugRenderer();
+	fontRenderer = new FontRenderer();
+	imageRenderer = new ImageRenderer();
+	vectorRenderer = new VectorRenderer();
+	skeletalSpriteRenderer = new SkeletalSpriteRenderer();
 }
 
 RenderManager::~RenderManager()
@@ -121,15 +125,6 @@ RenderManager::~RenderManager()
 	delete vectorRenderer;
 	delete debugRenderer;
 	delete skeletalSpriteRenderer;
-}
-
-void RenderManager::Setup()
-{	
-	debugRenderer = new DebugRenderer();
-	fontRenderer = new FontRenderer();
-	imageRenderer = new ImageRenderer();
-	skeletalSpriteRenderer = new SkeletalSpriteRenderer();
-	vectorRenderer = new VectorRenderer();
 }
 
 void RenderManager::StartFrame()

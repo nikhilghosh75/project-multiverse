@@ -8,6 +8,8 @@
 
 #include "RenderManager.h"
 
+#include "Symbol Search/SymbolSearch.h"
+
 int main()
 {
 	BuildUI buildUI;
@@ -18,7 +20,6 @@ int main()
 	device.Setup(Window::GetWindowHandle(), Device::Get());
 
 	RenderManager renderingManager;
-	renderingManager.Setup();
 
 	BuildSystem::Get()->Init();
 

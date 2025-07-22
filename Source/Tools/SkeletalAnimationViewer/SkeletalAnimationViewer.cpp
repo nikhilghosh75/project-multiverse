@@ -34,7 +34,6 @@ int main()
 	device.Setup(Window::GetWindowHandle(), Device::Get());
 
 	RenderManager renderingManager;
-	renderingManager.Setup();
 
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile = new PhotoshopAPI::LayeredFile<uint8_t>(file);
 	SkeletalAnimationLoader::Get()->RegisterPhotoshopFile(layeredFile);

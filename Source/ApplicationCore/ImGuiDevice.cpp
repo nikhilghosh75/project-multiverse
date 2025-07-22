@@ -65,10 +65,15 @@ void ImGuiDevice::EndFrame()
     renderPassInfo.framebuffer = Device::Get()->GetCurrentFramebuffer();
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = Device::Get()->GetCurrentExtent();
-    VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+    VkClearValue clearValue = {};
+    clearValue.color = { {0.0f, 0.0f, 0.0f, 1.0f} };  // Clear color (optional)
+
     renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearColor;
+    renderPassInfo.pClearValues = &clearValue;
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    ImGui::Render();
 
     // Record dear imgui primitives into command buffer
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);

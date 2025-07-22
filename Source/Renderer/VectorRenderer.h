@@ -110,10 +110,7 @@ private:
 	void CreateDescriptorSets();
 
 	void UpdateDescriptorSets();
-	void PopulateBuffers();
 	void DispatchCommands();
-
-	void Render();
 
 	bool IsValidPath(const VectorPainter::Path& path);
 

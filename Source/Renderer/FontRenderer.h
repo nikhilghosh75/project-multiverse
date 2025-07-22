@@ -84,7 +84,6 @@ private:
 	void CreateCommandBuffers();
 
 	void UpdateDescriptorSets();
-	void PopulateBuffers();
 	void DispatchCommands();
 
 	std::vector<FontVertex> vertices;

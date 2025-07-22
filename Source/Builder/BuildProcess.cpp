@@ -3,14 +3,37 @@
 #include <algorithm>
 #include <iostream>
 
+static int asyncPipeCount;
+
+void CreateAsyncPipe(HANDLE* outRead, HANDLE* outWrite)
+{
+    wchar_t pipeName[64] = { L'\0' };
+    swprintf(pipeName, L"\\\\.\\pipe\\buildprocess%i", asyncPipeCount);
+
+    asyncPipeCount++;
+
+    *outRead = CreateNamedPipeW(
+        pipeName,
+        PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+        PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+        2,
+        4096,
+        0,
+        0,
+        nullptr
+    );
+
+    SECURITY_ATTRIBUTES saAttr;
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.bInheritHandle = TRUE;
+    saAttr.lpSecurityDescriptor = NULL;
+    *outWrite = CreateFileW(pipeName, GENERIC_WRITE, 0, &saAttr, OPEN_EXISTING, 0, 0);
+}
+
 BuildProcess::BuildProcess(std::string commandLineArgs)
 {
-    SECURITY_ATTRIBUTES saAttr{};
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-    saAttr.bInheritHandle = TRUE; // Allow the child to inherit the handle
-    saAttr.lpSecurityDescriptor = nullptr;
-
-    CreatePipe(&hReadPipe, &hWritePipe, &saAttr, 0);
+    CreateAsyncPipe(&hReadPipe, &hWritePipe);
+    CreateAsyncPipe(&hReadErrorPipe, &hWriteErrorPipe);
 
     SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);
 
@@ -19,9 +42,9 @@ BuildProcess::BuildProcess(std::string commandLineArgs)
 	ZeroMemory(&si, sizeof(si));
 	ZeroMemory(&pi, sizeof(pi));
 	si.cb = sizeof(si);
-    si.hStdError = hWritePipe;
+    si.hStdError = hWriteErrorPipe;
     si.hStdOutput = hWritePipe;
-    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.dwFlags = STARTF_USESTDHANDLES;
 
     TCHAR* commandLineParam = new TCHAR[commandLineArgs.size() + 1];
     commandLineParam[commandLineArgs.size()] = 0;
@@ -33,16 +56,25 @@ BuildProcess::BuildProcess(std::string commandLineArgs)
         commandLineParam,        // Command line
         NULL,           // Process handle not inheritable
         NULL,           // Thread handle not inheritable
-        FALSE,          // Set handle inheritance to FALSE
+        TRUE,          // Set handle inheritance to TRUE
         0,              // No creation flags
         NULL,           // Use parent's environment block
         NULL,           // Use parent's starting directory 
         &si,            // Pointer to STARTUPINFO structure
         &pi);
 
-    if (success)
-    {
+    COMMTIMEOUTS timeouts;
+    timeouts.ReadIntervalTimeout = 0;
+    timeouts.ReadTotalTimeoutMultiplier = 0;
+    timeouts.ReadTotalTimeoutConstant = 3;
+    timeouts.WriteTotalTimeoutMultiplier = 0;
+    timeouts.WriteTotalTimeoutConstant = 0;
 
+    SetCommTimeouts(hReadPipe, &timeouts);
+
+    if (!success)
+    {
+        startupSucceeded = false;
     }
 }
 
@@ -58,6 +90,8 @@ BuildProcess::~BuildProcess()
     CloseHandle(pi.hThread);
     CloseHandle(hWritePipe);
     CloseHandle(hReadPipe);
+    CloseHandle(hWriteErrorPipe);
+    CloseHandle(hReadErrorPipe);
 }
 
 std::string BuildProcess::GetOutput() const
@@ -65,19 +99,43 @@ std::string BuildProcess::GetOutput() const
     return outputStream.str();
 }
 
+void BuildProcess::Terminate()
+{
+    if (startupSucceeded)
+    {
+        TerminateProcess(pi.hProcess, 137);
+    }
+}
+
 void BuildProcess::Update()
 {
-    char buffer[4096];
-    DWORD bytesRead;
-    if (ReadFile(hReadPipe, buffer, sizeof(buffer) - 1, &bytesRead, nullptr))
+    StillRunning();
+
+    DWORD bytesAvailable = 0;
+    if (!PeekNamedPipe(hReadPipe, nullptr, 0, nullptr, &bytesAvailable, nullptr)) 
     {
-        buffer[bytesRead] = '\0';
-        outputStream << buffer;
+        return;
+    }
+
+    if (bytesAvailable > 0) 
+    {
+        char buffer[4096];
+        DWORD bytesRead = 0;
+        if (ReadFile(hReadPipe, buffer, bytesAvailable, &bytesRead, nullptr)) 
+        {
+            buffer[bytesRead] = '\0';
+            outputStream << buffer; 
+        }
     }
 }
 
 bool BuildProcess::StillRunning()
 {
+    if (!startupSucceeded)
+    {
+        return false;
+    }
+
     DWORD exitCode = 0;
     GetExitCodeProcess(pi.hProcess, &exitCode);
 
@@ -93,4 +151,9 @@ bool BuildProcess::StillRunning()
     }
 
     return exitCode == STILL_ACTIVE;
+}
+
+bool BuildProcess::WasStartupSuccessful()
+{
+    return startupSucceeded;
 }

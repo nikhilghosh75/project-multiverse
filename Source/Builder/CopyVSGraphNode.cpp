@@ -10,8 +10,6 @@ CopyVSGraphNode::CopyVSGraphNode(const std::string& projectFilePath, const std::
 
 void CopyVSGraphNode::Start()
 {
-	BuildGraphNode::Start();
-
 	const std::string platform = "x64";
 	const std::string config = "Release";
 
@@ -22,19 +20,29 @@ void CopyVSGraphNode::Start()
 	std::string exeFilepath = platform + "/" + config + "/" + exeName + ".exe";
 	std::string resultFilepath = buildFolderPath + "/" + exeName + ".exe";
 
-	std::filesystem::copy_file(exeFilepath, resultFilepath, std::filesystem::copy_options::overwrite_existing);
+	if (std::filesystem::exists(exeFilepath))
+	{
+		std::filesystem::copy_file(exeFilepath, resultFilepath, std::filesystem::copy_options::overwrite_existing);
+		state = NodeState::Succeeded;
+	}
+	else
+	{
+		state = NodeState::Failed;
+	}
 }
 
 void CopyVSGraphNode::Update()
 {
 }
 
-bool CopyVSGraphNode::IsDone()
+void CopyVSGraphNode::Cancel()
 {
-	return HasStarted();
 }
 
 std::map<std::string, FileBuildState> CopyVSGraphNode::GetFileStates()
 {
-	return { {projectFilePath, HasStarted() ? FileBuildState::Succeeded : FileBuildState::NotStarted } };
+	FileBuildState fileState = state == NodeState::NotStarted ? FileBuildState::NotStarted : 
+		(state == NodeState::Succeeded ? FileBuildState::Succeeded : FileBuildState::Failed);
+
+	return { {projectFilePath, fileState } };
 }

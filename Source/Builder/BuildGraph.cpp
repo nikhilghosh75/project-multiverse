@@ -48,7 +48,8 @@ void BuildGraph::UpdateBuild()
 
 	for (auto it = nodesInProgress.begin(); it != nodesInProgress.end(); ++it)
 	{
-		if ((*it)->IsDone())
+		NodeState state = (*it)->GetState();
+		if (state == NodeState::Succeeded || state == NodeState::Failed)
 		{
 			nodesInProgress.erase(it);
 			break;
@@ -65,6 +66,33 @@ void BuildGraph::UpdateBuild()
 	if (IsBuildComplete())
 	{
 		currentState = BuildState::Complete;
+	}
+
+	if (DidBuildFail())
+	{
+		currentState = BuildState::Failed;
+	}
+}
+
+void BuildGraph::CancelBuild()
+{
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		if (node->GetState() == NodeState::InProgress)
+		{
+			node->Cancel();
+		}
+
+		nodesToSearch.pop_back();
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			nodesToSearch.push_back(node->children[i]);
+		}
 	}
 }
 
@@ -111,7 +139,7 @@ void BuildGraph::AddNodeToBuild()
 {
 	std::vector<BuildGraphNode*> nodesToSearch;
 
-	if (rootNode->IsDone())
+	if (rootNode->GetState() == NodeState::Succeeded)
 	{
 		nodesToSearch.push_back(rootNode);
 	}
@@ -119,7 +147,7 @@ void BuildGraph::AddNodeToBuild()
 	while (nodesToSearch.size() > 0)
 	{
 		BuildGraphNode* node = nodesToSearch.back();
-		if (!node->HasStarted() && !node->IsDone())
+		if (node->GetState() == NodeState::NotStarted)
 		{
 			node->Start();
 			nodesInProgress.push_back(node);
@@ -128,7 +156,7 @@ void BuildGraph::AddNodeToBuild()
 
 		nodesToSearch.pop_back();
 
-		if (node->IsDone())
+		if (node->GetState() == NodeState::Succeeded)
 		{
 			for (int i = 0; i < node->children.size(); i++)
 			{
@@ -147,7 +175,7 @@ bool BuildGraph::IsBuildComplete()
 	while (nodesToSearch.size() > 0)
 	{
 		BuildGraphNode* node = nodesToSearch.back();
-		if (node->HasStarted() && !node->IsDone())
+		if (node->GetState() == NodeState::InProgress)
 		{
 			isAnyNodeNotDone = true;
 		}
@@ -163,7 +191,28 @@ bool BuildGraph::IsBuildComplete()
 	return !isAnyNodeNotDone;
 }
 
-void BuildGraphNode::Start()
+bool BuildGraph::DidBuildFail()
 {
-	hasStarted = true;
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+	bool didAnyNodeFail = false;
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		if (node->GetState() == NodeState::Failed)
+		{
+			didAnyNodeFail = true;
+		}
+
+		nodesToSearch.pop_back();
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			nodesToSearch.push_back(node->children[i]);
+		}
+	}
+
+	return didAnyNodeFail;
 }
+

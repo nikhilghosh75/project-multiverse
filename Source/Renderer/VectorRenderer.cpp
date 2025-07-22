@@ -208,7 +208,6 @@ void VectorRenderer::RenderSimpleVectorRequest(SimpleVectorRenderRequest* reques
 	}
 
 	UpdateDescriptorSets();
-	PopulateBuffers();
 	DispatchCommands();
 
 	vertices.clear();
@@ -306,12 +305,6 @@ void VectorRenderer::UpdateDescriptorSets()
 	
 }
 
-void VectorRenderer::PopulateBuffers()
-{
-	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex]);
-	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
-}
-
 void VectorRenderer::DispatchCommands()
 {
 	VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
@@ -332,8 +325,30 @@ void VectorRenderer::DispatchCommands()
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
 
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex], commandBuffer);
+	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex], commandBuffer);
+	
+	VkBufferMemoryBarrier barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.buffer = vertexBuffers[currentIndex];
+	barrier.offset = 0;
+	barrier.size = VK_WHOLE_SIZE;
 
+	vkCmdPipelineBarrier(
+		commandBuffer,
+		VK_PIPELINE_STAGE_TRANSFER_BIT,         // srcStageMask
+		VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,     // dstStageMask
+		0,
+		0, nullptr,                             // No memory barriers
+		1, &barrier,                            // One buffer memory barrier
+		0, nullptr                              // No image barriers
+	);
+
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipeline());
 
 	VkViewport viewport{};
@@ -356,7 +371,6 @@ void VectorRenderer::DispatchCommands()
 
 	vkCmdBindIndexBuffer(commandBuffer, indexBuffers[currentIndex], 0, VK_INDEX_TYPE_UINT16);
 
-	// VkDescriptorSet& descriptorSet = descriptorSets[Device::GetFrameNumber() % MAX_FRAMES_IN_FLIGHT];
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.GetPipelineLayout(), 0, 1, &descriptorSet, 0, nullptr);
 
 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
