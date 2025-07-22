@@ -52,7 +52,7 @@ void CompanionCharacter::Render()
 
 	ImageRenderingOptions options;
 	options.keepAspectRatio = true;
-	ImageRenderer::Get()->AddImage(texture, rect, options);
+	ImageRenderer::Get()->AddImage(texture, rect, CHARACTER_ORDER, options);
 }
 
 void CompanionCharacter::OnTurnStart(CombatStage* stage)

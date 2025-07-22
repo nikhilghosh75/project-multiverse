@@ -139,8 +139,13 @@
     <ClCompile Include="DateTime.cpp" />
     <ClCompile Include="ErrorManager.cpp" />
     <ClCompile Include="FileUtils.cpp" />
+    <ClCompile Include="GeometryUtils.cpp" />
     <ClCompile Include="MathUtils.cpp" />
+    <ClCompile Include="MatrixUtils.cpp" />
+    <ClCompile Include="Quat.cpp" />
     <ClCompile Include="Rect.cpp" />
+    <ClCompile Include="StringUtils.cpp" />
+    <ClCompile Include="YAMLParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssertUtils.h" />
@@ -153,8 +158,13 @@
     <ClInclude Include="ErrorManager.h" />
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="FixedPoint.h" />
+    <ClInclude Include="GeometryUtils.h" />
     <ClInclude Include="MathUtils.h" />
+    <ClInclude Include="MatrixUtils.h" />
+    <ClInclude Include="Quat.h" />
     <ClInclude Include="Rect.h" />
+    <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="YAMLParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

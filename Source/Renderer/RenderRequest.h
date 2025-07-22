@@ -12,4 +12,5 @@ public:
 
 	bool isActive = false; // Does the request have data that is actively used
 	bool isProcessing = false; // Is the request being processed by the RenderingManager
+	float renderingOrder = 0.f;
 };

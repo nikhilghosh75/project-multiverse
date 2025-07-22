@@ -18,6 +18,7 @@ public:
 	void SetColorBlendingEnabled(bool enabled);
 	void SetTopology(VkPrimitiveTopology topology);
 	void SetPolygonMode(VkPolygonMode mode);
+	void SetFrontFace(bool isCounterClockwise);
 
 	void Create();
 
@@ -48,6 +49,8 @@ private:
 	bool colorBlendingEnabled = false;
 
 	bool hasDescriptorLayout = false;
+
+	bool isCounterClockwise = false;
 
 	VkPrimitiveTopology primitiveTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;

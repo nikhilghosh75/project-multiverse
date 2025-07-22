@@ -8,6 +8,9 @@
 std::array<DebugRenderRequest, DebugRenderRequest::MAX_DEBUG_REQUESTS> DebugRenderRequest::requests;
 std::mutex DebugRenderRequest::requestsMutex;
 
+// Debug Render Requests should only render on top of everything else
+static const float DEBUG_RENDER_SORTING_ORDER = 100000.f;
+
 bool DebugRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
 	if (const DebugRenderRequest* otherDebugRequest = dynamic_cast<const DebugRenderRequest*>(other))
@@ -52,6 +55,7 @@ DebugRenderRequest* DebugRenderRequest::CreateRequest()
 		{
 			requests[i].isActive = false;
 			requests[i].rects.reserve(DEFAULT_RECTS_RESERVE_SIZE);
+			requests[i].renderingOrder = DEBUG_RENDER_SORTING_ORDER;
 		}
 		requestsArrayInitialized = true;
 	}

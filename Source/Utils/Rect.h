@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 // Bottom is bigger than the top
 class Rect
 {
@@ -15,8 +17,13 @@ public:
 	float Width() const;
 	float Height() const;
 
+	float CenterX() const;
+	float CenterY() const;
+
 	void ResizeFromCenter(float newWidth, float newHeight);
 
 	bool IsPointInside(float x, float y);
+
+	static Rect GetBoundingRect(const std::vector<Rect>& rects);
 };
 

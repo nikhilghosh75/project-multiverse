@@ -4,13 +4,14 @@
 
 #include "DateTime.h"
 
-#include <chrono>
+#include <algorithm>
 #include <iostream>
 #include <thread>
 
 #include "tracy/Tracy.hpp"
 
 void MarkRenderRequestsAsProcessing(std::vector<RenderRequest*>& requestsLastFrame);
+void SortRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
 void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
 void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame);
 
@@ -37,6 +38,7 @@ void RunRenderThread(RenderManager* manager)
 		if (Device::Get()->shouldRenderFrame)
 		{
 			int requestsBeforeCombining = requestsLastFrame.size();
+			SortRenderRequests(requestsLastFrame);
 			CombineRenderRequests(requestsLastFrame);
 			int requestsAfterCombining = requestsLastFrame.size();
 
@@ -53,6 +55,12 @@ void RunRenderThread(RenderManager* manager)
 		manager->EndFrame();
 		manager->isFinishedRenderingFrame = true;
 	}
+}
+
+void SortRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
+{
+	ZoneScoped;
+	std::sort(requestsLastFrame.begin(), requestsLastFrame.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
 }
 
 void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
@@ -107,6 +115,7 @@ RenderManager::RenderManager()
 	fontRenderer = new FontRenderer();
 	imageRenderer = new ImageRenderer();
 	vectorRenderer = new VectorRenderer();
+	skeletalSpriteRenderer = new SkeletalSpriteRenderer();
 }
 
 RenderManager::~RenderManager()
@@ -115,6 +124,7 @@ RenderManager::~RenderManager()
 	delete imageRenderer;
 	delete vectorRenderer;
 	delete debugRenderer;
+	delete skeletalSpriteRenderer;
 }
 
 void RenderManager::StartFrame()
@@ -178,6 +188,12 @@ std::vector<RenderRequest*> RenderManager::GetRenderRequests()
 
 	std::vector<RenderRequest*> debugRequests = DebugRenderRequest::GetRequestsThisFrame();
 	for (RenderRequest* request : debugRequests)
+	{
+		requests.push_back(request);
+	}
+
+	std::vector<RenderRequest*> skeletalSpriteRequests = SkeletalSpriteRenderRequest::GetRequestsThisFrame();
+	for (RenderRequest* request : skeletalSpriteRequests)
 	{
 		requests.push_back(request);
 	}

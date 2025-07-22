@@ -2,6 +2,7 @@
 #include "DebugRenderer.h"
 #include "FontRenderer.h"
 #include "ImageRenderer.h"
+#include "SkeletalSpriteRenderer.h"
 #include "VectorRenderer.h"
 
 class RenderManager
@@ -23,6 +24,8 @@ private:
 	DebugRenderer* debugRenderer;
 	FontRenderer* fontRenderer;
 	ImageRenderer* imageRenderer;
+	SkeletalSpriteRenderer* skeletalSpriteRenderer;
 	VectorRenderer* vectorRenderer;
 };
+
 void RunRenderThread(RenderManager* manager);

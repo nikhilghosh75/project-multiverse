@@ -1,5 +1,6 @@
 #include "SkeletalAnimationLoader.h"
 #include "SkeletalAnimationTab.h"
+#include "Importer/UnitySkeletonImporter.h"
 #include "Views/LayerHierarchyView.h"
 #include "Views/MainView.h"
 
@@ -37,6 +38,8 @@ int main()
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile = new PhotoshopAPI::LayeredFile<uint8_t>(file);
 	SkeletalAnimationLoader::Get()->RegisterPhotoshopFile(layeredFile);
 
+	std::string tempPath = "C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta";
+	UnitySkeletonImporter::Import(tempPath, SkeletalAnimationLoader::Get()->sprite.skeleton, SkeletalAnimationLoader::Get()->skeletonDebugInfo);
 
 	SkeletalAnimationTabSystem::Get()->AddTab(new MainView());
 	SkeletalAnimationTabSystem::Get()->AddTab(new LayerHierarchyView());

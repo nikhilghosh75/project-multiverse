@@ -138,7 +138,7 @@ FontRenderer* FontRenderer::Get()
 	return instance;
 }
 
-void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
+void FontRenderer::AddText(std::string text, glm::vec2 position, float renderingOrder, int fontSize)
 {
 	ASSERT(defaultFont != nullptr);
 
@@ -147,6 +147,7 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, int fontSize)
 
 	FontRenderRequest* request = FontRenderRequest::CreateRequest();
 	request->texts.push_back({ text, position, fontSize });
+	request->renderingOrder = renderingOrder;
 }
 
 void FontRenderer::RenderFontRequest(FontRenderRequest* request)

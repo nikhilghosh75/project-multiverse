@@ -55,7 +55,7 @@ public:
 
 	static ImageRenderer* Get();
 
-	ImageRenderingResult AddImage(Texture* texture, Rect rect, ImageRenderingOptions options = defaultOptions);
+	ImageRenderingResult AddImage(Texture* texture, Rect rect, float renderingOrder, ImageRenderingOptions options = defaultOptions);
 
 	void RenderImageRequest(ImageRenderRequest* request);
 

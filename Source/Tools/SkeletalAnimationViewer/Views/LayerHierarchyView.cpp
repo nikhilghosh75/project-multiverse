@@ -14,11 +14,11 @@ void LayerHierarchyView::Render()
 	PhotoshopAPI::LayeredFile<uint8_t>* layeredFile = SkeletalAnimationLoader::Get()->layeredFile;
 	for (int i = 0; i < layeredFile->m_Layers.size(); i++)
 	{
-		RenderHierarchy(layeredFile->m_Layers[i].get());
+		RenderHierarchy(layeredFile->m_Layers[i].get(), "");
 	}
 }
 
-void LayerHierarchyView::RenderHierarchy(PhotoshopAPI::Layer<uint8_t>* layer)
+void LayerHierarchyView::RenderHierarchy(PhotoshopAPI::Layer<uint8_t>* layer, std::string path)
 {
 	PhotoshopAPI::GroupLayer<uint8_t>* groupLayer = dynamic_cast<PhotoshopAPI::GroupLayer<uint8_t>*>(layer);
 
@@ -34,23 +34,14 @@ void LayerHierarchyView::RenderHierarchy(PhotoshopAPI::Layer<uint8_t>* layer)
 		bool nodeOpen = ImGui::TreeNodeEx(layer->m_LayerName.c_str(), flags);
 		if (ImGui::IsItemClicked() && currentLayer != layer->m_LayerName)
 		{
-			if (imageView != nullptr)
-			{
-				SkeletalAnimationTabSystem::Get()->RemoveTab(imageView);
-				delete imageView;
-			}
-
-			currentLayer = layer->m_LayerName;
-			imageView = new LayerImageView(currentLayer);
-			imageView->onTabClose = [this]() { this->imageView = nullptr; };
-			SkeletalAnimationTabSystem::Get()->AddTab(imageView);
+			currentLayer = path + layer->m_LayerName;
 		}
 
 		if (nodeOpen)
 		{
 			for (int i = 0; i < groupLayer->m_Layers.size(); i++)
 			{
-				RenderHierarchy(groupLayer->m_Layers[i].get());
+				RenderHierarchy(groupLayer->m_Layers[i].get(), path + layer->m_LayerName + "/");
 			}
 			ImGui::TreePop();
 		}
@@ -68,7 +59,7 @@ void LayerHierarchyView::RenderHierarchy(PhotoshopAPI::Layer<uint8_t>* layer)
 				delete imageView;
 			}
 
-			currentLayer = layer->m_LayerName;
+			currentLayer = path + layer->m_LayerName;
 			imageView = new LayerImageView(currentLayer);
 			imageView->onTabClose = [this]() { this->imageView = nullptr; this->currentLayer = "UNUSED"; };
 			SkeletalAnimationTabSystem::Get()->AddTab(imageView);

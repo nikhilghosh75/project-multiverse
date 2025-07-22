@@ -15,5 +15,5 @@ public:
 	std::string currentLayer = "UNUSED";
 	LayerImageView* imageView = nullptr;
 private:
-	void RenderHierarchy(PhotoshopAPI::Layer<uint8_t>* layer);
+	void RenderHierarchy(PhotoshopAPI::Layer<uint8_t>* layer, std::string path);
 };

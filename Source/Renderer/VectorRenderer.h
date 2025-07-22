@@ -11,8 +11,8 @@
 class VectorPainter
 {
 public:
-	VectorPainter();
-	VectorPainter(ScreenSpace space);
+	VectorPainter(float renderOrder);
+	VectorPainter(float renderOrder, ScreenSpace space);
 
 	void SetFillColor(Color color);
 
@@ -51,6 +51,7 @@ private:
 	std::vector<Path> paths;
 
 	Color currentColor;
+	float renderOrder;
 };
 
 class SimpleVectorRenderRequest : public RenderRequest

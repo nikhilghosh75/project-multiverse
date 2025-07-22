@@ -70,6 +70,9 @@ public:
 protected:
 	virtual void SetFromJsonData(const rapidjson::Document& data);
 
+	// TODO: Change when we support more than 2 enemies
+	static inline const float CHARACTER_ORDER = 30.f;
+
 	int maxHealth;
 	int health;
 	int actionPoints;
