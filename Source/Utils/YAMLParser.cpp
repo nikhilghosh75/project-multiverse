@@ -1,5 +1,7 @@
 #include "YAMLParser.h"
 
+#include "ErrorManager.h"
+
 #include <charconv>
 
 std::string_view YAML::Node::GetName() const
@@ -211,12 +213,16 @@ void YAML::Populate(char* buffer, size_t size)
 
 	std::vector<int> currentNodeStackIndices;
 
+	int lines = 0;
+
 	size_t i = 0;
 	while (i < size)
 	{
 		switch (parseState)
 		{
 		case LineParseState::StartOfLine:
+			lines++;
+
 			indentation = 0;
 			nameStartIndex = 0;
 			nameEndIndex = 0;
@@ -234,7 +240,7 @@ void YAML::Populate(char* buffer, size_t size)
 			break;
 		case LineParseState::Name:
 			nameStartIndex = i;
-			while (buffer[i] != ':' && buffer[i] != '-' && buffer[i] != '\n')
+			while (buffer[i] != ':' && buffer[i] != '-' && buffer[i] != '\n' && buffer[i] != '{')
 			{
 				i++;
 			}
@@ -244,7 +250,7 @@ void YAML::Populate(char* buffer, size_t size)
 				i++;
 				parseState = LineParseState::StartOfLine;
 			}
-			else if (buffer[i] == '-')
+			else if (buffer[i] == '-' || buffer[i] == '{')
 			{
 				// If this happens, we have an anonymous node, so we leave the name blank
 				nameStartIndex = i;
@@ -256,9 +262,14 @@ void YAML::Populate(char* buffer, size_t size)
 				nameEndIndex = i;
 				parseState = LineParseState::BetweenValue;
 			}
+			else
+			{
+				ErrorManager::Get()->ReportError(ErrorSeverity::Warning, "YAMLParser::Populate", "Utils", buffer[i], "YAML Parser found a character in the name it could not understand");
+				parseState = LineParseState::StartOfLine;
+			}
 			break;
 		case LineParseState::BetweenValue:
-			while (!std::isalnum(buffer[i]) && buffer[i] != '\n' && buffer[i] != '-')
+			while (!std::isalnum(buffer[i]) && buffer[i] != '\n' && buffer[i] != '-' && buffer[i] != '{' && buffer[i] != '<')
 			{
 				i++;
 			}
