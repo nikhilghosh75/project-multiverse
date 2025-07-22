@@ -4,12 +4,15 @@
 
 #include "AssertUtils.h"
 #include "ErrorManager.h"
+#include "GeometryUtils.h"
 #include "Quat.h"
+#include "StringUtils.h"
 #include "YAMLParser.h"
 
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include <unordered_set>
 
 glm::vec2 ParsePosition(const std::string_view& positionString);
 float ParseRotation(const std::string_view& rotationString);
@@ -137,6 +140,190 @@ std::vector<SpriteVertex> ParseSpriteVertices(YAML yaml, YAML::Node* parent)
 	return spriteVertices;
 }
 
+void CalculateUVPositions(SkeletalSprite::Layer* layerInfo, std::vector<SpriteVertex>& vertices, float textureWidth, float textureHeight)
+{
+	for (SpriteVertex& vertex : vertices)
+	{
+		float x = (layerInfo->uvRect.left * textureWidth + vertex.position).x / textureWidth;
+		float y = (layerInfo->uvRect.bottom * textureHeight - vertex.position).y / textureHeight;
+		vertex.uv = glm::vec2(x, y);
+	}
+}
+
+using Edge = std::pair<int, int>;
+
+std::vector<Edge> ParseEdges(YAML yaml, YAML::Node* parent)
+{
+	std::vector<Edge> edges;
+
+	for (auto child = yaml.NodeChildren(parent).begin(); child != yaml.NodeChildren(parent).end(); ++child)
+	{
+		std::regex regex(R"(x:\s*([0-9]*),\s*y:\s*([0-9]*))");
+		std::smatch match;
+
+		std::string str = std::string((*child).GetString());
+		if (std::regex_search(str, match, regex) && match.size() == 3) 
+		{
+			edges.push_back({ atoi(match[1].str().c_str()), atoi(match[2].str().c_str()) });
+		}
+	}
+
+	return edges;
+}
+
+std::vector<int> ParseIndices(YAML yaml, YAML::Node* node)
+{
+	std::vector<int> indices;
+
+	std::string_view str = node->GetString();
+
+	for (int i = 0; i + 7 < str.size(); i += 8)
+	{
+		uint8_t b0, b1, b2, b3; 
+		std::from_chars(str.data() + i + 0, str.data() + i + 2, b0, 16);
+		std::from_chars(str.data() + i + 2, str.data() + i + 4, b1, 16);
+		std::from_chars(str.data() + i + 4, str.data() + i + 6, b2, 16);
+		std::from_chars(str.data() + i + 6, str.data() + i + 8, b3, 16);
+
+		uint32_t value = value = (b0) | (b1 << 8) | (b2 << 16) | (b3 << 24);
+		indices.push_back(value);
+	}
+
+	return indices;
+}
+
+std::vector<std::array<int, 3>> TriangulateLoop(const std::vector<int>& loop, const std::vector<SpriteVertex>& vertices)
+{
+	std::vector<std::array<int, 3>> result;
+	std::vector<int> polygon = loop;
+
+	while (polygon.size() >= 3) 
+	{
+		bool ear_found = false;
+		for (size_t i = 0; i < polygon.size(); ++i) 
+		{
+			int previousIndex = polygon[(i + polygon.size() - 1) % polygon.size()];
+			int currentIndex = polygon[i];
+			int nextIndex = polygon[(i + 1) % polygon.size()];
+
+			glm::vec2 p0 = vertices[previousIndex].position;
+			glm::vec2 p1 = vertices[currentIndex].position;
+			glm::vec2 p2 = vertices[nextIndex].position;
+
+			if (!Geometry::DoesCornerBendOutwards(p0, p1, p2))
+			{
+				continue;
+			}
+
+			// Check no other point is inside this triangle
+			bool containsOther = false;
+			for (int j = 0; j < polygon.size(); ++j) 
+			{
+				if (j == previousIndex || j == currentIndex || j == nextIndex)
+				{
+					continue;
+				}
+
+				if (Geometry::IsPointInTriangle(vertices[polygon[j]].position, p0, p1, p2)) 
+				{
+					containsOther = true;
+					break;
+				}
+			}
+
+			if (containsOther)
+			{
+				continue;
+			}
+
+			// We found an ear
+			result.push_back({ previousIndex, currentIndex, nextIndex });
+			polygon.erase(polygon.begin() + i);
+			ear_found = true;
+			break;
+		}
+
+		if (!ear_found) 
+		{
+			// Bad polygon (e.g. it might be self-intersecting)
+			break;
+		}
+	}
+
+	return result;
+}
+
+std::vector<std::vector<int>> ExtractLoopsFromEdges(std::vector<Edge>& edges)
+{
+	// We create a undirected adjacency list
+	std::unordered_map<int, std::vector<int>> adjacency;
+	for (const Edge& edge : edges) 
+	{
+		adjacency[edge.first].push_back(edge.second);
+		adjacency[edge.second].push_back(edge.first); 
+	}
+
+	std::unordered_set<int> visitedNodes;
+	std::vector<std::vector<int>> loops;
+
+	for (const auto& [start, neighbors] : adjacency) 
+	{
+		if (visitedNodes.find(start) != visitedNodes.end())
+		{
+			continue;
+		}
+
+		std::vector<int> loop;
+		int current = start;
+		int previous = -1;
+
+		while (true) 
+		{
+			loop.push_back(current);
+			visitedNodes.insert(current);
+
+			const std::vector<int>& neighbors = adjacency[current];
+			int next = -1;
+
+			for (int neighbor : neighbors) 
+			{
+				if (neighbor != previous) 
+				{
+					next = neighbor;
+					break;
+				}
+			}
+
+			if (next == -1 || next == start)
+			{
+				break;
+			}
+
+			previous = current;
+			current = next;
+
+			if (visitedNodes.count(current))
+			{
+				break;
+			}
+		}
+
+		// If there's a duplicate closing vertex, remove it
+		if (loop.size() >= 3 && loop.front() == loop.back())
+		{
+			loop.pop_back();
+		}
+
+		if (loop.size() >= 3)
+		{
+			loops.push_back(loop);
+		}
+	}
+
+	return loops;
+}
+
+
 void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 {
 	YAML::Node& importer = yaml["ScriptedImporter"];
@@ -144,30 +331,86 @@ void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 	// Get Rig Data
 	YAML::Node* spriteSettings = yaml.GetChild(&importer, "spriteImportData");
 	YAML::Node* rigSpriteSettings = yaml.GetChild(&importer, "rigSpriteImportData");
+	YAML::Node* rigPSDLayersNode = yaml.GetChild(&importer, "rigPSDLayers");
 
-	LayerInfo* layerInfo = nullptr;
+	SkeletalSprite::Layer* layerInfo = nullptr;
 	
 	// Each layer has their own set of indices to refer to bones
 	std::vector<int> absoluteBoneIndicesOfLocalLayers;
 
-	int i = 0;
+	float textureWidth = SkeletalAnimationLoader::Get()->sprite.texture->GetTextureWidth();
+	float textureHeight = SkeletalAnimationLoader::Get()->sprite.texture->GetTextureHeight();
+	
+	// Some layers will have the same name but different parent, so we want to differentiate them.
+	struct RigPSDLayer
+	{
+		std::string_view layerName;
+		std::string_view spriteName;
+		int parentIndex;
+		std::string fullName;
+	};
+	std::vector<RigPSDLayer> rigPSDLayers;
+
+	for (auto child = yaml.NodeChildren(rigPSDLayersNode).begin(); child != yaml.NodeChildren(rigPSDLayersNode).end(); ++child)
+	{
+		std::string_view layerName = (*child).GetString();
+		++child;
+
+		std::string_view spriteName = (*child).GetString();
+		++child;
+		++child;
+
+		int parentIndex = (*child).GetInt();
+		++child;
+		++child;
+		++child;
+
+		int currentParentIndex = parentIndex;
+		std::string fullName = (std::string)layerName;
+		String::ReplaceAll(fullName, '_', ' ');
+		String::ReplaceAll(fullName, "\\", "");
+		if (fullName[fullName.size() - 1] == '\"')
+		{
+			fullName.pop_back();
+		}
+
+		int i = 0;
+		while (currentParentIndex != -1 && i < 10)
+		{
+			fullName = (std::string)rigPSDLayers[currentParentIndex].layerName + "/" + fullName;
+			currentParentIndex = rigPSDLayers[currentParentIndex].parentIndex;
+			i++;
+		}
+
+		rigPSDLayers.push_back({ layerName, spriteName, parentIndex, fullName });
+	}
 
 	// Iterate over all the sprites
 	for (auto child = yaml.NodeChildren(rigSpriteSettings).begin(); child != yaml.NodeChildren(rigSpriteSettings).end(); ++child)
 	{
-		YAML::Node& node = *child;
 		std::string_view name = (*child).GetName();
 		if (name == "name")
 		{
 			std::string layerName = (std::string)(*child).GetString();
-			std::optional<std::string> fullLayerName = SkeletalAnimationLoader::Get()->FindFullNameOfLayer(layerName);
-			if (fullLayerName)
+
+			// layerInfo = SkeletalAnimationLoader::Get()->FindLayerOfName(layerName);
+			// if (layerInfo == nullptr)
 			{
-				layerInfo = &(SkeletalAnimationLoader::Get()->layers[*fullLayerName]);
-			}
-			else
-			{
-				ErrorManager::Get()->ReportError(ErrorSeverity::Error, "UnitySkeletalAnimation::ParseRig", "SkeletalAnimationViewer", 0, "LayerInfo cannot be found");
+				// This layer has a similar name as another node
+				// Use the rigPSDLayers vector to find it
+				for (int i = 0; i < rigPSDLayers.size(); i++)
+				{
+					if (rigPSDLayers[i].spriteName == layerName)
+					{
+						layerInfo = SkeletalAnimationLoader::Get()->FindLayerOfName(rigPSDLayers[i].fullName);
+						break;
+					}
+				}
+
+				if (layerInfo == nullptr)
+				{
+					ErrorManager::Get()->ReportError(ErrorSeverity::Error, "UnitySkeletalAnimation::ParseRig", "SkeletalAnimationViewer", 0, "LayerInfo cannot be found");
+				}
 			}
 		}
 		else if (name == "spriteBone")
@@ -197,9 +440,10 @@ void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 		{
 			if (layerInfo != nullptr)
 			{
-				layerInfo->spriteVertices = ParseSpriteVertices(yaml, &(*child));
+				layerInfo->vertices = ParseSpriteVertices(yaml, &(*child));
+				CalculateUVPositions(layerInfo, layerInfo->vertices, textureWidth, textureHeight);
 
-				for (SpriteVertex vertex : layerInfo->spriteVertices)
+				for (SpriteVertex vertex : layerInfo->vertices)
 				{
 					for (BoneWeight weight : vertex.weights)
 					{
@@ -208,6 +452,31 @@ void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 							weight.boneIndex = absoluteBoneIndicesOfLocalLayers[weight.boneIndex];
 						}
 					}
+				}
+			}
+		}
+		else if (name == "indices")
+		{
+			if (layerInfo != nullptr)
+			{
+				layerInfo->indices = ParseIndices(yaml, &(*child));
+				debugInfo.indicesSize += layerInfo->indices.size();
+			}
+		}
+		else if (name == "edges")
+		{
+			if (layerInfo != nullptr)
+			{
+				std::vector<Edge> edges = ParseEdges(yaml, &(*child));
+
+				// Triangulate those edges
+				std::vector<std::vector<int>> loops = ExtractLoopsFromEdges(edges);
+				std::vector<std::array<int, 3>> triangles;
+
+				for (std::vector<int>& loop : loops)
+				{
+					std::vector<std::array<int, 3>> loopTriangles = TriangulateLoop(loop, layerInfo->vertices);
+					triangles.insert(triangles.end(), loopTriangles.begin(), loopTriangles.end());
 				}
 			}
 		}
