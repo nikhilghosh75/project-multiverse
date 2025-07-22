@@ -40,7 +40,7 @@ int main()
 	SkeletalAnimationLoader::Get()->RegisterPhotoshopFile(layeredFile);
 
 	std::string tempPath = "C:/Users/debgh/OneDrive/Documents/Unity Projects/Dreamwillow/Assets/Art/Characters/Player/PlayerHorizSprite.psb.meta";
-	UnitySkeletonImporter::Import(tempPath, SkeletalAnimationLoader::Get()->skeleton, SkeletalAnimationLoader::Get()->skeletonDebugInfo);
+	UnitySkeletonImporter::Import(tempPath, SkeletalAnimationLoader::Get()->sprite.skeleton, SkeletalAnimationLoader::Get()->skeletonDebugInfo);
 
 	SkeletalAnimationTabSystem::Get()->AddTab(new MainView());
 	SkeletalAnimationTabSystem::Get()->AddTab(new LayerHierarchyView());

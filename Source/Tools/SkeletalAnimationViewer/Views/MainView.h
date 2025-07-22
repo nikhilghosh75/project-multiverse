@@ -18,6 +18,7 @@ public:
 	void Render() override;
 
 private:
+	void RenderEntireTexture(int width, int height);
 	void RenderSprites(int width, int height);
 	void RenderBones(int width, int height);
 	void RenderVertices(int width, int height);

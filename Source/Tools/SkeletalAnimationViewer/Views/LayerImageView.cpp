@@ -11,13 +11,12 @@ LayerImageView::LayerImageView(std::string _layerName)
 
 void LayerImageView::Render()
 {
-	auto foundLayer = SkeletalAnimationLoader::Get()->layers.find(layerName);
-	if (foundLayer == SkeletalAnimationLoader::Get()->layers.end())
+	auto foundLayer = SkeletalAnimationLoader::Get()->FindLayerOfName(layerName);
+	if (foundLayer == nullptr)
 	{
 		return;
 	}
 
-	LayerInfo& currentLayerInfo = (*foundLayer).second;
-
-	ImGui::Image((ImTextureID)currentLayerInfo.descriptorSet, GetTextureDimensions(currentLayerInfo.texture));
+	Texture* texture = SkeletalAnimationLoader::Get()->sprite.texture;
+	ImGui::Image(SkeletalAnimationLoader::Get()->textureDescriptorSet, ImVec2(texture->GetTextureWidth(), texture->GetTextureHeight()), ImVec2(foundLayer->uvRect.left, foundLayer->uvRect.bottom), ImVec2(foundLayer->uvRect.right, foundLayer->uvRect.top));
 }

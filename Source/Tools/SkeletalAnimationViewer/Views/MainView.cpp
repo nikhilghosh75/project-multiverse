@@ -5,6 +5,7 @@
 #include "Rect.h"
 
 #include "ImageRenderer.h"
+#include "SkeletalSpriteRenderer.h"
 #include "VectorRenderer.h"
 
 #include <algorithm>
@@ -173,8 +174,9 @@ void MainView::Render()
 	Device::Get()->SetOverrideRenderPass(renderPass);
 
 	RenderSprites(width, height);
-	RenderBones(width, height);
-	RenderVertices(width, height);
+	// RenderEntireTexture(width, height);
+	// RenderBones(width, height);
+	// RenderVertices(width, height);
 
 	SubmitRenderRequests();
 
@@ -186,6 +188,12 @@ void MainView::Render()
 	ImGui::Image(offscreenImguiTextures[currentImageIndex], ImVec2(400, 400));
 }
 
+void MainView::RenderEntireTexture(int width, int height)
+{
+	Texture* texture = SkeletalAnimationLoader::Get()->sprite.texture;
+	ImageRenderer::Get()->AddImage(texture, Rect(-0.9, 0.9, -0.9, 0.9), 10);
+}
+
 void MainView::RenderSprites(int width, int height)
 {
 	int halfWidth = width / 2;
@@ -193,23 +201,15 @@ void MainView::RenderSprites(int width, int height)
 
 	// Render all of the images in the file one at a time
 	int index = 0;
-	for (auto& layer : SkeletalAnimationLoader::Get()->layers)
-	{
-		float layerHalfWidth = layer.second.width * 0.5f;
-		float layerHalfHeight = layer.second.height * 0.5f;
+	std::vector<SkeletalSprite::Layer>& layers = SkeletalAnimationLoader::Get()->sprite.layers;
 
-		Rect rect(halfHeight + layer.second.centerY - layerHalfHeight, halfHeight + layer.second.centerY + layerHalfHeight,
-			halfWidth + layer.second.centerX - layerHalfWidth, halfWidth + layer.second.centerX + layerHalfWidth);
+	SkeletalSpriteRenderer::Get()->AddSkeletalSprite(SkeletalAnimationLoader::Get()->sprite, ScreenCoordinate(glm::vec2(0, 0), glm::vec2(0.1, 0.1)), 1.5f);
 
-		rect.top /= height;
-		rect.bottom /= height;
-		rect.left /= width;
-		rect.right /= width;
+	VectorPainter painter(10, ScreenSpace::Rendering);
+	painter.SetFillColor(Color(0.f, 1.f, 0.f, 1.f));
+	painter.DrawRegularPolygon(glm::vec2(0.1f, 0.1f), 6, 0.01f);
 
-		ImageRenderer::Get()->AddImage(layer.second.texture, rect, index);
-
-		index--;
-	}
+	VectorRenderer::Get()->SubmitPainter(painter);
 }
 
 void MainView::RenderBones(int width, int height)
@@ -221,7 +221,7 @@ void MainView::RenderBones(int width, int height)
 
 	painter.SetFillColor(Color(0.0f, 1.0f, 0.0f, 1.0f));
 
-	std::vector<Bone>& bones = SkeletalAnimationLoader::Get()->skeleton.bones;
+	std::vector<Bone>& bones = SkeletalAnimationLoader::Get()->sprite.skeleton.bones;
 	for (int i = 0; i < bones.size(); i++)
 	{
 		glm::vec2 bonePosition = bones[i].GetAbsolutePosition();
@@ -239,34 +239,7 @@ void MainView::RenderBones(int width, int height)
 
 void MainView::RenderVertices(int width, int height)
 {
-	int halfWidth = width / 2;
-	int halfHeight = height / 2;
-
 	// TODO: Switch to rendering the current image's vertices
-	LayerInfo& currentLayer = SkeletalAnimationLoader::Get()->layers["Head/Face"];
-
-	VectorPainter painter(VERTEX_RENDER_ORDER);
-
-	painter.SetFillColor(Color(0.5f, 1.0f, 0.0f, 1.f));
-
-	// painter.BeginPath();
-
-	for (int i = 0; i < currentLayer.spriteVertices.size(); i++)
-	{
-		glm::vec2 vertexPosition = currentLayer.spriteVertices[i].position + glm::vec2(currentLayer.centerX - currentLayer.width * 0.5f, currentLayer.centerY + currentLayer.height * 0.5f);;
-
-		glm::vec2 vertexScreenPosition = glm::vec2(halfWidth + vertexPosition.x, halfHeight - vertexPosition.y);
-		vertexScreenPosition.x /= width;
-		vertexScreenPosition.y /= height;
-
-		std::cout << "(" << vertexScreenPosition.x << ", " << vertexScreenPosition.y << ")" << std::endl;
-
-		painter.DrawRegularPolygon(vertexScreenPosition, 4, 0.0025);
-	}
-
-	// painter.ClosePath();
-
-	VectorRenderer::Get()->SubmitPainter(painter);
 }
 
 void MainView::SubmitRenderRequests()
@@ -291,5 +264,16 @@ void MainView::SubmitRenderRequests()
 		vectorRenderRequests[i]->isActive = false;
 		vectorRenderRequests[i]->isProcessing = false;
 		vectorRenderRequests[i]->Clean();
+	}
+
+	std::vector<RenderRequest*> skeletalSpriteRenderRequest = SkeletalSpriteRenderRequest::GetRequestsThisFrame();
+	std::sort(skeletalSpriteRenderRequest.begin(), skeletalSpriteRenderRequest.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
+
+	for (int i = 0; i < skeletalSpriteRenderRequest.size(); i++)
+	{
+		skeletalSpriteRenderRequest[i]->Render();
+		skeletalSpriteRenderRequest[i]->isActive = false;
+		skeletalSpriteRenderRequest[i]->isProcessing = false;
+		skeletalSpriteRenderRequest[i]->Clean();
 	}
 }
