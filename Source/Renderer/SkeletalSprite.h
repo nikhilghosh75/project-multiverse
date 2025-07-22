@@ -2,6 +2,8 @@
 
 #include "Texture.h"
 
+#include "Rect.h"
+
 #include "glm/mat4x4.hpp"
 
 #include <array>
@@ -41,16 +43,28 @@ public:
 	Skeleton();
 
 	std::vector<Bone> bones;
-	std::vector<SpriteVertex> vertices;
 };
 
 class SkeletalSprite
 {
 public:
+	SkeletalSprite();
+
 	struct Layer
 	{
 		std::string name;
-		Texture* texture;
 		std::vector<SpriteVertex> vertices;
+		std::vector<int> indices;
+
+		Rect uvRect;
+
+		// Relative to ?
+		glm::vec2 center;
+		float width;
+		float height;
 	};
+
+	std::vector<Layer> layers;
+	Skeleton skeleton;
+	Texture* texture;
 };

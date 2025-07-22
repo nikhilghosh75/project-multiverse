@@ -33,3 +33,8 @@ float Bone::GetAbsoluteRotation() const
 Skeleton::Skeleton()
 {
 }
+
+SkeletalSprite::SkeletalSprite()
+{
+    texture = nullptr;
+}
