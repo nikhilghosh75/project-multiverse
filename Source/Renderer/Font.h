@@ -11,6 +11,9 @@ struct FontLoadingOptions
 	int pixelHeight;
 };
 
+/*
+* Fonts are just vectors of Characters and a texture
+*/
 class Font
 {
 public:

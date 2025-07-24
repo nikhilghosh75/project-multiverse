@@ -18,7 +18,7 @@ const float spaceSpacingFactor = 12.0f;
 
 bool FontRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
-	// TODO: Add font merging
+	// Right now, we only merge requests with the same font
 	if (const FontRenderRequest* otherFont = dynamic_cast<const FontRenderRequest*>(other))
 	{
 		if (otherFont->font != font)
@@ -148,6 +148,9 @@ void FontRenderer::AddText(std::string text, glm::vec2 position, float rendering
 	FontRenderRequest* request = FontRenderRequest::CreateRequest();
 	request->texts.push_back({ text, position, fontSize });
 	request->renderingOrder = renderingOrder;
+
+	// TODO: Allow suggestions to override default font
+	request->font = defaultFont;
 }
 
 void FontRenderer::RenderFontRequest(FontRenderRequest* request)

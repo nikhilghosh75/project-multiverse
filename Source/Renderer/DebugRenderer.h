@@ -9,6 +9,10 @@
 #include <mutex>
 #include <vector>
 
+/*
+* Renders Debug Rectangles to the screen (traditionally green)
+*/
+
 class DebugRenderRequest : public RenderRequest
 {
 public:

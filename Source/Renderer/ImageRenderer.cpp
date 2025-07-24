@@ -22,6 +22,7 @@ ImageRenderingOptions::ImageRenderingOptions()
     keepAspectRatio = false;
 }
 
+// TODO: Add functionality to combine Image Render Requests
 bool ImageRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
     return false;
@@ -134,6 +135,7 @@ void ImageRenderer::SetTexture(Texture* texture)
 
 void ImageRenderer::PopulateWithRect(Rect rect)
 {
+    // Note that this assumes only one rect is ever present, so no need to change the index buffer
     ZoneScoped;
 
     glm::vec2 bottomLeft = glm::vec2(rect.left, rect.bottom);

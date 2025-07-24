@@ -13,6 +13,7 @@ static const float DEBUG_RENDER_SORTING_ORDER = 100000.f;
 
 bool DebugRenderRequest::CanBeCombined(const RenderRequest* other) const
 {
+	// All debug requests can be combined since they just render rectangles
 	if (const DebugRenderRequest* otherDebugRequest = dynamic_cast<const DebugRenderRequest*>(other))
 	{
 		return true;
