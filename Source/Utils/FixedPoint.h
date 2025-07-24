@@ -2,6 +2,9 @@
 
 #include <cstdint>
 
+/*
+* Exists primarily for TTF file parsing
+*/
 template <typename T, int DecimalBytes>
 class FixedPoint
 {

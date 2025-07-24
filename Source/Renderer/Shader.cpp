@@ -5,6 +5,7 @@
 
 Shader::Shader(const std::string& fileName, VkDevice device)
 {
+    // This is expected to be the SPIR-V compiled shader code
     std::ifstream file(fileName, std::ios::ate | std::ios::binary);
     size = (uint32_t)file.tellg();
     data = (char*)malloc((size_t)size);

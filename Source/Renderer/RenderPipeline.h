@@ -3,6 +3,9 @@
 #include "vulkan/vulkan.h"
 #include "Shader.h"
 
+/*
+* An Abstraction over a VkRenderPipeline to simplify the code of the renderer
+*/
 class RenderPipeline
 {
 public:

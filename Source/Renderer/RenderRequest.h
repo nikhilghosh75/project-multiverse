@@ -1,5 +1,8 @@
 #pragma once
 
+/*
+* Render Requests are not dynamically instantiated. They are a base class for all render request
+*/
 class RenderRequest
 {
 public:

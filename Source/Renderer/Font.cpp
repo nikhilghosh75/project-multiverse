@@ -3,6 +3,7 @@
 #include "TTFRasterizer.h"
 
 #include "ErrorManager.h"
+#include "FileUtils.h"
 #include "MathUtils.h"
 
 #include <array>
@@ -10,17 +11,15 @@
 #include <filesystem>
 #include <iostream>
 
-#define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
-
-#include <ft2build.h>
-#include FT_FREETYPE_H 
-
-static FT_Library library;
-static bool libraryInitialized = false;
-
 Font::Font(const std::string& filepath, FontLoadingOptions options)
+	: defaultSize(options.pixelHeight), isInitialized(false), texture(nullptr)
 {
+	// Reads only from TTF file
+	if (File::HasExtension(filepath, "ttf"))
+	{
+		ErrorManager::Get()->ReportError(ErrorSeverity::Error, "Font::Font", "Renderer", 0, "Font File is not TTF File");
+	}
+
 	std::filesystem::path path(filepath);
 	std::size_t size = std::filesystem::file_size(path);
 
@@ -31,7 +30,6 @@ Font::Font(const std::string& filepath, FontLoadingOptions options)
 	if (file.read(buffer.data(), size))
 	{
 		TTFRasterizer::ReadFromTTFBuffer(buffer.data(), buffer.size(), *this, options);
-		defaultSize = options.pixelHeight;
 		isInitialized = true;
 	}
 }

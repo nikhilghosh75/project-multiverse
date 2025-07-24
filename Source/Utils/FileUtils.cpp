@@ -21,3 +21,21 @@ void File::EnforceBackwardSlash(std::string& path)
 		}
 	}
 }
+
+bool File::HasExtension(const std::string& path, const std::string& ext)
+{
+	if (ext.size() > path.size())
+	{
+		return false;
+	}
+
+	for (int i = 1; i <= ext.size(); i++)
+	{
+		if (path[path.size() - i] != ext[ext.size() - i])
+		{
+			return false;
+		}
+	}
+
+	return path[path.size() - ext.size() - 1] == '.';
+}

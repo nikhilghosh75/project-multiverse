@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include <stdint.h>
 
+// Stored internally as 0-255
 class Color
 {
 public:
@@ -14,6 +15,7 @@ public:
 	uint8_t b;
 	uint8_t a;
 
+	// Converts to a [0-1] range
 	operator glm::vec4() const;
 };
 

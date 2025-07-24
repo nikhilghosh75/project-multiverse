@@ -15,6 +15,7 @@ Texture::Texture()
 
 Texture::Texture(const std::string& filepath)
 {
+	// Load the texture directly from a png file
 	int _textureWidth, _textureHeight, _textureChannels;
 	stbi_uc* pixels = stbi_load(filepath.c_str(), &_textureWidth, &_textureHeight, &_textureChannels, STBI_rgb_alpha);
 
@@ -29,21 +30,16 @@ Texture::Texture(const std::string& filepath)
 }
 
 Texture::Texture(void* data, uint32_t _width, uint32_t _height)
+	: textureWidth(_width), textureHeight(_height), textureChannels(4)
 {
-	textureWidth = _width;
-	textureHeight = _height;
-	textureChannels = 4;
-
+	// Create the texture from the given data
 	SetupVulkanTexture(reinterpret_cast<unsigned char*>(data));
 	isInitialized = true;
 }
 
 Texture::Texture(void* data, uint32_t _width, uint32_t _height, uint8_t _channels)
+	: textureWidth(_width), textureHeight(_height), textureChannels(_channels)
 {
-	textureWidth = _width;
-	textureHeight = _height;
-	textureChannels = _channels;
-
 	SetupVulkanTexture(reinterpret_cast<unsigned char*>(data));
 	isInitialized = true;
 }

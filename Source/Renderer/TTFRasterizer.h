@@ -45,7 +45,7 @@ private:
 		uint32_t unicodeCharacter;
 	};
 
-	static std::unordered_map<std::string, size_t> ReadTableLocation(BinaryBufferStream& bs);
+	static std::unordered_map<std::string, size_t> ReadTableLocations(BinaryBufferStream& bs);
 
 	static int GetIdealBitmapResolution(int numCharacters);
 	static std::vector<uint32_t> GetAllGlyphLocations(BinaryBufferStream& fs, uint32_t glyphCount, int numOfBytesPerLookup, uint32_t glyphTableLocation);

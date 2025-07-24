@@ -2,6 +2,7 @@
 #include <vulkan/vulkan.h>
 #include <string>
 
+// All textures default to Linear
 enum TextureFilter : uint8_t
 {
 	Linear,

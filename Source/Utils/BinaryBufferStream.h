@@ -3,6 +3,9 @@
 #include "FixedPoint.h"
 #include "FileUtils.h"
 
+/*
+* A class that exists for when a buffer is already loaded but we want to go through it like a filestream
+*/
 class BinaryBufferStream
 {
 public:

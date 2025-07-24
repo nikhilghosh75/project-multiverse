@@ -78,6 +78,9 @@ private:
 	static inline int lastIndex = 0;
 };
 
+/*
+* Renders Simple, singular colored vector shapes and objects
+*/
 class VectorRenderer
 {
 public:

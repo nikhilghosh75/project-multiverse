@@ -31,6 +31,7 @@ void RunRenderThread(RenderManager* manager)
 		std::vector<RenderRequest*> requestsLastFrame = manager->GetRenderRequests();
 		MarkRenderRequestsAsProcessing(requestsLastFrame);
 
+		// Don't let the game loop start adding more requests until we get all of the requests
 		manager->StartFrame();
 		manager->canStartRenderingFrame = false;
 		manager->isFinishedRenderingFrame = false;
@@ -42,6 +43,7 @@ void RunRenderThread(RenderManager* manager)
 			CombineRenderRequests(requestsLastFrame);
 			int requestsAfterCombining = requestsLastFrame.size();
 
+			// TODO: Make a better way to enable/disable debugging
 			std::cout << requestsBeforeCombining << " before, " << requestsAfterCombining << " after" << std::endl;
 
 			for (int i = 0; i < requestsLastFrame.size(); i++)
@@ -59,6 +61,7 @@ void RunRenderThread(RenderManager* manager)
 
 void SortRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 {
+	// For now, render requests are only sorted by order, and not by type
 	ZoneScoped;
 	std::sort(requestsLastFrame.begin(), requestsLastFrame.end(), [](RenderRequest* r1, RenderRequest* r2) { return r1->renderingOrder < r2->renderingOrder; });
 }
@@ -91,6 +94,7 @@ void CombineRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 
 void FreeRenderRequests(std::vector<RenderRequest*>& requestsLastFrame)
 {
+	// Render Requests are not dynamically allocated (stored by the renderers), so they need to be set as inactive
 	ZoneScoped;
 	for (RenderRequest* request : requestsLastFrame)
 	{
@@ -131,6 +135,7 @@ void RenderManager::StartFrame()
 {
 	ZoneScoped;
 
+	// Clear the swapchain image
 	Device::Get()->TransitionImageLayout(
 		Device::Get()->GetCurrentSwapChainImage(),
 		Device::Get()->GetSwapChainFormat(),
@@ -166,6 +171,7 @@ void RenderManager::EndFrame()
 
 std::vector<RenderRequest*> RenderManager::GetRenderRequests()
 {
+	// Since we only have a few renderers, it's easier to just call them manually
 	std::vector<RenderRequest*> requests;
 
 	std::vector<RenderRequest*> imageRequests = ImageRenderRequest::GetRequestsThisFrame();
