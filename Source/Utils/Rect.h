@@ -2,7 +2,10 @@
 
 #include <vector>
 
-// Bottom is bigger than the top
+/*
+* A class representing a rectangle
+* Because this code primarily works in rendering space, the bottom value is always bigger than the top
+*/
 class Rect
 {
 public:

@@ -23,4 +23,6 @@ namespace File
 	void EnforceForwardSlash(std::string& path);
 
 	void EnforceBackwardSlash(std::string& path);
+
+	bool HasExtension(const std::string& path, const std::string& ext);
 }

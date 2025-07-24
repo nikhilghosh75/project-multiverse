@@ -2,6 +2,7 @@
 
 bool Geometry::DoesCornerBendOutwards(glm::vec2 previousVertex, glm::vec2 currentVertex, const glm::vec2& nextVertex)
 {
+    // Assumed counter-clockwise polygon unwinding
 	return glm::cross(glm::vec3(nextVertex - currentVertex, 0), glm::vec3(previousVertex - currentVertex, 0)).z < 0;
 }
 

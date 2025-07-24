@@ -2,6 +2,9 @@
 #include <cstdint>
 #include <string>
 
+/*
+* Represents the time
+*/
 class DateTime
 {
 public:
