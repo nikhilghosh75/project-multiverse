@@ -12,7 +12,7 @@ void TTFRasterizer::ReadFromTTFBuffer(void* data, uint32_t size, Font& font, Fon
 {
 	BinaryBufferStream bs(data, size, FileFlags::BigEndian);
 
-	std::unordered_map<std::string, size_t> offsetTables = ReadTableLocation(bs);
+	std::unordered_map<std::string, size_t> offsetTables = ReadTableLocations(bs);
 
 	// Head table
 	bs.GoTo(offsetTables["head"]);
@@ -51,7 +51,7 @@ void TTFRasterizer::ReadFromTTFBuffer(void* data, uint32_t size, Font& font, Fon
 	font.texture = new Texture(textureData.data(), textureDimensions, textureDimensions, 1);
 }
 
-std::unordered_map<std::string, size_t> TTFRasterizer::ReadTableLocation(BinaryBufferStream& bs)
+std::unordered_map<std::string, size_t> TTFRasterizer::ReadTableLocations(BinaryBufferStream& bs)
 {
 	std::unordered_map<std::string, size_t> table;
 

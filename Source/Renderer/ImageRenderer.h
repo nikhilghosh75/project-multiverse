@@ -11,6 +11,7 @@ class ImageRenderingOptions
 public:
 	ImageRenderingOptions();
 
+	// Should the render scale down the image based on the aspect ratio
 	bool keepAspectRatio;
 };
 
@@ -45,6 +46,10 @@ private:
 	static inline int lastIndex = 0;
 };
 
+/*
+* Renders a single full texture to the screen
+* Will eventually support batch rendering to reduce draw calls
+*/
 class ImageRenderer
 {
 	static inline ImageRenderingOptions defaultOptions;

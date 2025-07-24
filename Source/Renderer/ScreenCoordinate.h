@@ -33,7 +33,10 @@ public:
 	glm::vec2 relativePosition; // In pixels
 	glm::vec2 anchor; // Relative to screen space
 
+	// The position in pixels
 	glm::vec2 GetAbsolutePosition() const;
+
+	// The position in [0, 1]
 	glm::vec2 GetScreenPosition() const;
 
 	static Rect CreateRect(ScreenCoordinate position, glm::vec2 dimensions, glm::vec2 pivot);

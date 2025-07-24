@@ -5,6 +5,9 @@
 #include "SkeletalSpriteRenderer.h"
 #include "VectorRenderer.h"
 
+/*
+* It is expected at every project that renders to the screen creates a RenderManager
+*/
 class RenderManager
 {
 public:
