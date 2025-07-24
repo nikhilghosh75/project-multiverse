@@ -15,7 +15,7 @@ const size_t LINE_SIZE = 1024;
 const uint8_t CURRENT_VERSION = 1;
 
 const size_t HEADER_SIZE = 40;
-const int RESERVED_WORDS = 128;
+const int RESERVED_WORDS = 128; // Codes 0-RESERVED_WORDS are reserved for specific macros
 
 struct LocalizationHeader
 {
@@ -93,6 +93,7 @@ int main(int argc, char** argv)
 			}
 		}
 
+		// If line doesn't have an equals sign, skip it
 		if (equalsIndex == 0)
 		{
 			continue;
@@ -153,6 +154,7 @@ int main(int argc, char** argv)
 		std::memset(line, 0, LINE_SIZE);
 	}
 
+	// We add padding between the words and entries to ensure the ensures always start on a multiple of 4
 	uint8_t wordsPadding = currentWordPosition % 4 == 0 ? 0 : 4 - (currentWordPosition % 4);
 
 	LocalizationHeader header;
