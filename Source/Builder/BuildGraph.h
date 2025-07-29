@@ -2,6 +2,7 @@
 
 #include <map>
 #include <optional>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -53,9 +54,12 @@ public:
 
 	virtual std::map<std::string, FileBuildState> GetFileStates() = 0;
 
+	std::string GetCurrentFile();
+
 	NodeState GetState() inline const { return state; }
 
 	std::vector<BuildGraphNode*> children;
+	uint32_t id;
 
 protected:
 	NodeState state = NodeState::NotStarted;
@@ -75,6 +79,8 @@ public:
 
 	void CancelBuild();
 
+	BuildGraphNode* GetNodeById(uint32_t id);
+
 	BuildState GetCurrentState();
 
 	std::map<std::string, FileBuildState> GetFileStates();
@@ -87,8 +93,11 @@ private:
 	std::vector<BuildGraphNode*> nodesInProgress;
 
 	void AddNodeToBuild();
+	void StartNode(BuildGraphNode* node);
 	bool IsBuildComplete();
 	bool DidBuildFail();
+	
+	void AssignNodeIDs();
 
 	BuildState currentState;
 };

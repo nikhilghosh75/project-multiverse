@@ -1,5 +1,7 @@
 #include "BuildProcess.h"
 
+#include "BuildSystem.h"
+
 #include <algorithm>
 #include <iostream>
 
@@ -31,6 +33,7 @@ void CreateAsyncPipe(HANDLE* outRead, HANDLE* outWrite)
 }
 
 BuildProcess::BuildProcess(std::string commandLineArgs)
+    : exitValue(0)
 {
     CreateAsyncPipe(&hReadPipe, &hWritePipe);
     CreateAsyncPipe(&hReadErrorPipe, &hWriteErrorPipe);
@@ -72,16 +75,32 @@ BuildProcess::BuildProcess(std::string commandLineArgs)
 
     SetCommTimeouts(hReadPipe, &timeouts);
 
+    BuildSystem::Get()->output << "Calling command line for node " << nodeId << ": " << commandLineArgs << "\n";
+
     if (!success)
     {
         startupSucceeded = false;
+        BuildSystem::Get()->output << "Command failed" << std::endl;
     }
+}
+
+BuildProcess::BuildProcess(std::string commandLineArgs, uint32_t _nodeId)
+    : BuildProcess(commandLineArgs)
+{
+    nodeId = _nodeId;
 }
 
 BuildProcess::BuildProcess(std::string commandLineArgs, std::function<void(BuildProcess&, uint32_t)> callback)
     : BuildProcess(commandLineArgs)
 {
     endOfProcessCallback = callback;
+}
+
+BuildProcess::BuildProcess(std::string commandLineArgs, std::function<void(BuildProcess&, uint32_t)> callback, uint32_t _nodeId)
+    : BuildProcess(commandLineArgs)
+{
+    endOfProcessCallback = callback;
+    nodeId = _nodeId;
 }
 
 BuildProcess::~BuildProcess()
@@ -125,6 +144,8 @@ void BuildProcess::Update()
         {
             buffer[bytesRead] = '\0';
             outputStream << buffer; 
+
+            BuildSystem::Get()->LogOutputFromFile(buffer, nodeId);
         }
     }
 }

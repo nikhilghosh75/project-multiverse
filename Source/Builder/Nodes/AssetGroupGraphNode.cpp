@@ -37,7 +37,7 @@ void AssetGroupGraphNode::Start()
 
 	std::string command = GenerateCommandForFile(files[0]);
 
-	process = new BuildProcess(command);
+	process = new BuildProcess(command, id);
 	state = NodeState::InProgress;
 }
 

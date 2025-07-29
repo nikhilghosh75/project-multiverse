@@ -32,7 +32,7 @@ void VSProjectGraphNode::Start()
 	{
 		delete process;
 	}
-	process = new BuildProcess(command, std::bind(&VSProjectGraphNode::OnProjectBuildFinished, this, std::placeholders::_1, std::placeholders::_2));
+	process = new BuildProcess(command, std::bind(&VSProjectGraphNode::OnProjectBuildFinished, this, std::placeholders::_1, std::placeholders::_2), id);
 
 	projectBuildState = FileBuildState::InProgress;
 	state = NodeState::InProgress;
