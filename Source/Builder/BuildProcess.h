@@ -11,7 +11,9 @@ class BuildProcess
 {
 public:
 	BuildProcess(std::string commandLineArgs);
+	BuildProcess(std::string commandLineArgs, uint32_t nodeId);
 	BuildProcess(std::string commandLineArgs, std::function<void(BuildProcess&, uint32_t)>);
+	BuildProcess(std::string commandLineArgs, std::function<void(BuildProcess&, uint32_t)>, uint32_t nodeId);
 	~BuildProcess();
 
 	std::string GetOutput() const;
@@ -27,6 +29,7 @@ private:
 	std::stringstream outputStream;
 
 	bool startupSucceeded = true;
+	int nodeId;
 
 	PROCESS_INFORMATION pi;
 	uint32_t exitValue;

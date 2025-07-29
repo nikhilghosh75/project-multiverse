@@ -1,6 +1,8 @@
-#include "BuildUI.h"
-
 #include "BuildSystem.h"
+#include "BuilderTab.h"
+#include "Views/BuildDashboard.h"
+#include "Views/FileStatuses.h"
+#include "Views/TotalOutput.h"
 
 #include "Device.h"
 #include "ImGuiDevice.h"
@@ -12,8 +14,6 @@
 
 int main()
 {
-	BuildUI buildUI;
-
 	Window window;
 
 	ImGuiDevice device;
@@ -22,6 +22,10 @@ int main()
 	RenderManager renderingManager;
 
 	BuildSystem::Get()->Init();
+
+	BuilderTabSystem::Get()->AddTab(new BuildDashboard());
+	BuilderTabSystem::Get()->AddTab(new FileStatuses());
+	BuilderTabSystem::Get()->AddTab(new TotalOutput());
 
 	while (window.windowRunning)
 	{
@@ -32,7 +36,7 @@ int main()
 
 		BuildSystem::Get()->UpdateBuild();
 
-		buildUI.Render();
+		BuilderTabSystem::Get()->RenderTabs();
 
 		renderingManager.EndFrame();
 		device.EndFrame();

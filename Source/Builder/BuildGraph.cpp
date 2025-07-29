@@ -1,9 +1,9 @@
 #include "BuildGraph.h"
 
-#include "AssetGroupGraphNode.h"
-#include "CopyFolderGraphNode.h"
-#include "CopyVSGraphNode.h"
-#include "VSProjectGraphNode.h"
+#include "Nodes/AssetGroupGraphNode.h"
+#include "Nodes/CopyFolderGraphNode.h"
+#include "Nodes/CopyVSGraphNode.h"
+#include "Nodes/VSProjectGraphNode.h"
 
 void BuildGraph::Initialize(const std::string& buildFolderPath)
 {
@@ -33,8 +33,8 @@ void BuildGraph::AddFolderPath(const std::string& folderPath, const std::string&
 
 void BuildGraph::StartBuild()
 {
-	rootNode->Start();
-	nodesInProgress.push_back(rootNode);
+	AssignNodeIDs();
+	StartNode(rootNode);
 
 	currentState = BuildState::InProgress;
 }
@@ -96,6 +96,31 @@ void BuildGraph::CancelBuild()
 	}
 }
 
+BuildGraphNode* BuildGraph::GetNodeById(uint32_t id)
+{
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		
+		if (node->id == id)
+		{
+			return node;
+		}
+
+		nodesToSearch.pop_back();
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			nodesToSearch.push_back(node->children[i]);
+		}
+	}
+
+	return nullptr;
+}
+
 BuildState BuildGraph::GetCurrentState()
 {
 	return currentState;
@@ -149,8 +174,7 @@ void BuildGraph::AddNodeToBuild()
 		BuildGraphNode* node = nodesToSearch.back();
 		if (node->GetState() == NodeState::NotStarted)
 		{
-			node->Start();
-			nodesInProgress.push_back(node);
+			StartNode(node);
 			break;
 		}
 
@@ -164,6 +188,12 @@ void BuildGraph::AddNodeToBuild()
 			}
 		}
 	}
+}
+
+void BuildGraph::StartNode(BuildGraphNode* node)
+{
+	node->Start(); 
+	nodesInProgress.push_back(node);
 }
 
 bool BuildGraph::IsBuildComplete()
@@ -216,3 +246,37 @@ bool BuildGraph::DidBuildFail()
 	return didAnyNodeFail;
 }
 
+void BuildGraph::AssignNodeIDs()
+{
+	std::vector<BuildGraphNode*> nodesToSearch;
+	nodesToSearch.push_back(rootNode);
+	uint32_t currentNodeID = 1;
+
+	while (nodesToSearch.size() > 0)
+	{
+		BuildGraphNode* node = nodesToSearch.back();
+		node->id = currentNodeID;
+		currentNodeID++;
+		
+		nodesToSearch.pop_back();
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			nodesToSearch.push_back(node->children[i]);
+		}
+	}
+}
+
+std::string BuildGraphNode::GetCurrentFile()
+{
+	std::map<std::string, FileBuildState> fileStates = GetFileStates();
+	for (auto it = fileStates.begin(); it != fileStates.end(); ++it)
+	{
+		if (it->second == FileBuildState::InProgress)
+		{
+			return it->first;
+		}
+	}
+
+	return "";
+}

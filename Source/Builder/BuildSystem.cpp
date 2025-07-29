@@ -130,6 +130,8 @@ void BuildSystem::StartBuild()
 
 void BuildSystem::UpdateBuild()
 {
+	currentDatetime = DateTime::Now();
+
 	if (isBuildInProgress)
 	{
 		buildGraph.UpdateBuild();
@@ -159,6 +161,25 @@ void BuildSystem::CancelBuild()
 bool BuildSystem::IsBuildInProgress() const
 {
 	return isBuildInProgress;
+}
+
+void BuildSystem::LogOutputFromFile(char* buffer, uint32_t nodeId)
+{
+	int bufferLength = strlen(buffer);
+	output.seekg(0, std::ios::end);
+	int currentOutputSize = output.tellg();
+	output.seekg(0, std::ios::beg);
+
+	BuildGraphNode* node = buildGraph.GetNodeById(nodeId);
+
+	OutputLog log;
+	log.nodeId = nodeId;
+	log.filepath = node == nullptr ? "" : node->GetCurrentFile();
+	log.output = std::string(buffer);
+
+	fileOutputLogs.push_back(log);
+
+	output << nodeId << "> [" << currentDatetime.Str() << "] " << buffer << "\n";
 }
 
 std::string BuildSystem::ParseFilepath(const std::string& baseFilepath, std::optional<std::string>& projectPath)

@@ -46,8 +46,7 @@ void SkeletalSpriteRenderer::RenderSkeletalSpriteRequest(SkeletalSpriteRenderReq
 	verticesCount = request->vertices.size();
 
 	UpdateDescriptorSets();
-	PopulateBuffers(request->vertices, request->indices);
-	DispatchCommands();
+	DispatchCommands(request->vertices, request->indices);
 
 	currentIndex = (currentIndex + 1) % SkeletalSpriteRenderer::MAX_REQUESTS_IN_FLIGHT;
 
@@ -170,14 +169,7 @@ void SkeletalSpriteRenderer::UpdateDescriptorSets()
 	currentTexture->TransitionLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-void SkeletalSpriteRenderer::PopulateBuffers(std::vector<SkeletalSpriteVertex>& vertices, std::vector<unsigned int>& indices)
-{
-	ZoneScoped;
-	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex]);
-	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex]);
-}
-
-void SkeletalSpriteRenderer::DispatchCommands()
+void SkeletalSpriteRenderer::DispatchCommands(std::vector<SkeletalSpriteVertex>& vertices, std::vector<unsigned int>& indices)
 {
 	ZoneScoped;
 	VkCommandBuffer commandBuffer = commandBuffers[currentIndex];
@@ -197,6 +189,30 @@ void SkeletalSpriteRenderer::DispatchCommands()
 	VkClearValue clearColor = { {{1.0f, 0.0f, 0.0f, 1.0f}} };
 	renderPassInfo.clearValueCount = 1;
 	renderPassInfo.pClearValues = &clearColor;
+
+	Device::Get()->PopulateBufferFromVector(vertices, vertexBuffers[currentIndex], vertexBufferMemories[currentIndex], commandBuffer);
+	Device::Get()->PopulateBufferFromVector(indices, indexBuffers[currentIndex], indexBufferMemories[currentIndex], commandBuffer);
+
+	VkBufferMemoryBarrier barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.buffer = vertexBuffers[currentIndex];
+	barrier.offset = 0;
+	barrier.size = VK_WHOLE_SIZE;
+
+	vkCmdPipelineBarrier(
+		commandBuffer,
+		VK_PIPELINE_STAGE_TRANSFER_BIT,         // srcStageMask
+		VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,     // dstStageMask
+		0,
+		0, nullptr,                             // No memory barriers
+		1, &barrier,                            // One buffer memory barrier
+		0, nullptr                              // No image barriers
+	);
+
 
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 

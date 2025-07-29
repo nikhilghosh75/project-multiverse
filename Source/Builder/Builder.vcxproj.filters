@@ -18,9 +18,6 @@
     <ClCompile Include="Builder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BuildUI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BuildSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,23 +30,35 @@
     <ClCompile Include="BuildGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VSProjectGraphNode.cpp">
+    <ClCompile Include="Nodes\VSProjectGraphNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AssetGroupGraphNode.cpp">
+    <ClCompile Include="Nodes\AssetGroupGraphNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CopyVSGraphNode.cpp">
+    <ClCompile Include="Nodes\CopyVSGraphNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CopyFolderGraphNode.cpp">
+    <ClCompile Include="Nodes\CopyFolderGraphNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\BuildDashboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BuilderTab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\FileStatuses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\TotalOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\FileOutput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BuildUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BuildSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -62,16 +71,31 @@
     <ClInclude Include="BuildGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VSProjectGraphNode.h">
+    <ClInclude Include="Nodes\VSProjectGraphNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AssetGroupGraphNode.h">
+    <ClInclude Include="Nodes\AssetGroupGraphNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CopyVSGraphNode.h">
+    <ClInclude Include="Nodes\CopyVSGraphNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CopyFolderGraphNode.h">
+    <ClInclude Include="Nodes\CopyFolderGraphNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\BuildDashboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BuilderTab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\FileStatuses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\TotalOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\FileOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

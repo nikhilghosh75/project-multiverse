@@ -4,8 +4,9 @@
 
 #include "DateTime.h"
 
-#include <string>
 #include <optional>
+#include <sstream>
+#include <string>
 #include <vector>
 
 struct BuildInfo
@@ -29,11 +30,23 @@ public:
 
 	bool IsBuildInProgress() const;
 
+	void LogOutputFromFile(char* buffer, uint32_t nodeId);
+
 	std::optional<std::string> buildFolderPath;
 
 	std::vector<BuildInfo> previousBuilds;
 
 	BuildGraph buildGraph;
+
+	struct OutputLog
+	{
+		uint32_t nodeId;
+		std::string filepath;
+		std::string output;
+	};
+
+	std::vector<OutputLog> fileOutputLogs;
+	std::stringstream output;
 
 private:
 	std::string ParseFilepath(const std::string& baseFilepath, std::optional<std::string>& project);
@@ -44,6 +57,8 @@ private:
 
 	std::vector<BuildConfig> configs;
 	std::vector<std::string> foldersToCopy;
+
+	DateTime currentDatetime;
 
 	bool isBuildInProgress = false;
 
