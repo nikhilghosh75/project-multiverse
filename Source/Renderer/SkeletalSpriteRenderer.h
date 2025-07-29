@@ -77,8 +77,7 @@ private:
 	void CreateDescriptorSets();
 
 	void UpdateDescriptorSets();
-	void PopulateBuffers(std::vector<SkeletalSpriteVertex>& vertices, std::vector<unsigned int>& indices);
-	void DispatchCommands();
+	void DispatchCommands(std::vector<SkeletalSpriteVertex>& vertices, std::vector<unsigned int>& indices);
 
 	std::array<VkBuffer, MAX_REQUESTS_IN_FLIGHT> vertexBuffers;
 	std::array<VkDeviceMemory, MAX_REQUESTS_IN_FLIGHT> vertexBufferMemories;
