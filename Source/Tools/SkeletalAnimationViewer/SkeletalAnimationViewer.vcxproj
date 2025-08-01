@@ -150,6 +150,7 @@
     <ClCompile Include="Views\LayerHierarchyView.cpp" />
     <ClCompile Include="Views\LayerImageView.cpp" />
     <ClCompile Include="Views\MainView.cpp" />
+    <ClCompile Include="Views\TempBoneView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Vendor\imgui\ImGui.vcxproj">
@@ -178,6 +179,7 @@
     <ClInclude Include="Views\LayerHierarchyView.h" />
     <ClInclude Include="Views\LayerImageView.h" />
     <ClInclude Include="Views\MainView.h" />
+    <ClInclude Include="Views\TempBoneView.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
