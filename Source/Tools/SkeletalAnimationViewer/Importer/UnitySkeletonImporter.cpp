@@ -80,20 +80,36 @@ void ParseBones(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo, gl
 		bone.localPosition = localPosition;
 		bone.localRotation = ParseRotation(boneRotation);
 		bone.length = boneLength;
+		bone.parent = nullptr;
 
 		debugInfo.boneNameToIndex.insert({ (std::string)boneName, skeleton.bones.size() });
 		skeleton.bones.push_back(bone);
 
+		// If the bone has a parent, store it and figure out the bone's positions after the vector is properly allocated
 		if (boneParentIndex != -1)
 		{
 			bonesToParentIndices.insert({ skeleton.bones.size() - 1, boneParentIndex });
 		}
 	}
-
+	
 	for (auto it : bonesToParentIndices)
 	{
 		skeleton.bones[it.first].parent = &skeleton.bones[it.second];
 		skeleton.bones[it.second].children.push_back(&skeleton.bones[it.first]);
+	}
+
+	// Calculate the inverse bind poses of all the bones
+	for (int i = 0; i < skeleton.bones.size(); i++)
+	{
+		if (skeleton.bones[i].parent != nullptr)
+		{
+			skeleton.bones[i].inverseBindPose = glm::inverse(skeleton.bones[i].parent->GetAbsoluteTransform()
+				* skeleton.bones[i].GetLocalTransform());
+		}
+		else
+		{
+			skeleton.bones[i].inverseBindPose = glm::inverse(skeleton.bones[i].GetLocalTransform());
+		}
 	}
 }
 
@@ -443,9 +459,9 @@ void ParseRig(YAML& yaml, Skeleton& skeleton, SkeletonDebugInfo& debugInfo)
 				layerInfo->vertices = ParseSpriteVertices(yaml, &(*child));
 				CalculateUVPositions(layerInfo, layerInfo->vertices, textureWidth, textureHeight);
 
-				for (SpriteVertex vertex : layerInfo->vertices)
+				for (SpriteVertex& vertex : layerInfo->vertices)
 				{
-					for (BoneWeight weight : vertex.weights)
+					for (BoneWeight& weight : vertex.weights)
 					{
 						if (weight.boneWeight > 0)
 						{

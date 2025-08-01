@@ -268,7 +268,7 @@ std::vector<SkeletalSpriteVertex> SkeletalSpriteRenderer::ComputeVertices(Skelet
 		float layerValue = (float)currentLayer / (float)sprite.layers.size();
 		for (SpriteVertex& spriteVertex : layer.vertices)
 		{
-			glm::vec2 vertexOffset = glm::vec2(spriteVertex.position.x, -spriteVertex.position.y) + glm::vec2(layer.center.x - layer.width * 0.5f, layer.center.y + layer.height * 0.5f);
+			glm::vec2 vertexOffset = glm::vec2(spriteVertex.skinnedPosition.x, -spriteVertex.skinnedPosition.y);
 			glm::vec2 screenPosition = position.GetScreenPosition() + glm::vec2(vertexOffset.x / screenExtent.width, vertexOffset.y / screenExtent.height) * scale;
 			vertices.push_back({ screenPosition, spriteVertex.uv, layerValue });
 		}

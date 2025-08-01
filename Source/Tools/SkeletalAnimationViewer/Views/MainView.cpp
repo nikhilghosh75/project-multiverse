@@ -166,6 +166,20 @@ void MainView::Render()
 	unsigned int width = 5000;
 	unsigned int height = 5000;
 
+	VkImageSubresourceRange imageSubresourceRange;
+	imageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	imageSubresourceRange.baseMipLevel = 0;
+	imageSubresourceRange.levelCount = 1;
+	imageSubresourceRange.baseArrayLayer = 0;
+	imageSubresourceRange.layerCount = 1;
+
+	VkCommandBuffer commandBuffer = Device::Get()->BeginSingleTimeCommands();
+
+	VkClearColorValue clearColorValue = { 0.0, 0.0, 0.0, 0.0 };
+	vkCmdClearColorImage(commandBuffer, offscreenImages[currentImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColorValue, 1, &imageSubresourceRange);
+
+	Device::Get()->EndSingleTimeCommands(commandBuffer);
+
 	RenderPass renderPass;
 	renderPass.extents = { width, height };
 	renderPass.framebuffer = offscreenFramebuffers[currentImageIndex];
@@ -174,9 +188,6 @@ void MainView::Render()
 	Device::Get()->SetOverrideRenderPass(renderPass);
 
 	RenderSprites(width, height);
-	// RenderEntireTexture(width, height);
-	// RenderBones(width, height);
-	// RenderVertices(width, height);
 
 	SubmitRenderRequests();
 
@@ -199,9 +210,7 @@ void MainView::RenderSprites(int width, int height)
 	int halfWidth = width / 2;
 	int halfHeight = height / 2;
 
-	// Render all of the images in the file one at a time
-	int index = 0;
-	std::vector<SkeletalSprite::Layer>& layers = SkeletalAnimationLoader::Get()->sprite.layers;
+	SkeletalAnimationLoader::Get()->sprite.SkinVertices();
 
 	SkeletalSpriteRenderer::Get()->AddSkeletalSprite(SkeletalAnimationLoader::Get()->sprite, ScreenCoordinate(glm::vec2(0, 0), glm::vec2(0.1, 0.1)), 1.5f);
 

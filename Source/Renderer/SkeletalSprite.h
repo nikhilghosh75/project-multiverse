@@ -14,11 +14,14 @@ class Bone
 public:
 	glm::vec2 localPosition;
 	float localRotation;
+	glm::mat4 inverseBindPose;
+
 	std::vector<Bone*> children;
 	Bone* parent;
 	float length;
 
 	glm::mat4 GetLocalTransform() const;
+	glm::mat4 GetAbsoluteTransform() const;
 
 	glm::vec2 GetAbsolutePosition() const;
 	float GetAbsoluteRotation() const;
@@ -34,6 +37,7 @@ struct SpriteVertex
 {
 	glm::vec2 position;
 	glm::vec2 uv;
+	glm::vec2 skinnedPosition;
 	std::array<BoneWeight, 4> weights;
 };
 
@@ -63,6 +67,8 @@ public:
 		float width;
 		float height;
 	};
+
+	void SkinVertices();
 
 	std::vector<Layer> layers;
 	Skeleton skeleton;

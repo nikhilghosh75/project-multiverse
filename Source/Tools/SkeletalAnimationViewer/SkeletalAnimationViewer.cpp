@@ -3,6 +3,7 @@
 #include "Importer/UnitySkeletonImporter.h"
 #include "Views/LayerHierarchyView.h"
 #include "Views/MainView.h"
+#include "Views/TempBoneView.h"
 
 #include "PhotoshopAPI/include/PhotoshopAPI.h"
 
@@ -43,6 +44,7 @@ int main()
 
 	SkeletalAnimationTabSystem::Get()->AddTab(new MainView());
 	SkeletalAnimationTabSystem::Get()->AddTab(new LayerHierarchyView());
+	SkeletalAnimationTabSystem::Get()->AddTab(new TempBoneView());
 
 	while (window.windowRunning)
 	{
